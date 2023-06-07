@@ -1,0 +1,48 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 80px);
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar{
+    display: none;
+  }
+}
+.select {
+  width: calc(100% - 2px);
+}
+
+.toggle {
+  display: flex;
+  flex-direction: row;
+  .toggler {
+    width: 45px;
+  }
+
+  .description {
+    margin-left: 16px;
+  }
+}
+
+.preferences {
+  margin-bottom: 40px;
+}
+.impressum, .version {
+  border-top: 1px solid #595959;
+
+  p {
+    margin-top: 16px;
+    font-size: 12px;
+  }
+}
+
+.impressum {
+  margin-bottom: 20px;
+}
+
+.spellchecker-version {
+  font-size: 10px;
+  text-align: right;
+  margin-right: 2px;
+}
