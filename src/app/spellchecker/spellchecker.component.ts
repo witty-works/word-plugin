@@ -156,11 +156,9 @@ export class SpellcheckerComponent {
     });
     if (e instanceof Error) {
       if (e.message.startsWith("Could not find range for chunk: ")) {
-        this.error = e.message.replace("Could not find range for chunk: ", "");
-        this.error = "Betg chattà il paragraf: " + this.error;
+        // this.error = e.message.replace("Could not find range for chunk: ", "..");
       } else if(e.message.startsWith("The range for the error was not found: ")) {
-        this.error = e.message.replace("The range for the error was not found: ", "");
-        this.error = "Betg chattà il pled: " + this.error;
+        // this.error = e.message.replace("The range for the error was not found: ", "..");
       } else {
         this.error = e.message;
       }

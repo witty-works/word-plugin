@@ -1,36 +1,37 @@
-<button (click)="checkGrammar()">Controllar l'ortografia</button>
+<button (click)="checkGrammar()">Witty Check</button>
 
 <div *ngIf="spellingErrors.length > 0" class="number-spelling-errors">
-    Chattà {{ spellingErrors.length }} propostas:
+    {{ spellingErrors.length }} proposals:
 </div>
-<app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphs"
-                 (highlightEvent)="highlight($event)"
-                 (acceptSuggestionEvent)="acceptSuggestion($event)"
-                 (ignoreWordEvent)="ignoreWord($event)"
-                 *ngIf="!isFirstRun && spellingErrors.length > 0"></app-errors-list>
+<app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphs" (highlightEvent)="highlight($event)"
+    (acceptSuggestionEvent)="acceptSuggestion($event)" (ignoreWordEvent)="ignoreWord($event)"
+    *ngIf="!isFirstRun && spellingErrors.length > 0"></app-errors-list>
 
 <div class="full-size-notification" *ngIf="isFirstRun">
-    <span>Cliccar sin «Controllar l’ortografia», lura vegnan eventuals sbagls ortografics mussads en ina glista. <br><br>
-        Cun in clic sin in pled en la glista vegn quel selecziunà en il document ed il program fa propostas da correctura. Cliccar sin ina proposta per l'acceptar.</span>
+    <span>Click «Witty Check», to get suggestions</span>
 </div>
 
 <div class="full-size-notification" *ngIf="!isFirstRun && spellingErrors.length === 0">
-    <span>Chattà nagins sbagls.</span>
+    <span>Analyzing text ..</span>
 </div>
 
-<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="line-scale" [fullScreen]="true" [showSpinner]="isSpellchecking"><p style="color: white" > Curreger... </p></ngx-spinner>
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="line-scale" [fullScreen]="true"
+    [showSpinner]="isSpellchecking">
+    <p style="color: white">Suggesting ... </p>
+</ngx-spinner>
 
 <modal #errorModal>
     <modal-header>
-        <h4>Betg chattà</h4>
+        <h4>Error</h4>
     </modal-header>
     <modal-content>
         <p>{{ error }}</p>
 
-        <p style="margin-top: 24px;">Nus recummandain da tschertgar danovamain sbagls.</p>
+        <p style="margin-top: 24px;">Please try again.</p>
     </modal-content>
     <modal-footer>
-        <button class="secondary" (click)="errorModal.close(false)" style="margin-right: 12px;">Na, cuntinuar</button>
-        <button (click)="errorModal.close(true)">Gea, tschertgar</button>
+        <button class="secondary" (click)="errorModal.close(false)" style="margin-right: 12px;">No, do not analyze
+            again</button>
+        <button (click)="errorModal.close(true)">Yes, analyze the text again</button>
     </modal-footer>
 </modal>

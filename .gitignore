@@ -92,7 +92,7 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist/addin
+dist/word-plugin
 
 # Gatsby files
 .cache/

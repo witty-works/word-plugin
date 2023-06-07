@@ -1,19 +1,4 @@
 <div class="preferences">
-    Idiom per la correctura:
-    <div class="select">
-        <select name="language" id="language" [ngModel]="language" (ngModelChange)="languageSelected($event)">
-            <option value="puter" disabled>Puter</option>
-            <option value="rumgr">Rumantsch Grischun</option>
-            <option value="surmiran">Surmiran</option>
-            <option value="sursilvan" disabled>Sursilvan</option>
-            <option value="sutsilvan">Sutsilvan</option>
-            <option value="vallader" disabled>Vallader</option>
-        </select>
-    </div>
-    <div class="spellchecker-version">{{ spellcheckerService.version }}</div>
-
-    <br>
-
     <div class="toggle">
         <div class="toggler">
             <div class="check-box">
@@ -21,7 +6,7 @@
             </div>
         </div>
         <div class="description">
-            Mussar context
+            Show context
         </div>
     </div>
 </div>
@@ -29,18 +14,13 @@
 <div>
     <div class="impressum">
         <p>
-            La controlla ortografica rumantscha è in project da la <a href="https://www.rumantsch.ch/" target="_blank">Pro Svizra Rumantscha</a>
-            realisà en collaboraziun cun la <a href="http://www.liarumantscha.ch" target="_blank">Lia Rumantscha</a>.
-            L'Uffizi federal da cultura ed il Chantun Grischun sustegnan finanzialmain il project.
-        </p>
-
-        <p>
-            <a href="https://www.far.ch" target="_blank">far.ch</a> ha sviluppà quest add-in.
+            This Word Plugin is provided by <a href="https://www.witty.works/" target="_blank">Witty
+                Works AG</a>
         </p>
     </div>
     <div class="version">
         <p>
-            Versiun da l'add-in: {{ appVersion }}
+            Witty Word Plugin Version: {{ appVersion }}
         </p>
     </div>
 </div>

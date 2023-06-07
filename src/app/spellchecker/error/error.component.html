@@ -3,14 +3,16 @@
         <div class="header" (click)="toggle()">
             <div class="preview" *ngIf="showContext" [innerHTML]="getContext(error.word) | highlight:error.word"></div>
             <div class="preview" *ngIf="!showContext">{{ error.word }}</div>
-            <div class="toggle" [class.active]="isOpen"><img src="assets/icons/chevron-down.svg" alt="Icon that indicates, if box is open"></div>
+            <div class="toggle" [class.active]="isOpen"><img src="assets/icons/chevron-down.svg"
+                    alt="Icon that indicates, if box is open"></div>
         </div>
         <div class="suggestions" *ngIf="isOpen">
-            <div class="suggestion-title">Propostas:</div>
-            <button *ngFor="let suggestion of suggestions" (click)="acceptSuggestion(suggestion)">{{ suggestion }}</button>
+            <div class="suggestion-title">Proposal:</div>
+            <button *ngFor="let suggestion of suggestions" (click)="acceptSuggestion(suggestion)">{{ suggestion
+                }}</button>
 
             <div class="ignore-button-container">
-                <button class="secondary" (click)="ignoreWord(error.word)">Agiuntar al dicziunari persunal</button>
+                <button class="secondary" (click)="ignoreWord(error.word)">Add to personal ignore list</button>
             </div>
         </div>
     </div>

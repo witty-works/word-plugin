@@ -1,8 +1,8 @@
 {
-  "name": "spellchecker-addin-office",
+  "name": "witty-word-plugin",
   "version": "1.0.6",
   "scripts": {
-    "build": "ng build --configuration production --base-href=/addin/",
+    "build": "ng build --configuration production --base-href=/word-plugin/",
     "build:test": "ng build --configuration test",
     "build:dev": "ng build",
     "dev-server": "bash -c \"ng serve --ssl --ssl-key ~/.office-addin-dev-certs/localhost.key --ssl-cert ~/.office-addin-dev-certs/localhost.crt\"",
@@ -22,7 +22,7 @@
     "validate": "office-toolbox validate -m ./src/manifest.xml",
     "validate:prod": "office-toolbox validate -m ./src/manifest-prod.xml"
   },
-  "license": "MIT",
+  "license": "propietary",
   "config": {
     "app-to-debug": "word",
     "app-type-to-debug": "desktop",

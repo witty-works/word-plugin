@@ -1,60 +1,62 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
-           xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
-           xsi:type="TaskPaneApp">
-  <Id>f1f7b009-6c3f-4431-90d8-141cf47757a1</Id>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+  xsi:type="TaskPaneApp">
+  <Id>5452ee64-ed62-411c-b9da-8e8acc512614</Id>
   <Version>1.0.0</Version>
   <ProviderName>far ScRL</ProviderName>
-  <DefaultLocale>de</DefaultLocale>
-  <DisplayName DefaultValue="Controlla ortografica DEV"/>
-  <Description DefaultValue="In program da controlla ortografica rumantscha."/>
-  <IconUrl DefaultValue="https://localhost:4200/assets/icon-32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://localhost:4200/assets/icon-64.png"/>
-  <SupportUrl DefaultValue="https://addin.pledarigrond.ch/help.html"/>
+  <DefaultLocale>en</DefaultLocale>
+  <DisplayName DefaultValue="Witty Inclusive Writing DEV" />
+  <Description
+    DefaultValue="Witty educates employees on bias and changes their real-life behavior, within hours. " />
+  <IconUrl DefaultValue="https://localhost:4200/assets/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://localhost:4200/assets/icon-64.png" />
+  <SupportUrl DefaultValue="https://www.witty.works/en/help/wittys-help-center" />
   <AppDomains>
-    <AppDomain>https://www.pledarigrond.ch</AppDomain>
+    <AppDomain>https://www.witty.works</AppDomain>
   </AppDomains>
   <Hosts>
-    <Host Name="Document"/>
+    <Host Name="Document" />
   </Hosts>
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://localhost:4200/index.html"/>
+    <SourceLocation DefaultValue="https://localhost:4200/word-plugin/index.html" />
   </DefaultSettings>
   <Permissions>ReadWriteDocument</Permissions>
-  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+    xsi:type="VersionOverridesV1_0">
     <Hosts>
       <Host xsi:type="Document">
         <DesktopFormFactor>
           <GetStarted>
-            <Title resid="GetStarted.Title"/>
-            <Description resid="GetStarted.Description"/>
-            <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
+            <Title resid="GetStarted.Title" />
+            <Description resid="GetStarted.Description" />
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl" />
           </GetStarted>
           <ExtensionPoint xsi:type="PrimaryCommandSurface">
             <OfficeTab id="TabHome">
               <Group id="CommandsGroup">
-                <Label resid="CommandsGroup.Label"/>
+                <Label resid="CommandsGroup.Label" />
                 <Icon>
-                  <bt:Image size="16" resid="Icon.16x16"/>
-                  <bt:Image size="32" resid="Icon.32x32"/>
-                  <bt:Image size="80" resid="Icon.80x80"/>
+                  <bt:Image size="16" resid="Icon.16x16" />
+                  <bt:Image size="32" resid="Icon.32x32" />
+                  <bt:Image size="80" resid="Icon.80x80" />
                 </Icon>
                 <Control xsi:type="Button" id="TaskpaneButton">
-                  <Label resid="TaskpaneButton.Label"/>
+                  <Label resid="TaskpaneButton.Label" />
                   <Supertip>
-                    <Title resid="TaskpaneButton.Label"/>
-                    <Description resid="TaskpaneButton.Tooltip"/>
+                    <Title resid="TaskpaneButton.Label" />
+                    <Description resid="TaskpaneButton.Tooltip" />
                   </Supertip>
                   <Icon>
-                    <bt:Image size="16" resid="Icon.16x16"/>
-                    <bt:Image size="32" resid="Icon.32x32"/>
-                    <bt:Image size="80" resid="Icon.80x80"/>
+                    <bt:Image size="16" resid="Icon.16x16" />
+                    <bt:Image size="32" resid="Icon.32x32" />
+                    <bt:Image size="80" resid="Icon.80x80" />
                   </Icon>
                   <Action xsi:type="ShowTaskpane">
                     <TaskpaneId>ButtonId1</TaskpaneId>
-                    <SourceLocation resid="Taskpane.Url"/>
+                    <SourceLocation resid="Taskpane.Url" />
                   </Action>
                 </Control>
               </Group>
@@ -65,22 +67,29 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://localhost:4200/assets/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://localhost:4200/assets/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://localhost:4200/assets/icon-80.png"/>
+        <bt:Image id="Icon.16x16"
+          DefaultValue="https://localhost:4200/assets/icon-16.png" />
+        <bt:Image id="Icon.32x32"
+          DefaultValue="https://localhost:4200/assets/icon-32.png" />
+        <bt:Image id="Icon.80x80"
+          DefaultValue="https://localhost:4200/assets/icon-80.png" />
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://addin.pledarigrond.ch/help.html"/>
-        <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:4200/index.html"/>
+        <bt:Url id="GetStarted.LearnMoreUrl"
+          DefaultValue="https://www.witty.works/en/help/wittys-help-center" />
+        <bt:Url id="Taskpane.Url"
+          DefaultValue="https://localhost:4200/word-plugin/index.html" />
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="GetStarted.Title" DefaultValue="Curreger texts en Word"/>
-        <bt:String id="CommandsGroup.Label" DefaultValue="Correctura"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="Ortografia rumantscha DEV"/>
+        <bt:String id="GetStarted.Title" DefaultValue="GetStarted.Title" />
+        <bt:String id="CommandsGroup.Label" DefaultValue="Writing" />
+        <bt:String id="TaskpaneButton.Label" DefaultValue="Witty - Inclusive Writing" />
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="GetStarted.Description" DefaultValue="La controlla ortografica rumantscha è installada correctamain. En il tab «Start» da Word datti ussa in nov butttun «Ortografia rumantscha»."/>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Cliccar per mussar il program da controlla rumantsch"/>
+        <bt:String id="GetStarted.Description"
+          DefaultValue="Witty analyzes text and highlights non-inclusive language in real time. Detect bias, simple and fast." />
+        <bt:String id="TaskpaneButton.Tooltip"
+          DefaultValue="TaskpaneButton.Tooltip" />
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>
