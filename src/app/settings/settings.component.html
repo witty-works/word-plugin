@@ -1,0 +1,26 @@
+<div class="preferences">
+    <div class="toggle">
+        <div class="toggler">
+            <div class="check-box">
+                <input type="checkbox" [ngModel]="showContext" (ngModelChange)="showContextChanged($event)">
+            </div>
+        </div>
+        <div class="description">
+            Show context
+        </div>
+    </div>
+</div>
+
+<div>
+    <div class="impressum">
+        <p>
+            This Word Plugin is provided by <a href="https://www.witty.works/" target="_blank">Witty
+                Works AG</a>
+        </p>
+    </div>
+    <div class="version">
+        <p>
+            Witty Word Plugin Version: {{ appVersion }}
+        </p>
+    </div>
+</div>

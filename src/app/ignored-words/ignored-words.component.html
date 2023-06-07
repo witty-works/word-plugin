@@ -1,0 +1,5 @@
+Click on a word in the list to remove it from the ignore word list.
+
+<ul class="words-list">
+    <li *ngFor="let word of words">- {{ word }} (<span (click)="remove(word)" class="action-link">allontanar</span>)</li>
+</ul>
