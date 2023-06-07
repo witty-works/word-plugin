@@ -1,9 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
-import { SpellcheckerService } from "../services/spellchecker.service";
+import { CheckingService } from "../services/checking.service";
 import WordUtils from "../utils/word.utils";
 import { ISpellingError } from "../data/data-structures";
 import { UserDictionaryService } from "../services/user-dictionary.service";
 import { ModalComponent } from "@independer/ng-modal/modal.component";
+import { IAlternatives } from "../data/types";
 
 /* global Word */
 
@@ -29,7 +30,7 @@ export class SpellcheckerComponent {
   error = "";
 
   constructor(
-      private spellcheckerService: SpellcheckerService,
+      private spellcheckerService: CheckingService,
       private userDictionaryService: UserDictionaryService,
   ) {
   }
@@ -51,18 +52,30 @@ export class SpellcheckerComponent {
         this.spellingErrors = [];
         for (let paragraphIndex = 0; paragraphIndex < this.paragraphs.length; paragraphIndex++) {
           const paragraph = this.paragraphs[paragraphIndex];
-          const errs = await this.spellcheckerService.proofreadText(paragraph);
-          errs.forEach(e => {
-            if (this.userDictionaryService.isInDictionary(e.word)) {
-              return;
+          try {
+            const errs = await this.spellcheckerService.checkText(paragraph);
+            if (!errs) {
+              continue;
             }
-            this.spellingErrors.push({
-              paragraph: paragraphIndex,
-              offset: e.offset,
-              length: e.length,
-              word: e.word,
+            console.log(errs);
+            errs.results.forEach(e => {
+              // TODO: check if in ignore list
+
+              this.spellingErrors.push({
+                paragraph: paragraphIndex,
+                offset: e.start,
+                length: e.end - e.start,
+                word: e.text,
+                details: e
+              });
             });
-          });
+          } catch (e: any) {
+            if (e.name === 'HttpErrorResponse' && e.status === 422) {
+              continue;
+            }
+            console.error(e);
+          }
+
         }
       } catch (e) {
         // @ts-ignore
@@ -89,7 +102,7 @@ export class SpellcheckerComponent {
     });
   }
 
-  acceptSuggestion(obj: {paragraphIndex: number, errorIndex: number, suggestion: string }) {
+  acceptSuggestion(obj: {paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
     Word.run(async (context) => {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
@@ -97,7 +110,7 @@ export class SpellcheckerComponent {
         const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText);
         const errorRange = await WordUtils.getWordRange(context, paragraphRange, errorText);
 
-        errorRange.insertText(obj.suggestion, 'Replace');
+        errorRange.insertText(obj.suggestion.text, 'Replace');
         errorRange.select('End');
 
         const newParagraph = paragraphRange.paragraphs.getFirst();

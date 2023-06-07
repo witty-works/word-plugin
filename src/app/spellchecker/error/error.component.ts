@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ITextWithPosition } from "../../data/data-structures";
+import { ISpellingError } from "../../data/data-structures";
 import TextUtils from "../../utils/text.utils";
-import { SpellcheckerService } from "../../services/spellchecker.service";
+import { CheckingService } from "../../services/checking.service";
+import {IAlternatives} from "../../data/types";
 
 @Component({
   selector: 'app-error',
@@ -11,7 +12,7 @@ import { SpellcheckerService } from "../../services/spellchecker.service";
 export class ErrorComponent {
 
   @Input()
-  error?: ITextWithPosition;
+  error?: ISpellingError;
 
   @Input()
   context?: string;
@@ -23,17 +24,17 @@ export class ErrorComponent {
   highlightEvent = new EventEmitter();
 
   @Output()
-  acceptSuggestionEvent = new EventEmitter<{ suggestion: string }>();
+  acceptSuggestionEvent = new EventEmitter<{ suggestion: IAlternatives }>();
 
   @Output()
   ignoreWordEvent = new EventEmitter<{ word: string }>();
 
   isOpen = false;
 
-  suggestions: string[] = [];
+  suggestions: IAlternatives[] = [];
 
 
-  constructor(private spellcheckerService: SpellcheckerService) {
+  constructor(private spellcheckerService: CheckingService) {
   }
 
   getContext(word: string) {
@@ -43,7 +44,7 @@ export class ErrorComponent {
   async toggle(): Promise<void> {
     if (!this.isOpen) {
       this.isOpen = true;
-      this.suggestions = await this.spellcheckerService.getSuggestions(this.error!.word);
+      this.suggestions = await this.spellcheckerService.getSuggestions(this.error!);
       this.sendHighlight()
     } else {
       this.isOpen = false;
@@ -54,7 +55,7 @@ export class ErrorComponent {
     this.highlightEvent.emit();
   }
 
-  acceptSuggestion(suggestion: string) {
+  acceptSuggestion(suggestion: IAlternatives) {
     this.acceptSuggestionEvent.emit({ suggestion });
   }
 

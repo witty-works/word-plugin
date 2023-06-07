@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { ISpellingError } from "../../data/data-structures";
 import { SettingsService } from "../../services/settings.service";
 import { Subscription } from "rxjs";
+import { IAlternatives } from "../../data/types";
 
 @Component({
   selector: 'app-errors-list',
@@ -20,7 +21,7 @@ export class ErrorsListComponent implements OnInit, OnDestroy {
   highlightEvent = new EventEmitter<{ paragraphIndex: number, errorIndex: number }>();
 
   @Output()
-  acceptSuggestionEvent = new EventEmitter<{ paragraphIndex: number, errorIndex: number, suggestion: string }>();
+  acceptSuggestionEvent = new EventEmitter<{ paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }>();
 
   @Output()
   ignoreWordEvent = new EventEmitter<{ paragraphIndex: number, errorIndex: number, word: string }>();
@@ -48,7 +49,7 @@ export class ErrorsListComponent implements OnInit, OnDestroy {
     this.highlightEvent.emit({ paragraphIndex, errorIndex });
   }
 
-  acceptSuggestion(paragraphIndex: number, errorIndex: number, childObj: { suggestion: string }) {
+  acceptSuggestion(paragraphIndex: number, errorIndex: number, childObj: { suggestion: IAlternatives }) {
     this.acceptSuggestionEvent.emit({ paragraphIndex, errorIndex, suggestion: childObj.suggestion });
   }
 

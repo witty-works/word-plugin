@@ -16,6 +16,7 @@
   <SupportUrl DefaultValue="https://www.witty.works/en/help/wittys-help-center" />
   <AppDomains>
     <AppDomain>https://www.witty.works</AppDomain>
+    <AppDomain>https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Document" />

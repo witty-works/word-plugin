@@ -8,8 +8,7 @@
         </div>
         <div class="suggestions" *ngIf="isOpen">
             <div class="suggestion-title">Proposal:</div>
-            <button *ngFor="let suggestion of suggestions" (click)="acceptSuggestion(suggestion)">{{ suggestion
-                }}</button>
+            <button *ngFor="let suggestion of suggestions" (click)="acceptSuggestion(suggestion)">{{ suggestion.text }}</button>
 
             <div class="ignore-button-container">
                 <button class="secondary" (click)="ignoreWord(error.word)">Add to personal ignore list</button>
