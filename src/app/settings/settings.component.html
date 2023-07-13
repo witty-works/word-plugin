@@ -1,80 +1,79 @@
 <div>
-    <div class="witty-works-ext-header"> 
-        <img src="assets/icons/witty-logo.svg" alt="Icon that shows the logo of Witty Works" (click)="openWittyHomePage()">
-        <img src="assets/icons/settings.svg" alt="Settings icon that leads to the Witty dashboard" (click)="openDashboard()">
-    </div>
+    <nav aria-label="Witty Works Navigation" class="witty-works-ext-header">
+        <img src="assets/icons/witty-logo.svg" alt="Icon that shows the logo of Witty Works" role="link" tabindex="0" (keydown.enter)="openWittyHomePage()" (click)="openWittyHomePage()">
+        <img src="assets/icons/settings.svg" alt="Settings icon that leads to the Witty dashboard" role="link" tabindex="0" (keydown.enter)="openDashboard()" (click)="openDashboard()">
+    </nav>
 
     <div class='witty-works-ext-separator'></div>
 
-    <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-space-between'>
-        <div class='witty-works-ext-lato-popup-title'>
+    <section class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-space-between'>
+        <h1 class='witty-works-ext-lato-popup-title'>
             Quick Settings
-        </div>
-    </div>
+        </h1>
+    </section>
 
-    <div class="toggle">
+    <section class="toggle" aria-labelledby="toggle-description-1">
         <div class="toggler">
             <div class="check-box">
-                <input type="checkbox" [ngModel]="checkUpperAndLowerCase" (ngModelChange)="checkUpperAndLowerCaseChanged($event)">
+                <input type="checkbox" id="toggle-checkbox-1" [ngModel]="checkUpperAndLowerCase" (ngModelChange)="checkUpperAndLowerCaseChanged($event)">
             </div>
         </div>
-        <div class="description">
+        <label for="toggle-checkbox-1" id="toggle-description-1" class="description">
             Check upper & lower case
-        </div>
-    </div>
+        </label>
+    </section>
 
-
-    <div class="toggle">
+    <section class="toggle" aria-labelledby="toggle-description-2">
         <div class="toggler">
             <div class="check-box">
-                <input type="checkbox" [ngModel]="checkGrammarAndSpelling" (ngModelChange)="checkGrammarAndSpellingChanged($event)">
+                <input type="checkbox" id="toggle-checkbox-2" [ngModel]="checkGrammarAndSpelling" (ngModelChange)="checkGrammarAndSpellingChanged($event)">
             </div>
         </div>
-        <div class="description">
+        <label for="toggle-checkbox-2" id="toggle-description-2" class="description">
             Check grammar & spelling
-        </div>
-    </div>
+        </label>
+    </section>
 
-    <div class="toggle">
+    <section class="toggle" aria-labelledby="toggle-description-3">
         <div class="toggler">
             <div class="check-box">
-                <input type="checkbox" [ngModel]="showContext" (ngModelChange)="showContextChanged($event)">
+                <input type="checkbox" id="toggle-checkbox-3" [ngModel]="showContext" (ngModelChange)="showContextChanged($event)">
             </div>
         </div>
-        <div class="description">
+        <label for="toggle-checkbox-3" id="toggle-description-3" class="description">
             Show context
-        </div>
-    </div>
+        </label>
+    </section>
 
-    <div class='witty-works-ext-left'>
-        <div
+    <section class='witty-works-ext-left'>
+        <button
         class='witty-works-ext-button witty-works-ext-primary-button-red'
         (click)="openEditor()"
         >
           Go to Witty Editor
-        </div>
-    </div>
+        </button>
+    </section>
 
-    <div class='witty-works-ext-section'>
-        <div class='witty-works-ext-lato-popup-text'>
+    <section class='witty-works-ext-section'>
+        <p class='witty-works-ext-lato-popup-text'>
           Logged into TEAMNAME
-        </div>
-    </div>
+        </p>
+    </section>
 </div>
 
-<div class='witty-works-ext-section' *ngIf="isDevEnv">
+<section class='witty-works-ext-section' *ngIf="isDevEnv">
     <h2 class="witty-works-ext-lato-popup-title">Development Settings</h2>
     <!-- <ApiSelector /> //is this necessary?
     <DelaySelector /> -->
     <div class='witty-works-ext-left'>
         <!-- TODO: add logout onclick here -->
-      <div class='witty-works-ext-button witty-works-ext-primary-button-red'> 
+      <button class='witty-works-ext-button witty-works-ext-primary-button-red' aria-label="Log out"> 
         Log out
-      </div>
+      </button>
     </div>
-</div>
+</section>
 
-<div class="witty-works-ext-lato-popup-text">
+<footer class="witty-works-ext-lato-popup-text">
     <div class='witty-works-ext-separator'></div>
     Witty Word Plugin Version: {{ appVersion }}
-</div>
+</footer>

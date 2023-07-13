@@ -1,13 +1,15 @@
 <ng-container *ngIf="error && context">
     <div class="error-box">
-        <div class="header" (click)="toggle()">
+        <header class="header" (click)="toggle()">
             <div class="preview" *ngIf="showContext" [innerHTML]="getContext(error.word) | highlight:error.word"></div>
             <div class="preview" *ngIf="!showContext">{{ error.word }}</div>
-            <div class="toggle" [class.active]="isOpen"><img src="assets/icons/chevron-down.svg" alt="Icon that indicates if box is open"></div>
-        </div>
+            <div class="toggle" [class.active]="isOpen" tabindex="0" (keydown.enter)="toggle()" role="button">
+                <img src="assets/icons/chevron-down.svg" alt="Toggle display of box content">
+            </div>
+        </header>
         
 
-        <div class="suggestions" *ngIf="isOpen">
+        <section class="suggestions" *ngIf="isOpen">
             <div
             class="witty-works-ext-wittyworks-container witty-works-ext-container-rounded witty-works-ext-full-padding witty-works-ext-justify-start"
             [ngStyle]="containerStyle"
@@ -26,21 +28,24 @@
                 <div class="witty-works-ext-container-row witty-works-ext-justify-end witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer"
                      [ngStyle]="urlContainerStyle"             
                      (click)="onClick()"
+                     tabindex="0"
+                     (keydown.enter)="onClick()"
+                     role="link"
                      >
                   <div class="witty-works-ext-secondary-button-red witty-works-ext-container-row">
                     Learn more
                     <ng-container *ngIf="error.details.explanation.content === 'video'">
-                        <img class="witty-works-ext-margin-left" src="assets/icons/video.svg" alt="Icon that indicates if a video is available">
+                        <img class="witty-works-ext-margin-left" src="assets/icons/video.svg" alt="A video is available for more learning">
                     </ng-container>
                     <div
                       class="witty-works-ext-margin-left"
                       style="pointer-events: 'none'"
                     >
                       <ng-container *ngIf="showLearningBite; else elseBlock">
-                        <img src="assets/icons/arrow-up.svg" alt="Icon that indicates that a learning bite section is open">
+                        <img src="assets/icons/arrow-up.svg" alt="The learning bite section is open">
                       </ng-container>
                       <ng-template #elseBlock>
-                        <img src="assets/icons/arrow-down.svg" alt="Icon that indicates that a learning bite section is closed">
+                        <img src="assets/icons/arrow-down.svg" alt="The learning bite section is closed">
                       </ng-template>
                     </div>
                   </div>
@@ -54,8 +59,6 @@
                 <button (click)="acceptSuggestion(suggestion)">{{ suggestion.text }}</button>
                 <br>
             </ng-container>
-        </div>
+        </section>
     </div>
 </ng-container>
-
-
