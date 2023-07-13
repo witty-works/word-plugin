@@ -8,12 +8,17 @@ export class HighlightPipe implements PipeTransform {
 
   transform(value: any, args: string): unknown {
     if(!value || !args) return value;
-    // the search term has to be enclosed by word boundaries. as the standard word boundaries (\b)
-    // do not include special characters like àèì, the regex has to be written manually. see:
-    // https://stackoverflow.com/a/56945933
     const re = new RegExp(`(?<![äöüÄÖÜàéèòìÀÉÈÒÌ\\w])(${TextUtils.escapeRegExp(args)})(?![äöüÄÖÜàéèòìÀÉÈÒÌ\\w])`, 'gm');
-    value= value.replace(re, '<span class="highlighted-text">$1</span>');
+    const color = this.getExplanationColor('null'); //TODO: need to figure out how to get graviy here 
+    value = value.replace(re, `<span class="highlighted-text highlighted-text--${color}">$1</span>`);
     return value;
   }
 
+  getExplanationColor(gravity: string): string {
+    let gravityNum = parseFloat(gravity);
+    if (!gravityNum) return 'green';
+    else if (gravityNum < 1.5) return 'red';
+    else if (gravityNum > 2.5) return 'yellow';
+    else return 'orange';
+  }
 }

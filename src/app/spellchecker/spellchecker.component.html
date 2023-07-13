@@ -1,10 +1,10 @@
-<button (click)="checkGrammar()">Witty Check</button>
+<button class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="checkGrammar()">Witty Check</button>
 
 <div *ngIf="spellingErrors.length > 0" class="number-spelling-errors">
     {{ spellingErrors.length }} proposals:
 </div>
 <app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphs" (highlightEvent)="highlight($event)"
-    (acceptSuggestionEvent)="acceptSuggestion($event)" (ignoreWordEvent)="ignoreWord($event)"
+    (acceptSuggestionEvent)="acceptSuggestion($event)"
     *ngIf="!isFirstRun && spellingErrors.length > 0"></app-errors-list>
 
 <div class="full-size-notification" *ngIf="isFirstRun">
@@ -15,9 +15,9 @@
     <span>No further suggestions ..</span>
 </div>
 
-<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="line-scale" [fullScreen]="true"
+<ngx-spinner bdColor="#f1f2f2" size="medium" color="#f06464" type="line-scale" [fullScreen]="true"
     [showSpinner]="isSpellchecking">
-    <p style="color: white">Suggesting ... </p>
+    <!-- <p>Analyzing...</p> -->
 </ngx-spinner>
 
 <modal #errorModal>
@@ -26,7 +26,6 @@
     </modal-header>
     <modal-content>
         <p>{{ error }}</p>
-
         <p style="margin-top: 24px;">Please try again.</p>
     </modal-content>
     <modal-footer>

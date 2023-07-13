@@ -1,5 +1,13 @@
+@import './styles/variables';
+
 #main-content {
   height: calc(100vh - 45px);
+  font-family: $lato;
+  font-style: normal;
+  font-weight: $regular;
+  color: $black;
+  background-color: $white;
+  font-size: 16px;
 
   > div {
     padding: 20px

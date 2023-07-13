@@ -23,9 +23,6 @@ export class ErrorsListComponent implements OnInit, OnDestroy {
   @Output()
   acceptSuggestionEvent = new EventEmitter<{ paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }>();
 
-  @Output()
-  ignoreWordEvent = new EventEmitter<{ paragraphIndex: number, errorIndex: number, word: string }>();
-
   showContext = true;
 
   private settingsServiceSubscription?: Subscription;
@@ -51,9 +48,5 @@ export class ErrorsListComponent implements OnInit, OnDestroy {
 
   acceptSuggestion(paragraphIndex: number, errorIndex: number, childObj: { suggestion: IAlternatives }) {
     this.acceptSuggestionEvent.emit({ paragraphIndex, errorIndex, suggestion: childObj.suggestion });
-  }
-
-  ignoreWord(paragraphIndex: number, errorIndex: number, childObj: { word: string }) {
-    this.ignoreWordEvent.emit({ paragraphIndex, errorIndex, word: childObj.word });
   }
 }

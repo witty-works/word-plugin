@@ -20,14 +20,15 @@ export class ErrorComponent {
   @Input()
   showContext: boolean = true;
 
+  @Input() data: any;
+  // @Input() userIsSignedIn: boolean;
+  @Output() showLearningBiteChange = new EventEmitter<boolean>();
+
   @Output()
   highlightEvent = new EventEmitter();
 
   @Output()
   acceptSuggestionEvent = new EventEmitter<{ suggestion: IAlternatives }>();
-
-  @Output()
-  ignoreWordEvent = new EventEmitter<{ word: string }>();
 
   isOpen = false;
 
@@ -59,7 +60,38 @@ export class ErrorComponent {
     this.acceptSuggestionEvent.emit({ suggestion });
   }
 
-  ignoreWord(word: string) {
-    this.ignoreWordEvent.emit({ word});
+  showLearningBite = false;
+
+  onClick() {
+    this.showLearningBiteChange.emit(!this.showLearningBite);
+  }
+
+  get containerStyle() {
+    return {
+      backgroundColor: this.getExplanationColor(this.error?.details.gravity),
+    };
+  }
+
+  getExplanationColor(
+    gravity: number | undefined,
+  ): string {
+    if (!gravity) return '#D3E4AC';
+    else if (gravity < 1.5) return '#F7D4D4';
+    else if (gravity > 2.5) return '#FFFFD3';
+    else return '#F8E7CB';
+  }
+
+  get textContainerStyle() {
+    return {
+      display: 'flex',
+      flexDirection: this.showLearningBite ? 'row' : 'column',
+      alignItems: this.showLearningBite ? 'center' : 'flex-start',
+    };
+  }
+
+  get urlContainerStyle() {
+    return {
+      marginTop: this.showLearningBite ? '0em' : '1em',
+    };
   }
 }
