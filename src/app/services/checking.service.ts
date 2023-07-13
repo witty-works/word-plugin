@@ -9,7 +9,7 @@ import { ISpellingError } from "../data/data-structures";
 })
 export class CheckingService {
 
-  private url = 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site';
+  private url = 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site'; //TODO: implement url logic for dev and prod
 
   constructor(private settingsService: SettingsService, private http: HttpClient) {}
 

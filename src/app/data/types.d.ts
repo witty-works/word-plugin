@@ -222,8 +222,3 @@ export interface EnableWittyToggle {
   enabled: boolean;
   updateDashboard: boolean;
 }
-
-export interface IgnoredCategory {
-  category: string;
-  timestamp: number;
-}

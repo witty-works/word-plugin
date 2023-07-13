@@ -136,11 +136,6 @@ export class SpellcheckerComponent {
     });
   }
 
-  ignoreWord(obj: {paragraphIndex: number, errorIndex: number, word: string }) {
-    this.userDictionaryService.addToDictionary(obj.word);
-    this.removeGrammarError(obj.errorIndex);
-  }
-
   private getLineText(lineIndex: number): string {
     return this.paragraphs[lineIndex];
   }

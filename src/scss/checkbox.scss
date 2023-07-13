@@ -1,3 +1,6 @@
+@import '../app/styles/variables';
+
+
 .check-box {
   //transform: scale(2);
 }
@@ -16,8 +19,8 @@ input[type="checkbox"] {
 }
 
 input:checked[type="checkbox"] {
-  background: #0078d7;
-  border-color: #0078d7;
+  background: $successGreen;
+  border-color: $successGreen;
 }
 
 input[type="checkbox"]::after {

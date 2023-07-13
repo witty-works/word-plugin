@@ -1,4 +1,40 @@
-<div class="preferences">
+<div>
+    <div class="witty-works-ext-header"> 
+        <img src="assets/icons/witty-logo.svg" alt="Icon that shows the logo of Witty Works" (click)="openWittyHomePage()">
+        <img src="assets/icons/settings.svg" alt="Settings icon that leads to the Witty dashboard" (click)="openDashboard()">
+    </div>
+
+    <div class='witty-works-ext-separator'></div>
+
+    <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-space-between'>
+        <div class='witty-works-ext-lato-popup-title'>
+            Quick Settings
+        </div>
+    </div>
+
+    <div class="toggle">
+        <div class="toggler">
+            <div class="check-box">
+                <input type="checkbox" [ngModel]="checkUpperAndLowerCase" (ngModelChange)="checkUpperAndLowerCaseChanged($event)">
+            </div>
+        </div>
+        <div class="description">
+            Check upper & lower case
+        </div>
+    </div>
+
+
+    <div class="toggle">
+        <div class="toggler">
+            <div class="check-box">
+                <input type="checkbox" [ngModel]="checkGrammarAndSpelling" (ngModelChange)="checkGrammarAndSpellingChanged($event)">
+            </div>
+        </div>
+        <div class="description">
+            Check grammar & spelling
+        </div>
+    </div>
+
     <div class="toggle">
         <div class="toggler">
             <div class="check-box">
@@ -9,18 +45,36 @@
             Show context
         </div>
     </div>
+
+    <div class='witty-works-ext-left'>
+        <div
+        class='witty-works-ext-button witty-works-ext-primary-button-red'
+        (click)="openEditor()"
+        >
+          Go to Witty Editor
+        </div>
+    </div>
+
+    <div class='witty-works-ext-section'>
+        <div class='witty-works-ext-lato-popup-text'>
+          Logged into TEAMNAME
+        </div>
+    </div>
 </div>
 
-<div>
-    <div class="impressum">
-        <p>
-            This Word Plugin is provided by <a href="https://www.witty.works/" target="_blank">Witty
-                Works AG</a>
-        </p>
+<div class='witty-works-ext-section' *ngIf="isDevEnv">
+    <h2 class="witty-works-ext-lato-popup-title">Development Settings</h2>
+    <!-- <ApiSelector /> //is this necessary?
+    <DelaySelector /> -->
+    <div class='witty-works-ext-left'>
+        <!-- TODO: add logout onclick here -->
+      <div class='witty-works-ext-button witty-works-ext-primary-button-red'> 
+        Log out
+      </div>
     </div>
-    <div class="version">
-        <p>
-            Witty Word Plugin Version: {{ appVersion }}
-        </p>
-    </div>
+</div>
+
+<div class="witty-works-ext-lato-popup-text">
+    <div class='witty-works-ext-separator'></div>
+    Witty Word Plugin Version: {{ appVersion }}
 </div>
