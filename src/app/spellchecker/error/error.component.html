@@ -54,9 +54,9 @@
 
             </div>
           </div>
-            <div class="suggestion-title witty-works-ext-margin-top" *ngIf="suggestions.length > 0">Try instead...</div>
-            <ng-container *ngFor="let suggestion of suggestions">
-                <button (click)="acceptSuggestion(suggestion)">{{ suggestion.text }}</button>
+          <div class="suggestion-title witty-works-ext-margin-top" *ngIf="hasValidSuggestions()">Try instead...</div>
+          <ng-container *ngFor="let suggestion of suggestions.slice(0, 5)">
+                <button *ngIf="suggestion.text.length > 0" (click)="acceptSuggestion(suggestion)">{{ suggestion.text }}</button>
                 <br>
             </ng-container>
         </section>

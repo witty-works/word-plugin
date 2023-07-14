@@ -39,7 +39,11 @@ export class ErrorComponent {
   }
 
   getContext(word: string) {
-    return TextUtils.getContext(word, (this.context)!);
+    let ctxt = TextUtils.getContext(word, (this.context)!);
+    if (ctxt) {
+      ctxt = ctxt.replace(/()/g, '<img src="assets/icons/soft-return.svg" class="soft-return-icon" alt="Soft return icon"><br>');
+    }
+    return ctxt;
   }
 
   async toggle(): Promise<void> {
@@ -70,6 +74,10 @@ export class ErrorComponent {
     return {
       backgroundColor: this.getExplanationColor(this.error?.details.gravity),
     };
+  }
+
+  public hasValidSuggestions(): boolean {
+    return this.suggestions && this.suggestions.length > 0 && this.suggestions.some(suggestion => suggestion.text.length > 0);
   }
 
   getExplanationColor(
