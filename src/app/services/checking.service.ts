@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SettingsService } from "./settings.service";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { IAlternatives, ICheckResponse } from "../data/types";
+import { BaseUrl, IAlternatives, IBaseUrls, ICheckResponse } from "../data/types";
 import { ISpellingError } from "../data/data-structures";
 
 @Injectable({
@@ -9,7 +9,22 @@ import { ISpellingError } from "../data/data-structures";
 })
 export class CheckingService {
 
-  private url = 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site'; //TODO: implement url logic for dev and prod
+  BaseUrls: IBaseUrls = {
+    Prod: {
+      api: 'https://default.api.witty.works/',
+      dashboard: 'https://dashboard.witty.works/',
+    },
+    Dev: {
+      api: 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site/',
+      dashboard: 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/',
+    },
+  };
+
+  isDevEnv = window.location.hostname === 'localhost'
+
+  getBaseUrl(): BaseUrl {
+    return this.isDevEnv ? this.BaseUrls.Dev : this.BaseUrls.Prod;
+  }
 
   constructor(private settingsService: SettingsService, private http: HttpClient) {}
 
@@ -24,7 +39,7 @@ export class CheckingService {
     const httpOptions = {
       params: params
     };
-    return this.http.post<any>(this.url + '/debug/check', request, httpOptions).toPromise();
+    return this.http.post<any>(this.getBaseUrl().dashboard + '/debug/check', request, httpOptions).toPromise();
   }
 
   getSuggestions(word: ISpellingError): Promise<IAlternatives[]> {

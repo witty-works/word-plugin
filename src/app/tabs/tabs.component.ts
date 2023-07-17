@@ -1,6 +1,5 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { TabType } from "../data/tabs";
-import { Subscription } from 'rxjs';
 import { AuthService } from '../auth.service'; // import AuthService
 
 @Component({
@@ -8,14 +7,12 @@ import { AuthService } from '../auth.service'; // import AuthService
   templateUrl: './tabs.component.html',
   styleUrls: ['./tabs.component.scss']
 })
-export class TabsComponent implements OnInit, OnDestroy {
+export class TabsComponent {
   @Input()
   selectedTab: TabType = 'spellchecker';
 
   @Output()
   tabChangedEvent = new EventEmitter<TabType>();
-
-  private isLoggedInSubscription?: Subscription;
 
   constructor(private authService: AuthService) {}
 
@@ -25,17 +22,5 @@ export class TabsComponent implements OnInit, OnDestroy {
 
   isLoggedIn(): boolean {
     return this.authService.getValue();
-  }
-
-  ngOnInit() {
-    this.isLoggedInSubscription = this.authService.isLoggedIn.subscribe((isLoggedIn: any) => {
-      this.tabChanged(isLoggedIn ? 'spellchecker' : 'login');
-    });
-  }
-
-  ngOnDestroy() {
-    if (this.isLoggedInSubscription) {
-      this.isLoggedInSubscription.unsubscribe();
-    }
   }
 }

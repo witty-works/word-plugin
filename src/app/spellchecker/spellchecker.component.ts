@@ -1,10 +1,11 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
 import WordUtils from "../utils/word.utils";
 import { ISpellingError } from "../data/data-structures";
 import { UserDictionaryService } from "../services/user-dictionary.service";
 import { ModalComponent } from "@independer/ng-modal/modal.component";
-import { IAlternatives } from "../data/types";
+import { BaseUrl, IAlternatives, IBaseUrls } from "../data/types";
+import { AuthService } from '../auth.service';
 
 /* global Word */
 
@@ -13,11 +14,17 @@ import { IAlternatives } from "../data/types";
   templateUrl: './spellchecker.component.html',
   styleUrls: ['./spellchecker.component.scss']
 })
-export class SpellcheckerComponent {
+export class SpellcheckerComponent implements OnInit {
+  accessToken: string = '';
+  refreshToken: string = '';
+  isDevEnv = window.location.hostname === 'localhost'
+
 
   isSpellchecking = false;
 
   isFirstRun = true;
+
+  isLoggedin = true;
 
   paragraphs: string[] = [];
 
@@ -31,8 +38,16 @@ export class SpellcheckerComponent {
 
   constructor(
       private spellcheckerService: CheckingService,
-      private userDictionaryService: UserDictionaryService,
+      private authService: AuthService
   ) {
+  }
+
+  ngOnInit() {
+    this.authService.isLoggedIn.subscribe((isLoggedIn: any) => {
+      this.isLoggedin = isLoggedIn;
+    });
+
+    this.isLoggedin = this.authService.getValue();
   }
 
   async checkGrammar(): Promise<void> {
@@ -176,5 +191,37 @@ export class SpellcheckerComponent {
     } else {
       console.error(e);
     }
+  }
+
+  BaseUrls: IBaseUrls = {
+    Prod: {
+      api: 'https://default.api.witty.works/',
+      dashboard: 'https://dashboard.witty.works/',
+    },
+    Dev: {
+      api: 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site/',
+      dashboard: 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/',
+    },
+  };
+
+  getBaseUrl(): BaseUrl {
+    return this.isDevEnv ? this.BaseUrls.Dev : this.BaseUrls.Prod;
+  }
+  
+  login() {
+    const url = `${this.getBaseUrl().dashboard}browser-login?redirect_uri=${`https://localhost:4200/word-plugin/app/login/login.component.html`}?target=${this.getBaseUrl().dashboard}editor?onboarding=true`;
+    window.open(url, '_blank');
+  }
+
+  logout() { 
+    this.authService.logout();
+  }
+
+  openDashboard() {
+    window.open('https://dashboard.witty.works/en/user/language/customize-witty', '_blank');
+  }
+
+  openWittyHomePage() {
+    window.open('https://witty.works', '_blank');
   }
 }
