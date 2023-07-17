@@ -83,7 +83,7 @@
           DefaultValue="https://word.witty.works/index.html" />
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="GetStarted.Title" DefaultValue="GetStarted.Title" />
+        <bt:String id="GetStarted.Title" DefaultValue="Get Started" />
         <bt:String id="CommandsGroup.Label" DefaultValue="Writing" />
         <bt:String id="TaskpaneButton.Label" DefaultValue="Witty - Inclusive Writing" />
       </bt:ShortStrings>

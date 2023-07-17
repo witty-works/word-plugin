@@ -3,51 +3,35 @@
 import PlatformType = Office.PlatformType;
 
 export default class WordUtils {
-    static async getParagraphRange(context: Word.RequestContext, paragraph: string): Promise<Word.Range> {
-        const body = context.document.body;
-        context.load(body);
-        await context.sync();
-
-        // NOTE: This had to be done because regex splitting is
-        // not working ok with some browsers
-        // And the reason it should be done like this is the desktop
-        // version of Word which unlike the online one
-        // cannot search for more than 255 chars at a time
-        const chunks = WordUtils.splitStringToChunks(paragraph, 255);
-
-        let fullRange: Word.Range | null = null;
-        for (let index = 0; index < chunks.length; index++) {
-            const chunk = chunks[index];
-
-            if (chunk.trim() === "") {
-                continue;
+    static async getParagraphRange(context: Word.RequestContext, paragraph: string, paragraphIndex: number): Promise<Word.Range> {
+            const body = context.document.body;
+            context.load(body, 'paragraphs');
+            await context.sync();
+        
+            const allParagraphs = body.paragraphs.items;
+            if (paragraphIndex < 0 || paragraphIndex >= allParagraphs.length) {
+                return Promise.reject(new Error('Invalid paragraph index'));
             }
-
-            const paragraphRangeCollection = body.search(chunk, {
-                matchCase: true,
-            });
-
-            const paragraphRange = paragraphRangeCollection.getFirstOrNullObject();
+        
+            const targetParagraph = allParagraphs[paragraphIndex];
+            targetParagraph.load('text');
+            await context.sync();
+        
+            if (!targetParagraph.text.includes(paragraph)) {
+                return Promise.reject(new Error('Could not find paragraph in context'));
+            }
+        
+            const paragraphRange = targetParagraph.getRange();
             paragraphRange.load('isNullObject');
             await context.sync();
-
-            if (!paragraphRange || paragraphRange.isNullObject) {
-                return Promise.reject(new Error('Could not find range for chunk: ' + chunk));
+        
+            if (paragraphRange.isNullObject) {
+                return Promise.reject(new Error('Could not get range for paragraph'));
             }
-
-            if (!fullRange) {
-                fullRange = paragraphRange;
-            } else {
-                fullRange = fullRange.expandTo(paragraphRange);
-            }
+        
+            return paragraphRange;
         }
 
-        if (!fullRange) {
-            return Promise.reject(new Error('Context paragraph not found'));
-        }
-
-        return fullRange;
-    }
 
     static async getWordRange(context: Word.RequestContext, range: Word.Range, errorText: string): Promise<Word.Range> {
         range.load('text');
