@@ -91,7 +91,7 @@ export class SpellcheckerComponent {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText);
+        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText, obj.paragraphIndex);
         const errorRange = await WordUtils.getWordRange(context, paragraphRange, errorText);
 
         errorRange.select('Select');
@@ -107,7 +107,7 @@ export class SpellcheckerComponent {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText);
+        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText, obj.paragraphIndex);
         const errorRange = await WordUtils.getWordRange(context, paragraphRange, errorText);
 
         errorRange.insertText(obj.suggestion.text, 'Replace');
