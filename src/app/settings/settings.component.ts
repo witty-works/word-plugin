@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SettingsService } from "../services/settings.service";
 import { Subscription } from "rxjs";
+import { AuthService } from '../auth.service';
 // this loads package.json
 // then you destructure that object and take out the 'version' property from it
 // and finally with ': appVersion' you rename it to const appVersion
@@ -23,7 +24,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   private checkUpperAndLowerCaseSubscription?: Subscription;
   private checkGrammarAndSpellingSubscription?: Subscription;
 
-  constructor(private settingsService: SettingsService) {
+  constructor(private settingsService: SettingsService, private authService: AuthService) {
   }
 
   get isDevEnv(): boolean {
@@ -82,5 +83,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   checkGrammarAndSpellingChanged(value: boolean) {
     this.settingsService.setCheckGrammarAndSpelling(value);
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }
