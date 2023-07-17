@@ -27,9 +27,10 @@
       ieMessage.style.display = 'block';
     }
   }
-    //todo use getValue from authService here to check if user is logged in 
 
-  if (localStorage.getItem('access_token').length === 0) {
+  console.log('localStorage.getItem(\'access_token\')', localStorage.getItem('access_token'));
+
+  //needs to be moved tospellhecker component -> use auth service
     const searchParams = new URLSearchParams(window.location.search);
     if ([...searchParams].length > 0 && searchParams.get('access_token')) {
       localStorage.setItem('access_token', searchParams.get('access_token'));
@@ -41,7 +42,6 @@
         'noopener'
       );
     }
-  }
 </script>
 </body>
 </html>

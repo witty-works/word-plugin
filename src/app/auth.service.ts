@@ -8,7 +8,7 @@ export class AuthService {
   private _isLoggedIn = new BehaviorSubject<boolean>(this.hasToken());
 
   get isLoggedIn() {
-    return this._isLoggedIn.asObservable(); // Returns Observable
+    return this._isLoggedIn.asObservable();
   }
 
   private hasToken(): boolean {

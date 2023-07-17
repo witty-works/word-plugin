@@ -1,3 +1,66 @@
+<div *ngIf="!isLoggedin">
+    <nav aria-label="Witty Works Navigation" class="witty-works-ext-header">
+        <img src="assets/icons/witty-logo.svg" alt="Icon that shows the logo of Witty Works" role="link" tabindex="0" (keydown.enter)="openWittyHomePage()" (click)="openWittyHomePage()">
+    </nav>
+
+    <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-full-padding witty-works-ext-justify-start witty-works-ext-margin-top witty-works-ext-cursor-pointer witty-works-ext-full-padding witty-works-ext-light-gray-background'>
+        <div class='witty-works-ext-margin-right'>
+            <img src="assets/icons/sad-face.svg" alt="Icon that you are not logged in">
+        </div>
+        <div class='witty-works-ext-lato-popover-text witty-works-ext-margin-left'>
+            Log in to unlock
+            <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer'>
+                <div class='witty-works-ext-margin-right'>
+                    You are signed out
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class='witty-works-ext-full-padding'>
+        <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-start'>
+            <div class='witty-works-ext-margin-right'>
+                <img src="assets/icons/star.svg" alt="Star">
+            </div>
+            <div class='witty-works-ext-lato-popover-text'>
+                Bias detection in 30+ diversity dimensions
+            </div>
+        </div>
+        <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-start'>
+            <div class='witty-works-ext-margin-right'>
+                <img src="assets/icons/star.svg" alt="Star">
+            </div>
+            <div class='witty-works-ext-lato-popover-text'>
+                Alternatives for inclusive writing
+            </div>
+        </div>
+        <div class='witty-works-ext-container-row witty-works-ext-justify-start'>
+            <div class='witty-works-ext-margin-right'>
+                <img src="assets/icons/star.svg" alt="Star">
+            </div>
+            <div class='witty-works-ext-lato-popover-text'>
+                Team features, incl. shared dictionaries
+            </div>
+        </div>
+    </div>
+
+    <div class='witty-works-ext-wittyworks-container witty-works-ext-full-padding witty-works-ext-light-gray-background witty-works-ext-left'>
+        <button class='witty-works-ext-button witty-works-ext-primary-button-red' (click)="login()">
+            Sign In
+        </button>
+        
+        <div class='witty-works-ext-lato-popup-text witty-works-ext-margin-top-half'>
+            Dont have an account yet? 
+            <span class='witty-works-ext-lato-popup-text-purple witty-works-ext-cursor-pointer' (click)="login()">
+                Sign up
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+<div *ngIf="isLoggedin">
 <button class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="checkGrammar()">Witty Check</button>
 
 <div *ngIf="spellingErrors.length > 0" class="number-spelling-errors">
@@ -34,3 +97,4 @@
         <button (click)="errorModal.close(true)">Yes, analyze the text again</button>
     </modal-footer>
 </modal>
+</div>

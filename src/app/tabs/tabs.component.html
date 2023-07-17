@@ -1,3 +1,2 @@
-<div class="tab" [class.selected]="selectedTab === 'spellchecker'" (click)="tabChanged('spellchecker')" *ngIf="isLoggedIn">Writing</div>
-<div class="tab" [class.selected]="selectedTab === 'settings'" (click)="tabChanged('settings')" *ngIf="isLoggedIn">Preferences</div>
-<div class="tab" [class.selected]="selectedTab === 'login'" (click)="tabChanged('login')" *ngIf="!isLoggedIn">Account</div>
+<div class="tab" [class.selected]="selectedTab === 'spellchecker'" (click)="tabChanged('spellchecker')">Writing</div>
+<div class="tab" [class.selected]="selectedTab === 'settings'" (click)="tabChanged('settings')">Preferences</div>

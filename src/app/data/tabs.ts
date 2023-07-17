@@ -1,1 +1,1 @@
-export type TabType = 'spellchecker' | 'settings' | 'login';
+export type TabType = 'spellchecker' | 'settings';
