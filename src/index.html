@@ -17,9 +17,6 @@
   <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/9.6.1/css/fabric.min.css"/>
 </head>
 <body class="ms-font-m ms-welcome">
-<div id="ie-warn" style="display: none;margin: 20px;padding: 20px;background-color: #1ebbee;color: white;font-size: 16px;">
-  Quest add-in na funcziuna betg cun questa versiun dad Office. Per plaschair actualisar ad ina versiun actuala dal program.
-</div>
 <app-root></app-root>
 
 <script>
@@ -28,6 +25,21 @@
     const ieMessage = document.getElementById("ie-warn");
     if (ieMessage) {
       ieMessage.style.display = 'block';
+    }
+  }
+    //todo use getValue from authService here to check if user is logged in 
+
+  if (localStorage.getItem('access_token').length === 0) {
+    const searchParams = new URLSearchParams(window.location.search);
+    if ([...searchParams].length > 0 && searchParams.get('access_token')) {
+      localStorage.setItem('access_token', searchParams.get('access_token'));
+      localStorage.setItem('refresh_token', searchParams.get('refresh_token'));
+      const target = searchParams.get('target')?.split('?')[0];
+      window.open(
+        target ? target : `https://dashboard.witty.works/editor?onboarding=true`,
+        '_self',
+        'noopener'
+      );
     }
   }
 </script>

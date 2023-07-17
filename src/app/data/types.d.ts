@@ -222,3 +222,12 @@ export interface EnableWittyToggle {
   enabled: boolean;
   updateDashboard: boolean;
 }
+
+export type BaseUrl = {
+  api: string;
+  dashboard: string;
+};
+
+export interface IBaseUrls {
+  [key: string]: BaseUrl;
+}

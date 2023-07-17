@@ -63,11 +63,8 @@
 
 <section class='witty-works-ext-section' *ngIf="isDevEnv">
     <h2 class="witty-works-ext-lato-popup-title">Development Settings</h2>
-    <!-- <ApiSelector /> //is this necessary?
-    <DelaySelector /> -->
     <div class='witty-works-ext-left'>
-        <!-- TODO: add logout onclick here -->
-      <button class='witty-works-ext-button witty-works-ext-primary-button-red' aria-label="Log out"> 
+      <button class='witty-works-ext-button witty-works-ext-primary-button-red' aria-label="Log out" (click)="logout()">
         Log out
       </button>
     </div>

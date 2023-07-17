@@ -15,11 +15,13 @@ import { VirtualScrollerModule } from "@iharbeck/ngx-virtual-scroller";
 import { FormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
 import { ModalModule } from "@independer/ng-modal";
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SettingsComponent,
+    LoginComponent,
     SpellcheckerComponent,
     TabsComponent,
     ErrorsListComponent,
