@@ -1,6 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SettingsService } from "../services/settings.service";
 import { Subscription } from "rxjs";
+import { en, de } from '../translations';
+
 // this loads package.json
 // then you destructure that object and take out the 'version' property from it
 // and finally with ': appVersion' you rename it to const appVersion
@@ -17,6 +19,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   checkUpperAndLowerCase: boolean = true;
   checkGrammarAndSpelling: boolean = true;
   teamName = '';
+  lang = Office.context.displayLanguage.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   public appVersion = '-';
 

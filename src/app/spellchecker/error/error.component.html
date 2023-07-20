@@ -4,7 +4,7 @@
             <div class="preview" *ngIf="showContext" [innerHTML]="getContext(error.word) | highlight:error.word"></div>
             <div class="preview" *ngIf="!showContext">{{ error.word }}</div>
             <div class="toggle" [class.active]="isOpen" tabindex="0" (keydown.enter)="toggle()" role="button">
-                <img src="assets/icons/chevron-down.svg" alt="Toggle display of box content">
+                <img src="assets/icons/chevron-down.svg" alt="{lang.arrowDownIconAlt}">
             </div>
         </header>
         
@@ -14,9 +14,7 @@
           class="witty-works-ext-wittyworks-container witty-works-ext-container-rounded witty-works-ext-full-padding witty-works-ext-justify-start"
           [ngStyle]="containerStyle"
         >
-            <div
-              class="witty-works-ext-lato-popover-text witty-works-ext-justify-space-between witty-works-ext-wittyworks-container"
-            >
+            <div class="witty-works-ext-lato-popover-text witty-works-ext-justify-space-between witty-works-ext-wittyworks-container">
               <div class="witty-works-ext-container-row witty-works-ext-justify-start">
                 <div class="witty-works-ext-explanation-icon">{{error.details.explanation.icon}}</div>
                 {{error.details.explanation.text}}
@@ -31,15 +29,12 @@
                      role="link"
                      >
                   <div class="witty-works-ext-secondary-button-red witty-works-ext-container-row witty-works-ext-margin-top">
-                    Learn more
+                    {{lang.learnMore}}
                     <ng-container *ngIf="error.details.explanation.content === 'video'">
-                        <img class="witty-works-ext-margin-left" src="assets/icons/video.svg" alt="A video is available for more learning">
+                        <img class="witty-works-ext-margin-left" src="assets/icons/video.svg" alt="{lang.videoIconAlt}">
                     </ng-container>
-                    <div
-                      class="witty-works-ext-margin-left"
-                      style="pointer-events: 'none'"
-                    >
-                      <img src="assets/icons/arrow-right.svg" alt="Learn more">
+                    <div class="witty-works-ext-margin-left" style="pointer-events: 'none'">
+                      <img src="assets/icons/arrow-right.svg" alt="{lang.arrowRightAlt}">
                     </div>
                   </div>
                 </div>
@@ -47,7 +42,7 @@
 
             </div>
           </div>
-          <div class="suggestion-title witty-works-ext-margin-top" *ngIf="hasValidSuggestions()">Try instead...</div>
+          <div class="suggestion-title witty-works-ext-margin-top" *ngIf="hasValidSuggestions()">{{lang.tryInstead}}</div>
           <ng-container *ngFor="let suggestion of suggestions.slice(0, 5)">
                 <button *ngIf="suggestion.text && suggestion.text.length > 0" (click)="acceptSuggestion(suggestion)">{{ suggestion.text }}</button>
                 <br>
