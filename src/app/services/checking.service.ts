@@ -32,7 +32,8 @@ export class CheckingService {
 
   checkText(sentence: string): Promise<ICheckResponse> {
     const accessToken = localStorage.getItem('access_token');
-    if (!accessToken || !sentence) {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if ((!accessToken || !sentence) && refreshToken) {
       this.authService.makeRefreshTokenRequest().then((response) => {
         if (response.access_token && response.refresh_token) {
           localStorage.setItem('access_token', response.access_token);
@@ -66,7 +67,7 @@ export class CheckingService {
             this.checkGrammarAndSpelling ? '' : 'orthography',
             this.checkUpperAndLowerCase ? '' : 'casing',
           ]},
-          config_hash: localStorage.getItem('config_hash'),
+          config_hash: localStorage.getItem('config_hash'), //dont use config_hash and organization_config_hash for now
           organization_config_hash: localStorage.getItem('organization_config_hash'),
     }
 

@@ -3,6 +3,7 @@ import { ISpellingError } from "../../data/data-structures";
 import TextUtils from "../../utils/text.utils";
 import { CheckingService } from "../../services/checking.service";
 import {IAlternatives} from "../../data/types";
+import { en, de } from '../../translations';
 
 @Component({
   selector: 'app-error',
@@ -31,6 +32,7 @@ export class ErrorComponent {
   isOpen = false;
   suggestions: IAlternatives[] = [];
   showLearningBite: boolean = false;
+  lang = Office.context.displayLanguage.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   constructor(private spellcheckerService: CheckingService) {
   }

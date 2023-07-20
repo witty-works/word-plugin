@@ -5,6 +5,7 @@ import { ISpellingError } from "../data/data-structures";
 import { ModalComponent } from "@independer/ng-modal/modal.component";
 import { BaseUrl, IAlternatives, IBaseUrls } from "../data/types";
 import { AuthService } from '../services/auth.service';
+import { en, de } from '../translations';
 
 /* global Word */
 
@@ -23,6 +24,8 @@ export class SpellcheckerComponent implements OnInit {
   isFirstRun = true;
 
   isLoggedin = true;
+
+  lang = Office.context.displayLanguage.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   paragraphs: string[] = [];
 
@@ -106,6 +109,9 @@ export class SpellcheckerComponent implements OnInit {
         this.spellingErrors = [];
         for (let paragraphIndex = 0; paragraphIndex < this.paragraphs.length; paragraphIndex++) {
           const paragraph = this.paragraphs[paragraphIndex];
+          if (!paragraph) {
+            continue;
+          }
           try {
             const errs = await this.spellcheckerService.checkText(paragraph);
             if (!errs) {

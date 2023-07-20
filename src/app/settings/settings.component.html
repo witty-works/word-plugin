@@ -1,14 +1,14 @@
 <div>
-    <nav aria-label="Witty Works Navigation" class="witty-works-ext-header">
-        <img src="assets/icons/witty-logo.svg" alt="Icon that shows the logo of Witty Works" role="link" tabindex="0" (keydown.enter)="openWittyHomePage()" (click)="openWittyHomePage()">
-        <img src="assets/icons/settings.svg" alt="Settings icon that leads to the Witty dashboard" role="link" tabindex="0" (keydown.enter)="openDashboard()" (click)="openDashboard()">
+    <nav aria-label="{lang.areaLabelHeader}" class="witty-works-ext-header">
+        <img src="assets/icons/witty-logo.svg" alt="{lang.wittyIconAlt}" role="link" tabindex="0" (keydown.enter)="openWittyHomePage()" (click)="openWittyHomePage()">
+        <img src="assets/icons/settings.svg" alt="{lang.settingsIconAlt}" role="link" tabindex="0" (keydown.enter)="openDashboard()" (click)="openDashboard()">
     </nav>
 
     <div class='witty-works-ext-separator'></div>
 
     <section class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-space-between'>
         <h1 class='witty-works-ext-lato-popup-title'>
-            Quick Settings
+            {{lang.quickSettings}}
         </h1>
     </section>
 
@@ -19,7 +19,7 @@
             </div>
         </div>
         <label for="toggle-checkbox-1" id="toggle-description-1" class="description">
-            Check upper & lower case
+            {{lang.caseSensitivity}}
         </label>
     </section>
 
@@ -30,7 +30,7 @@
             </div>
         </div>
         <label for="toggle-checkbox-2" id="toggle-description-2" class="description">
-            Check grammar & spelling
+            {{lang.spellChecking}}
         </label>
     </section>
 
@@ -41,7 +41,7 @@
             </div>
         </div>
         <label for="toggle-checkbox-3" id="toggle-description-3" class="description">
-            Show context
+            {{lang.showContext}}
         </label>
     </section>
 
@@ -50,27 +50,27 @@
         class='witty-works-ext-button witty-works-ext-primary-button-red'
         (click)="openEditor()"
         >
-          Go to Witty Editor
+          {{lang.goToDashboard}}
         </button>
     </section>
 
     <section class='witty-works-ext-section'>
         <p class='witty-works-ext-lato-popup-text'>
-          Logged into {{teamName}}
+            {{lang.signedInTo}} {{teamName}}
         </p>
     </section>
 </div>
 
 <section class='witty-works-ext-section' *ngIf="isDevEnv">
-    <h2 class="witty-works-ext-lato-popup-title">Development Settings</h2>
+    <h2 class="witty-works-ext-lato-popup-title">{{lang.developmentSettings}}</h2>
     <div class='witty-works-ext-left'>
-      <button class='witty-works-ext-button witty-works-ext-primary-button-red' aria-label="Log out" (click)="logout()">
-        Log out
+      <button class='witty-works-ext-button witty-works-ext-primary-button-red' aria-label="{lang.ariaLabelLogOut}" (click)="logout()">
+        {{lang.logOut}}
       </button>
     </div>
 </section>
 
 <footer class="witty-works-ext-lato-popup-text">
     <div class='witty-works-ext-separator'></div>
-    Witty Word Plugin Version: {{ appVersion }}
+    {{lang.wittyVersion}} {{ appVersion }}
 </footer>
