@@ -21,8 +21,6 @@ export class ErrorComponent {
   showContext: boolean = true;
 
   @Input() data: any;
-  // @Input() userIsSignedIn: boolean;
-  @Output() showLearningBiteChange = new EventEmitter<boolean>();
 
   @Output()
   highlightEvent = new EventEmitter();
@@ -31,13 +29,12 @@ export class ErrorComponent {
   acceptSuggestionEvent = new EventEmitter<{ suggestion: IAlternatives }>();
 
   isOpen = false;
-
   suggestions: IAlternatives[] = [];
-
+  showLearningBite: boolean = false;
 
   constructor(private spellcheckerService: CheckingService) {
   }
-
+  
   getContext(word: string) {
     let ctxt = TextUtils.getContext(word, (this.context)!);
     if (ctxt) {
@@ -64,10 +61,10 @@ export class ErrorComponent {
     this.acceptSuggestionEvent.emit({ suggestion });
   }
 
-  showLearningBite = false;
 
-  onClick() {
-    this.showLearningBiteChange.emit(!this.showLearningBite);
+  onClick(url: string | undefined) {
+    this.showLearningBite = !this.showLearningBite;
+    url && window.open(url.split('?')[0], '_blank');
   }
 
   get containerStyle() {
@@ -77,7 +74,7 @@ export class ErrorComponent {
   }
 
   public hasValidSuggestions(): boolean {
-    return this.suggestions && this.suggestions.length > 0 && this.suggestions.some(suggestion => suggestion.text.length > 0);
+    return this.suggestions && this.suggestions.length > 0 && this.suggestions.some(suggestion => suggestion.text && suggestion.text.length > 0);
   }
 
   getExplanationColor(
@@ -87,19 +84,5 @@ export class ErrorComponent {
     else if (gravity < 1.5) return '#F7D4D4';
     else if (gravity > 2.5) return '#FFFFD3';
     else return '#F8E7CB';
-  }
-
-  get textContainerStyle() {
-    return {
-      display: 'flex',
-      flexDirection: this.showLearningBite ? 'row' : 'column',
-      alignItems: this.showLearningBite ? 'center' : 'flex-start',
-    };
-  }
-
-  get urlContainerStyle() {
-    return {
-      marginTop: this.showLearningBite ? '0em' : '1em',
-    };
   }
 }

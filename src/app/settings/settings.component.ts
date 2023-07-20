@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SettingsService } from "../services/settings.service";
 import { Subscription } from "rxjs";
-import { AuthService } from '../auth.service';
 // this loads package.json
 // then you destructure that object and take out the 'version' property from it
 // and finally with ': appVersion' you rename it to const appVersion
@@ -17,6 +16,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   showContext: boolean = true;
   checkUpperAndLowerCase: boolean = true;
   checkGrammarAndSpelling: boolean = true;
+  teamName = '';
 
   public appVersion = '-';
 
@@ -24,7 +24,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   private checkUpperAndLowerCaseSubscription?: Subscription;
   private checkGrammarAndSpellingSubscription?: Subscription;
 
-  constructor(private settingsService: SettingsService, private authService: AuthService) {
+  constructor(private settingsService: SettingsService) {
   }
 
   get isDevEnv(): boolean {
@@ -45,6 +45,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.appVersion = appVersion;
+    
+    this.teamName = localStorage.getItem('organization_name') || '';
 
     this.showContextSubscription = this.settingsService.getShowContextObservable().subscribe(ctx => {
       this.showContext = ctx;
@@ -86,6 +88,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.authService.logout();
+    localStorage.setItem('access_token', '');
   }
 }

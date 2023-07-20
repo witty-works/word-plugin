@@ -10,13 +10,12 @@
         
 
         <section class="suggestions" *ngIf="isOpen">
+        <div
+          class="witty-works-ext-wittyworks-container witty-works-ext-container-rounded witty-works-ext-full-padding witty-works-ext-justify-start"
+          [ngStyle]="containerStyle"
+        >
             <div
-            class="witty-works-ext-wittyworks-container witty-works-ext-container-rounded witty-works-ext-full-padding witty-works-ext-justify-start"
-            [ngStyle]="containerStyle"
-          >
-            <div
-              class="witty-works-ext-lato-popover-text witty-works-ext-justify-space-between"
-              [ngStyle]="textContainerStyle"
+              class="witty-works-ext-lato-popover-text witty-works-ext-justify-space-between witty-works-ext-wittyworks-container"
             >
               <div class="witty-works-ext-container-row witty-works-ext-justify-start">
                 <div class="witty-works-ext-explanation-icon">{{error.details.explanation.icon}}</div>
@@ -26,13 +25,12 @@
 
               <ng-container *ngIf="error.details.explanation?.url">
                 <div class="witty-works-ext-container-row witty-works-ext-justify-end witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer"
-                     [ngStyle]="urlContainerStyle"             
-                     (click)="onClick()"
+                     (click)="onClick(error.details.explanation.url)"
                      tabindex="0"
-                     (keydown.enter)="onClick()"
+                     (keydown.enter)="onClick(error.details.explanation.url)"
                      role="link"
                      >
-                  <div class="witty-works-ext-secondary-button-red witty-works-ext-container-row">
+                  <div class="witty-works-ext-secondary-button-red witty-works-ext-container-row witty-works-ext-margin-top">
                     Learn more
                     <ng-container *ngIf="error.details.explanation.content === 'video'">
                         <img class="witty-works-ext-margin-left" src="assets/icons/video.svg" alt="A video is available for more learning">
@@ -41,12 +39,7 @@
                       class="witty-works-ext-margin-left"
                       style="pointer-events: 'none'"
                     >
-                      <ng-container *ngIf="showLearningBite; else elseBlock">
-                        <img src="assets/icons/arrow-up.svg" alt="The learning bite section is open">
-                      </ng-container>
-                      <ng-template #elseBlock>
-                        <img src="assets/icons/arrow-down.svg" alt="The learning bite section is closed">
-                      </ng-template>
+                      <img src="assets/icons/arrow-right.svg" alt="Learn more">
                     </div>
                   </div>
                 </div>
@@ -56,9 +49,9 @@
           </div>
           <div class="suggestion-title witty-works-ext-margin-top" *ngIf="hasValidSuggestions()">Try instead...</div>
           <ng-container *ngFor="let suggestion of suggestions.slice(0, 5)">
-                <button *ngIf="suggestion.text.length > 0" (click)="acceptSuggestion(suggestion)">{{ suggestion.text }}</button>
+                <button *ngIf="suggestion.text && suggestion.text.length > 0" (click)="acceptSuggestion(suggestion)">{{ suggestion.text }}</button>
                 <br>
-            </ng-container>
+          </ng-container>
         </section>
     </div>
 </ng-container>

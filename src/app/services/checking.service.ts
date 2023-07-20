@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
 import { SettingsService } from "./settings.service";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { BaseUrl, IAlternatives, IBaseUrls, ICheckResponse } from "../data/types";
 import { ISpellingError } from "../data/data-structures";
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CheckingService {
-
+  checkUpperAndLowerCase: boolean = true;
+  checkGrammarAndSpelling: boolean = true;
   BaseUrls: IBaseUrls = {
     Prod: {
       api: 'https://default.api.witty.works/',
@@ -26,22 +28,64 @@ export class CheckingService {
     return this.isDevEnv ? this.BaseUrls.Dev : this.BaseUrls.Prod;
   }
 
-  constructor(private settingsService: SettingsService, private http: HttpClient) {}
+  constructor(private settingsService: SettingsService, private http: HttpClient, private authService: AuthService) {}
 
   checkText(sentence: string): Promise<ICheckResponse> {
-    const request = {
-      type: 'check',
-      text: sentence
-    };
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken || !sentence) {
+      this.authService.makeRefreshTokenRequest().then((response) => {
+        if (response.access_token && response.refresh_token) {
+          localStorage.setItem('access_token', response.access_token);
+          localStorage.setItem('refresh_token', response.refresh_token);
+          this.checkText(sentence);
+        } else {
+          localStorage.setItem('access_token', '');
+          localStorage.setItem('refresh_token', '');
+          Promise.resolve({} as ICheckResponse);
+        }
+      });
+    }
 
-    let params: HttpParams = new HttpParams();
+    this.settingsService.getCheckUpperAndLowerCaseObservable().subscribe(ctx => {
+      this.checkUpperAndLowerCase = ctx;
+    });
+  
+    this.settingsService.getCheckGrammarAndSpellingObservable().subscribe(ctx => {
+      this.checkGrammarAndSpelling = ctx;
+    });
+
+    const url = this.getBaseUrl().api + 'v2.3/check';
+
+    const body = {
+          text: sentence,
+          lang: 'auto',
+          id: 'appID', //TODO
+          client: 'appClient', //TODO
+          config: { //TODO: check that this is correct!
+            disabled_categories: [
+            this.checkGrammarAndSpelling ? '' : 'orthography',
+            this.checkUpperAndLowerCase ? '' : 'casing',
+          ]},
+          config_hash: localStorage.getItem('config_hash'),
+          organization_config_hash: localStorage.getItem('organization_config_hash'),
+    }
 
     const httpOptions = {
-      params: params
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      }
     };
-    return this.http.post<any>(this.getBaseUrl().dashboard + '/debug/check', request, httpOptions).toPromise();
+  
+    return this.http.post<any>(url, body, httpOptions)
+      .toPromise()
+      .catch(error => {
+        // console.error('CORS Error:', error);
+        throw error;
+      });
   }
-
+  
   getSuggestions(word: ISpellingError): Promise<IAlternatives[]> {
     return Promise.resolve(word.details.alternatives);
   }

@@ -2,10 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
 import WordUtils from "../utils/word.utils";
 import { ISpellingError } from "../data/data-structures";
-import { UserDictionaryService } from "../services/user-dictionary.service";
 import { ModalComponent } from "@independer/ng-modal/modal.component";
 import { BaseUrl, IAlternatives, IBaseUrls } from "../data/types";
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth.service';
 
 /* global Word */
 
@@ -18,7 +17,6 @@ export class SpellcheckerComponent implements OnInit {
   accessToken: string = '';
   refreshToken: string = '';
   isDevEnv = window.location.hostname === 'localhost'
-
 
   isSpellchecking = false;
 
@@ -36,18 +34,59 @@ export class SpellcheckerComponent implements OnInit {
 
   error = "";
 
-  constructor(
-      private spellcheckerService: CheckingService,
-      private authService: AuthService
-  ) {
-  }
+  constructor(private spellcheckerService: CheckingService, private authService: AuthService) {}
 
   ngOnInit() {
-    this.authService.isLoggedIn.subscribe((isLoggedIn: any) => {
-      this.isLoggedin = isLoggedIn;
+    const accessToken = localStorage.getItem('access_token') || '';
+    this.isLoggedin = !!accessToken;
+
+    window.addEventListener('storage', (event) => {
+      console.log('storage event', !!accessToken);
+      if (event.key === 'access_token') {
+        this.isLoggedin = !!accessToken;
+      }
+    });    
+    
+    //probably not needed -> just do auth if check fails, but good for testing
+    this.authService.makeAuthRequest().then((response) => {
+      if (!response) return;
+      localStorage.setItem('organization_name', response.organization_name);
+      localStorage.setItem('organization_config_hash', response.organization_config_hash);
+      localStorage.setItem('config_hash', response.config_hash);
     });
 
-    this.isLoggedin = this.authService.getValue();
+  }
+
+  BaseUrls: IBaseUrls = {
+    Prod: {
+      api: 'https://default.api.witty.works/',
+      dashboard: 'https://dashboard.witty.works/',
+    },
+    Dev: {
+      api: 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site/',
+      dashboard: 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/',
+    },
+  };
+
+  getBaseUrl(): BaseUrl {
+    return this.isDevEnv ? this.BaseUrls.Dev : this.BaseUrls.Prod;
+  }
+  
+  login() {
+    const url = `${this.getBaseUrl().dashboard}browser-login?redirect_uri=${`https://localhost:4200/word-plugin/app/login/login.component.html`}?target=${this.getBaseUrl().dashboard}editor?onboarding=true`;
+    window.open(url, '_blank');
+  }
+
+  logout() { 
+    localStorage.setItem('access_token', '');
+  }
+
+  openDashboard() {
+    window.open('https://dashboard.witty.works/en/user/language/customize-witty', '_blank');
+  }
+
+  openWittyHomePage() {
+    window.open('https://witty.works', '_blank');
   }
 
   async checkGrammar(): Promise<void> {
@@ -191,37 +230,5 @@ export class SpellcheckerComponent implements OnInit {
     } else {
       console.error(e);
     }
-  }
-
-  BaseUrls: IBaseUrls = {
-    Prod: {
-      api: 'https://default.api.witty.works/',
-      dashboard: 'https://dashboard.witty.works/',
-    },
-    Dev: {
-      api: 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site/',
-      dashboard: 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/',
-    },
-  };
-
-  getBaseUrl(): BaseUrl {
-    return this.isDevEnv ? this.BaseUrls.Dev : this.BaseUrls.Prod;
-  }
-  
-  login() {
-    const url = `${this.getBaseUrl().dashboard}browser-login?redirect_uri=${`https://localhost:4200/word-plugin/app/login/login.component.html`}?target=${this.getBaseUrl().dashboard}editor?onboarding=true`;
-    window.open(url, '_blank');
-  }
-
-  logout() { 
-    this.authService.logout();
-  }
-
-  openDashboard() {
-    window.open('https://dashboard.witty.works/en/user/language/customize-witty', '_blank');
-  }
-
-  openWittyHomePage() {
-    window.open('https://witty.works', '_blank');
   }
 }
