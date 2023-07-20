@@ -75,10 +75,6 @@ export class ErrorComponent {
     };
   }
 
-  public hasValidSuggestions(): boolean {
-    return this.suggestions && this.suggestions.length > 0 && this.suggestions.some(suggestion => suggestion.text && suggestion.text.length > 0);
-  }
-
   getExplanationColor(
     gravity: number | undefined,
   ): string {
