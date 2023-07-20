@@ -42,9 +42,12 @@
 
             </div>
           </div>
-          <div class="suggestion-title witty-works-ext-margin-top" *ngIf="hasValidSuggestions()">{{lang.tryInstead}}</div>
-          <ng-container *ngFor="let suggestion of suggestions.slice(0, 5)">
-                <button *ngIf="suggestion.text && suggestion.text.length > 0" (click)="acceptSuggestion(suggestion)">{{ suggestion.text }}</button>
+          <div class="suggestion-title witty-works-ext-margin-top">{{lang.tryInstead}}</div>
+          <!-- //TODO: show entire alternative on hover-->
+          <!-- //TODO: add line through word, remove on click -->
+          <ng-container *ngFor="let suggestion of suggestions.slice(0, 5)">            
+                <button (click)="acceptSuggestion(suggestion)">{{ suggestion.text ? suggestion.text.length > 20 && suggestion.context ? suggestion.text.substring(0, 15) + '..' : suggestion.text : error.word}}</button> 
+                {{suggestion.context}}
                 <br>
           </ng-container>
         </section>
