@@ -1,0 +1,17 @@
+name: app
+
+type: nodejs:18
+
+hooks:
+    build: npm run build
+
+web:
+    commands:
+        # Run a no-op process that uses no CPU resources, since this is a static site.
+        start: sleep infinity
+    locations:
+        # This tells Nginx to serve from the base directory
+        "/":
+            root: "dist/word-plugin"
+            index:
+                - "index.html"
