@@ -77,7 +77,12 @@ export class SpellcheckerComponent implements OnInit {
   
   login() {
     const url = `${this.getBaseUrl().dashboard}browser-login?redirect_uri=${`https://localhost:4200/word-plugin/app/login/login.component.html`}?target=${this.getBaseUrl().dashboard}editor?onboarding=true`;
-    window.open(url, '_blank');
+
+    Office.context.ui.displayDialogAsync(url, {height: 50, width: 50}, function (result) {
+      if (result.status === Office.AsyncResultStatus.Failed) {
+        console.log('result.error', result.error)
+      }
+    });
   }
 
   logout() { 

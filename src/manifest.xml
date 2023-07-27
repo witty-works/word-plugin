@@ -17,6 +17,8 @@
   <AppDomains>
     <AppDomain>https://www.witty.works</AppDomain>
     <AppDomain>https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site</AppDomain>
+    <AppDomain>https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site</AppDomain>
+    <AppDomain>https://dashboard.witty.works</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Document" />
