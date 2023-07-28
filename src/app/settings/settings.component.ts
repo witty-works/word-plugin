@@ -31,7 +31,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   get isDevEnv(): boolean {
-    return window.location.hostname === 'localhost'; //TODO: is this the best way to check for dev env?
+    return window.location.hostname === 'localhost';
   }
   
   openDashboard() {
