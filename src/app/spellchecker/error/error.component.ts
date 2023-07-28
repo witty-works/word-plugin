@@ -60,6 +60,9 @@ export class ErrorComponent {
   }
 
   acceptSuggestion(suggestion: IAlternatives) {
+    if (suggestion.remove) {
+      suggestion.text = '';
+    }
     this.acceptSuggestionEvent.emit({ suggestion });
   }
 

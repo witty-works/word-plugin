@@ -143,6 +143,7 @@ export interface IAlternatives {
   remove: boolean;
   inspiration: boolean;
   context: string;
+  hovered?: boolean;
 }
 
 export interface IExplanation {

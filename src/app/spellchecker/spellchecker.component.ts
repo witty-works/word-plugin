@@ -44,9 +44,9 @@ export class SpellcheckerComponent implements OnInit {
     this.isLoggedin = !!accessToken;
 
     window.addEventListener('storage', (event) => {
-      console.log('storage event', !!accessToken);
       if (event.key === 'access_token') {
         this.isLoggedin = !!accessToken;
+        window.location.reload();
       }
     });    
     
@@ -122,10 +122,9 @@ export class SpellcheckerComponent implements OnInit {
             if (!errs) {
               continue;
             }
-            console.log(errs);
             errs.results.forEach(e => {
-              // TODO: check if in ignore list
-
+              console.log('event', e);
+              if(e.text === ' \v') return; //TODO: handle white space typography error in the future
               this.spellingErrors.push({
                 paragraph: paragraphIndex,
                 offset: e.start,
@@ -184,7 +183,6 @@ export class SpellcheckerComponent implements OnInit {
 
         this.updateLineText(obj.paragraphIndex, newParagraph.text);
 
-        // TODO: show toast to revoke change
         this.lastCorrectedError = {
           errorIndex: obj.errorIndex,
           paragraphIndex: obj.paragraphIndex,

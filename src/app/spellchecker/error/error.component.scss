@@ -141,3 +141,22 @@
 .witty-works-ext-margin-left {
   margin-left: 0.5em;
 }
+
+.witty-works-ext-button-wrapper {
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+}
+
+.witty-works-ext-button-wrapper.hovered {
+  height: auto;
+}
+
+.witty-works-ext-button-wrapper.hovered button {
+  height: auto;
+  white-space: normal;
+}
+
+.witty-works-ext-button-wrapper.hovered .tag {
+  display: none;
+}
