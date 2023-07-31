@@ -143,6 +143,7 @@ export interface IAlternatives {
   remove: boolean;
   inspiration: boolean;
   context: string;
+  hovered?: boolean;
 }
 
 export interface IExplanation {
@@ -223,7 +224,12 @@ export interface EnableWittyToggle {
   updateDashboard: boolean;
 }
 
-export interface IgnoredCategory {
-  category: string;
-  timestamp: number;
+export type BaseUrl = {
+  api: string;
+  dashboard: string;
+  plugin: string;
+};
+
+export interface IBaseUrls {
+  [key: string]: BaseUrl;
 }

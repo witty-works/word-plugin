@@ -5,6 +5,7 @@ export default class TextUtils {
         // do not include special characters like àèì, the regex has to be written manually. see:
         // https://stackoverflow.com/a/56945933
         const regExpString = String.raw`(([a-z]+[^a-z]+)|([^a-z]+[a-z]+)){0,3}(?<![äöüÄÖÜàéèòìÀÉÈÒÌ\w])(${TextUtils.escapeRegExp(searchTerm)})(?![äöüÄÖÜàéèòìÀÉÈÒÌ\w])(([a-z]+[^a-z]+)|([^a-z]+[a-z]+)){0,3}`;
+        // const regExpString = String.raw`\b([a-z]+[^a-z]+|[^a-z]+[a-z]+){0,3}\b${TextUtils.escapeRegExp(searchTerm)}\b([a-z]+[^a-z]+|[^a-z]+[a-z]+){0,3}`;
         const regExp = new RegExp(regExpString, 'gm');
         return text.match(regExp)?.[0];
     }

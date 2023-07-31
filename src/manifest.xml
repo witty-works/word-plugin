@@ -17,6 +17,8 @@
   <AppDomains>
     <AppDomain>https://www.witty.works</AppDomain>
     <AppDomain>https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site</AppDomain>
+    <AppDomain>https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site</AppDomain>
+    <AppDomain>https://dashboard.witty.works</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Document" />
@@ -82,7 +84,7 @@
           DefaultValue="https://localhost:4200/word-plugin/index.html" />
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="GetStarted.Title" DefaultValue="GetStarted.Title" />
+        <bt:String id="GetStarted.Title" DefaultValue="Get Started" />
         <bt:String id="CommandsGroup.Label" DefaultValue="Writing" />
         <bt:String id="TaskpaneButton.Label" DefaultValue="Witty - Inclusive Writing" />
       </bt:ShortStrings>

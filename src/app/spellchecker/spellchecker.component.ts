@@ -1,10 +1,11 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
 import WordUtils from "../utils/word.utils";
 import { ISpellingError } from "../data/data-structures";
-import { UserDictionaryService } from "../services/user-dictionary.service";
 import { ModalComponent } from "@independer/ng-modal/modal.component";
-import { IAlternatives } from "../data/types";
+import { BaseUrl, IAlternatives, IBaseUrls } from "../data/types";
+import { AuthService } from '../services/auth.service';
+import { en, de } from '../translations';
 
 /* global Word */
 
@@ -13,11 +14,18 @@ import { IAlternatives } from "../data/types";
   templateUrl: './spellchecker.component.html',
   styleUrls: ['./spellchecker.component.scss']
 })
-export class SpellcheckerComponent {
+export class SpellcheckerComponent implements OnInit {
+  accessToken: string = '';
+  refreshToken: string = '';
+  isDevEnv = window.location.hostname === 'localhost'
 
   isSpellchecking = false;
 
   isFirstRun = true;
+
+  isLoggedin = true;
+
+  lang = Office.context.displayLanguage.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   paragraphs: string[] = [];
 
@@ -29,10 +37,66 @@ export class SpellcheckerComponent {
 
   error = "";
 
-  constructor(
-      private spellcheckerService: CheckingService,
-      private userDictionaryService: UserDictionaryService,
-  ) {
+  constructor(private spellcheckerService: CheckingService, private authService: AuthService) {}
+
+  ngOnInit() {
+    const accessToken = localStorage.getItem('access_token') || '';
+    this.isLoggedin = !!accessToken;
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'access_token') {
+        this.isLoggedin = !!accessToken;
+        window.location.reload();
+      }
+    });    
+    
+    //probably not needed -> just do auth if check fails, but good for testing
+    this.authService.makeAuthRequest().then((response) => {
+      if (!response) return;
+      localStorage.setItem('organization_name', response.organization_name);
+      localStorage.setItem('organization_config_hash', response.organization_config_hash);
+      localStorage.setItem('config_hash', response.config_hash);
+    });
+
+  }
+
+  BaseUrls: IBaseUrls = {
+    Prod: {
+      api: 'https://default.api.witty.works/',
+      dashboard: 'https://dashboard.witty.works/',
+      plugin: 'https://word.witty.works/',
+    },
+    Dev: {
+      api: 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site/',
+      dashboard: 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/',
+      plugin: 'https://localhost:4200/word-plugin/',
+    },
+  };
+
+  getBaseUrl(): BaseUrl {
+    return this.isDevEnv ? this.BaseUrls.Dev : this.BaseUrls.Prod;
+  }
+  
+  login() {
+    const url = `${this.getBaseUrl().dashboard}browser-login?redirect_uri=${this.getBaseUrl().plugin + `app/login/login.component.html`}?target=${this.getBaseUrl().dashboard}word-addin`;
+
+    Office.context.ui.displayDialogAsync(url, {height: 50, width: 50}, function (result) {
+      if (result.status === Office.AsyncResultStatus.Failed) {
+        console.log('result.error', result.error)
+      }
+    });
+  }
+
+  logout() { 
+    localStorage.setItem('access_token', '');
+  }
+
+  openDashboard() {
+    window.open('https://dashboard.witty.works/en/user/language/customize-witty', '_blank');
+  }
+
+  openWittyHomePage() {
+    window.open('https://witty.works', '_blank');
   }
 
   async checkGrammar(): Promise<void> {
@@ -52,15 +116,17 @@ export class SpellcheckerComponent {
         this.spellingErrors = [];
         for (let paragraphIndex = 0; paragraphIndex < this.paragraphs.length; paragraphIndex++) {
           const paragraph = this.paragraphs[paragraphIndex];
+          if (!paragraph) {
+            continue;
+          }
           try {
             const errs = await this.spellcheckerService.checkText(paragraph);
             if (!errs) {
               continue;
             }
-            console.log(errs);
             errs.results.forEach(e => {
-              // TODO: check if in ignore list
-
+              console.log('event', e);
+              if(e.text === ' \v') return; //TODO: handle white space typography error in the future
               this.spellingErrors.push({
                 paragraph: paragraphIndex,
                 offset: e.start,
@@ -91,7 +157,7 @@ export class SpellcheckerComponent {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText);
+        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText, obj.paragraphIndex);
         const errorRange = await WordUtils.getWordRange(context, paragraphRange, errorText);
 
         errorRange.select('Select');
@@ -107,7 +173,7 @@ export class SpellcheckerComponent {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText);
+        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText, obj.paragraphIndex);
         const errorRange = await WordUtils.getWordRange(context, paragraphRange, errorText);
 
         errorRange.insertText(obj.suggestion.text, 'Replace');
@@ -119,7 +185,6 @@ export class SpellcheckerComponent {
 
         this.updateLineText(obj.paragraphIndex, newParagraph.text);
 
-        // TODO: show toast to revoke change
         this.lastCorrectedError = {
           errorIndex: obj.errorIndex,
           paragraphIndex: obj.paragraphIndex,
@@ -134,11 +199,6 @@ export class SpellcheckerComponent {
         this.handleError(e);
       }
     });
-  }
-
-  ignoreWord(obj: {paragraphIndex: number, errorIndex: number, word: string }) {
-    this.userDictionaryService.addToDictionary(obj.word);
-    this.removeGrammarError(obj.errorIndex);
   }
 
   private getLineText(lineIndex: number): string {

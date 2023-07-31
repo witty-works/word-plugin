@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { TabType } from "../data/tabs";
+import { en, de } from '../translations';
 
 @Component({
   selector: 'app-tabs',
@@ -7,6 +8,8 @@ import { TabType } from "../data/tabs";
   styleUrls: ['./tabs.component.scss']
 })
 export class TabsComponent {
+  lang = Office.context.displayLanguage.split('-')[0].toLowerCase() === 'de' ? de : en;
+
   @Input()
   selectedTab: TabType = 'spellchecker';
 
@@ -15,5 +18,9 @@ export class TabsComponent {
 
   tabChanged(type: TabType) {
     this.tabChangedEvent.emit(type);
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('access_token');
   }
 }

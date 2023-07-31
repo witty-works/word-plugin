@@ -1,17 +1,22 @@
+@import '../../styles/variables';
+
 :host {
 
 }
 
 .error-box {
-  border: 1px solid #a4a4a4;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  background-color: white;
-  padding: 10px;
+  border: 1px solid $darkGray;
+  background-color: $white;
+  border-radius: 8px;
+  margin-bottom: 0.5em;
+  padding: 1em;
+  font-family: $lato;
 
   .header {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     cursor: pointer;
 
     .preview {
@@ -19,7 +24,7 @@
     }
 
     .toggle {
-      width: 20px;
+     margin-left: 0.5em;
 
       &.active {
         img {
@@ -32,9 +37,11 @@
   .suggestions {
     margin-top: 16px;
     padding-top: 16px;
-    border-top: 1px solid #a4a4a4;
+    border-top: 1px solid $darkGray;
 
     .suggestion-title {
+      font-size: 16px;
+      color: $black;;
       margin-bottom: 8px;
     }
 
@@ -46,7 +53,7 @@
     .ignore-button-container {
       text-align: right;
       padding-top: 8px;
-      border-top: 1px solid #a4a4a4;
+      border-top: 1px solid $darkGray;
 
       button {
         margin-right: 0;
@@ -54,4 +61,102 @@
       }
     }
   }
+}
+
+.witty-works-ext-wittyworks-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-bottom: 0.5em;
+}
+
+.witty-works-ext-container-rounded {
+  border-radius: 8px;
+}
+
+.witty-works-ext-full-padding {
+  padding: 1.5em;
+}
+
+.witty-works-ext-justify-start {
+  justify-content: flex-start;
+}
+
+.witty-works-ext-margin-top {
+  margin-top: 1em;
+}
+
+.witty-works-ext-lato-popover-text {
+  font-family: $lato;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px; /* or 214% */
+  color: $black;
+}
+
+.witty-works-ext-justify-space-between {
+  justify-content: space-between;
+}
+
+.witty-works-ext-explanation-icon {
+  font-size: 2em; 
+  margin-right: 0.5em;
+}
+
+.witty-works-ext-container-row {
+  display: flex;
+  flex-direction: row !important;
+  align-items: center;
+}
+
+.witty-works-ext-justify-start {
+  justify-content: flex-start;
+}
+
+.witty-works-ext-justify-end {
+  justify-content: flex-end;
+}
+
+.witty-works-ext-lato-popover-text-gray {
+  font-family: $lato;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px; /* or 214% */
+  color: $extraDarkGray;
+}
+
+.witty-works-ext-cursor-pointer {
+  cursor: pointer;
+}
+
+.witty-works-ext-secondary-button-red {
+  border: 1px solid $orange;
+  border-radius: 8px;
+  color: $orange;
+  padding: 0.4em;
+}
+
+.witty-works-ext-margin-left {
+  margin-left: 0.5em;
+}
+
+.witty-works-ext-button-wrapper {
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+}
+
+.witty-works-ext-button-wrapper.hovered {
+  height: auto;
+}
+
+.witty-works-ext-button-wrapper.hovered button {
+  height: auto;
+  white-space: normal;
+}
+
+.witty-works-ext-button-wrapper.hovered .tag {
+  display: none;
 }

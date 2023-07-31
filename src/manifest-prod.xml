@@ -17,6 +17,8 @@
   <SupportUrl DefaultValue="https://www.witty.works/en/help/wittys-help-center" />
   <AppDomains>
     <AppDomain>https://www.witty.works</AppDomain>
+    <AppDomain>https://default.api.witty.works</AppDomain>
+    <AppDomain>https://dashboard.witty.works</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Document" />
@@ -83,7 +85,7 @@
           DefaultValue="https://word.witty.works/index.html" />
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="GetStarted.Title" DefaultValue="GetStarted.Title" />
+        <bt:String id="GetStarted.Title" DefaultValue="Get Started" />
         <bt:String id="CommandsGroup.Label" DefaultValue="Writing" />
         <bt:String id="TaskpaneButton.Label" DefaultValue="Witty - Inclusive Writing" />
       </bt:ShortStrings>

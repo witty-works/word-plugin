@@ -1,26 +1,76 @@
-<div class="preferences">
-    <div class="toggle">
+<div>
+    <nav aria-label="{lang.areaLabelHeader}" class="witty-works-ext-header">
+        <img src="assets/icons/witty-logo.svg" alt="{lang.wittyIconAlt}" role="link" tabindex="0" (keydown.enter)="openWittyHomePage()" (click)="openWittyHomePage()">
+        <img src="assets/icons/settings.svg" alt="{lang.settingsIconAlt}" role="link" tabindex="0" (keydown.enter)="openDashboard()" (click)="openDashboard()">
+    </nav>
+
+    <div class='witty-works-ext-separator'></div>
+
+    <section class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-space-between'>
+        <h1 class='witty-works-ext-lato-popup-title'>
+            {{lang.quickSettings}}
+        </h1>
+    </section>
+
+    <section class="toggle" aria-labelledby="toggle-description-1">
         <div class="toggler">
             <div class="check-box">
-                <input type="checkbox" [ngModel]="showContext" (ngModelChange)="showContextChanged($event)">
+                <input type="checkbox" id="toggle-checkbox-1" [ngModel]="checkUpperAndLowerCase" (ngModelChange)="checkUpperAndLowerCaseChanged($event)">
             </div>
         </div>
-        <div class="description">
-            Show context
+        <label for="toggle-checkbox-1" id="toggle-description-1" class="description">
+            {{lang.caseSensitivity}}
+        </label>
+    </section>
+
+    <section class="toggle" aria-labelledby="toggle-description-2">
+        <div class="toggler">
+            <div class="check-box">
+                <input type="checkbox" id="toggle-checkbox-2" [ngModel]="checkGrammarAndSpelling" (ngModelChange)="checkGrammarAndSpellingChanged($event)">
+            </div>
         </div>
-    </div>
+        <label for="toggle-checkbox-2" id="toggle-description-2" class="description">
+            {{lang.spellChecking}}
+        </label>
+    </section>
+
+    <section class="toggle" aria-labelledby="toggle-description-3">
+        <div class="toggler">
+            <div class="check-box">
+                <input type="checkbox" id="toggle-checkbox-3" [ngModel]="showContext" (ngModelChange)="showContextChanged($event)">
+            </div>
+        </div>
+        <label for="toggle-checkbox-3" id="toggle-description-3" class="description">
+            {{lang.showContext}}
+        </label>
+    </section>
+
+    <section class='witty-works-ext-left'>
+        <button
+        class='witty-works-ext-button witty-works-ext-primary-button-red'
+        (click)="openEditor()"
+        >
+          {{lang.goToDashboard}}
+        </button>
+    </section>
+
+    <section class='witty-works-ext-section'>
+        <p class='witty-works-ext-lato-popup-text'>
+            {{lang.signedInTo}} {{teamName}}
+        </p>
+    </section>
 </div>
 
-<div>
-    <div class="impressum">
-        <p>
-            This Word Plugin is provided by <a href="https://www.witty.works/" target="_blank">Witty
-                Works AG</a>
-        </p>
+<section class='witty-works-ext-section' *ngIf="isDevEnv">
+    <h2 class="witty-works-ext-lato-popup-title">{{lang.developmentSettings}}</h2>
+    <div class='witty-works-ext-left'>
+      <button class='witty-works-ext-button witty-works-ext-primary-button-red' aria-label="{lang.ariaLabelLogOut}" (click)="logout()">
+        {{lang.logOut}}
+      </button>
     </div>
-    <div class="version">
-        <p>
-            Witty Word Plugin Version: {{ appVersion }}
-        </p>
-    </div>
-</div>
+</section>
+
+<footer class="witty-works-ext-lato-popup-text">
+    <div class='witty-works-ext-separator'></div>
+    {{lang.wittyVersion}} {{ appVersion }}
+</footer>

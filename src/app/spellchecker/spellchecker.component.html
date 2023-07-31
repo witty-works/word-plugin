@@ -1,37 +1,98 @@
-<button (click)="checkGrammar()">Witty Check</button>
+<div *ngIf="!isLoggedin">
+    <nav aria-label="{lang.areaLabelHeader}" class="witty-works-ext-header">
+        <img src="assets/icons/witty-logo.svg" alt="{lang.wittyIconAlt}" role="link" tabindex="0" (keydown.enter)="openWittyHomePage()" (click)="openWittyHomePage()">
+    </nav>
+
+    <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-full-padding witty-works-ext-justify-start witty-works-ext-margin-top witty-works-ext-cursor-pointer witty-works-ext-full-padding witty-works-ext-light-gray-background'>
+        <div class='witty-works-ext-margin-right'>
+            <img src="assets/icons/sad-face.svg" alt="{lang.sadFaceIconAlt}">
+        </div>
+        <div class='witty-works-ext-lato-popover-text witty-works-ext-margin-left'>
+            {{lang.loginToUnlock}}
+            <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer'>
+                <div class='witty-works-ext-margin-right'>
+                    {{lang.signedOutText}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class='witty-works-ext-full-padding'>
+        <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-start'>
+            <div class='witty-works-ext-margin-right'>
+                <img src="assets/icons/star.svg" alt="{lang.starIconAlt}">
+            </div>
+            <div class='witty-works-ext-lato-popover-text'>
+                {{lang.biasDetection}}
+            </div>
+        </div>
+        <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-start'>
+            <div class='witty-works-ext-margin-right'>
+                <img src="assets/icons/star.svg" alt="Star">
+            </div>
+            <div class='witty-works-ext-lato-popover-text'>
+                {{lang.inclusiveAlternatives}}
+            </div>
+        </div>
+        <div class='witty-works-ext-container-row witty-works-ext-justify-start'>
+            <div class='witty-works-ext-margin-right'>
+                <img src="assets/icons/star.svg" alt="Star">
+            </div>
+            <div class='witty-works-ext-lato-popover-text'>
+                {{lang.teamFeatures}}
+            </div>
+        </div>
+    </div>
+
+    <div class='witty-works-ext-wittyworks-container witty-works-ext-full-padding witty-works-ext-light-gray-background witty-works-ext-left'>
+        <button class='witty-works-ext-button witty-works-ext-primary-button-red' (click)="login()">
+            {{lang.signIn}}
+        </button>
+        <div class='witty-works-ext-lato-popup-text witty-works-ext-margin-top-half'>
+            {{lang.dontHaveAccount}}
+            <span class='witty-works-ext-lato-popup-text-purple witty-works-ext-cursor-pointer' (click)="login()">
+                {{lang.signUp}}
+            </span>
+        </div>
+    </div>
+
+</div>
+
+
+<div *ngIf="isLoggedin">
+<button class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="checkGrammar()">{{lang.wittyCheck}}</button>
 
 <div *ngIf="spellingErrors.length > 0" class="number-spelling-errors">
-    {{ spellingErrors.length }} proposals:
+    {{ spellingErrors.length }} {{lang.suggstions}}:
 </div>
 <app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphs" (highlightEvent)="highlight($event)"
-    (acceptSuggestionEvent)="acceptSuggestion($event)" (ignoreWordEvent)="ignoreWord($event)"
+    (acceptSuggestionEvent)="acceptSuggestion($event)"
     *ngIf="!isFirstRun && spellingErrors.length > 0"></app-errors-list>
 
 <div class="full-size-notification" *ngIf="isFirstRun">
-    <span>Click «Witty Check», to get suggestions</span>
+    <span>{{lang.clickWittyCheck}}</span>
 </div>
 
 <div class="full-size-notification" *ngIf="!isFirstRun && spellingErrors.length === 0">
-    <span>No further suggestions ..</span>
+    <span>{{lang.noFurtherSuggestions}}</span>
 </div>
 
-<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="line-scale" [fullScreen]="true"
+<ngx-spinner bdColor="#f1f2f2" size="medium" color="#f06464" type="line-scale" [fullScreen]="true"
     [showSpinner]="isSpellchecking">
-    <p style="color: white">Suggesting ... </p>
+    <!-- <p>{{lang.analyzing}}</p> -->
 </ngx-spinner>
 
 <modal #errorModal>
     <modal-header>
-        <h4>Error</h4>
+        <h4>{{lang.error}}</h4>
     </modal-header>
     <modal-content>
         <p>{{ error }}</p>
-
-        <p style="margin-top: 24px;">Please try again.</p>
+        <p style="margin-top: 24px;">{{lang.tryAgain}}</p>
     </modal-content>
     <modal-footer>
-        <button class="secondary" (click)="errorModal.close(false)" style="margin-right: 12px;">No, do not analyze
-            again</button>
-        <button (click)="errorModal.close(true)">Yes, analyze the text again</button>
+        <button class="secondary" (click)="errorModal.close(false)" style="margin-right: 12px;">{{lang.dontAnalyzeAgain}}</button>
+        <button (click)="errorModal.close(true)">{{lang.analyzeAgain}}</button>
     </modal-footer>
 </modal>
+</div>

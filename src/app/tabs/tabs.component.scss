@@ -1,32 +1,29 @@
+@import '../styles/variables';
+
 :host {
-  background: #F4F4F4;
+  background: $whiteGray;
   height: 40px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
-  border-top: 1px solid #95989A;
-  padding-top: 2px;
+  justify-content: space-between;
+  border-top: 1px solid $darkGray;
   flex-shrink: 0;
 
   .tab {
-    font-family: "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
-    line-height: 19px;
+    font-family: $lato;
     font-size: 14px;
-    text-align: center;
-    color: #333333;
-    text-align: center;
-    width: 30%;
+    width: 50%;
     cursor: pointer;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-top: #F4F4F4 4px solid;
+    border-top: 1px solid $darkGray;
 
     &.selected {
-      font-weight: bold;
-      border-top: #0078D4 4px solid;
+      font-weight: $bold;
+      border-top: 2px solid $orange;
     }
   }
 }

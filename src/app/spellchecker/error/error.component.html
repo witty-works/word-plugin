@@ -1,18 +1,65 @@
 <ng-container *ngIf="error && context">
     <div class="error-box">
-        <div class="header" (click)="toggle()">
-            <div class="preview" *ngIf="showContext" [innerHTML]="getContext(error.word) | highlight:error.word"></div>
+        <header class="header" (click)="toggle()">
+            <div class="preview" *ngIf="showContext" [innerHTML]="getContext(error.word) | highlight:error"></div>
             <div class="preview" *ngIf="!showContext">{{ error.word }}</div>
-            <div class="toggle" [class.active]="isOpen"><img src="assets/icons/chevron-down.svg"
-                    alt="Icon that indicates, if box is open"></div>
-        </div>
-        <div class="suggestions" *ngIf="isOpen">
-            <div class="suggestion-title">Proposal:</div>
-            <button *ngFor="let suggestion of suggestions" (click)="acceptSuggestion(suggestion)">{{ suggestion.text }}</button>
-
-            <div class="ignore-button-container">
-                <button class="secondary" (click)="ignoreWord(error.word)">Add to personal ignore list</button>
+            <div class="toggle" [class.active]="isOpen" tabindex="0" (keydown.enter)="toggle()" role="button">
+                <img src="assets/icons/chevron-down.svg" alt="{lang.arrowDownIconAlt}">
             </div>
-        </div>
+        </header>
+        
+
+        <section class="suggestions" *ngIf="isOpen">
+        <div
+          class="witty-works-ext-wittyworks-container witty-works-ext-container-rounded witty-works-ext-full-padding witty-works-ext-justify-start"
+          [ngStyle]="containerStyle"
+        >
+            <div class="witty-works-ext-lato-popover-text witty-works-ext-justify-space-between witty-works-ext-wittyworks-container">
+              <div class="witty-works-ext-container-row witty-works-ext-justify-start">
+                <div class="witty-works-ext-explanation-icon">{{error.details.explanation.icon}}</div>
+                {{error.details.explanation.text}}
+                {{error.details.explanation.context ? ' (' + error.details.explanation.context + ')' : ''}}
+              </div>
+
+              <ng-container *ngIf="error.details.explanation?.url">
+                <div class="witty-works-ext-container-row witty-works-ext-justify-end witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer"
+                     (click)="onClick(error.details.explanation.url)"
+                     tabindex="0"
+                     (keydown.enter)="onClick(error.details.explanation.url)"
+                     role="link"
+                     >
+                  <div class="witty-works-ext-secondary-button-red witty-works-ext-container-row witty-works-ext-margin-top">
+                    {{lang.learnMore}}
+                    <ng-container *ngIf="error.details.explanation.content === 'video'">
+                        <img class="witty-works-ext-margin-left" src="assets/icons/video.svg" alt="{lang.videoIconAlt}">
+                    </ng-container>
+                    <div class="witty-works-ext-margin-left" style="pointer-events: 'none'">
+                      <img src="assets/icons/arrow-right.svg" alt="{lang.arrowRightAlt}">
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+
+            </div>
+          </div>
+          <div class="suggestion-title witty-works-ext-margin-top" *ngIf="suggestions.length > 0">{{lang.tryInstead}}</div>
+          <ng-container *ngFor="let suggestion of suggestions.slice(0, 5)">     
+            <div class="witty-works-ext-button-wrapper" [class.hovered]="suggestion.hovered">
+              <button 
+                (click)="acceptSuggestion(suggestion)" 
+                (mouseenter)="suggestion.hovered = true" 
+                (mouseleave)="suggestion.hovered = false" 
+                [ngStyle]="{'text-decoration': suggestion.text ? 'none' : 'line-through'}">
+                  {{ suggestion.text 
+                    ? (suggestion.hovered || !suggestion.context || suggestion.text.length <= 20)
+                      ? suggestion.text 
+                      : (suggestion.text.substring(0, 15) + '..')
+                    : error.word
+                  }}
+              </button>
+              <div class="tag" *ngIf="!suggestion.hovered">{{suggestion.context}}</div>
+            </div>       
+          </ng-container>
+        </section>
     </div>
 </ng-container>
