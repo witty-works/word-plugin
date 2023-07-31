@@ -79,10 +79,15 @@ export class SpellcheckerComponent implements OnInit {
   
   login() {
     const url = `${this.getBaseUrl().dashboard}browser-login?redirect_uri=${this.getBaseUrl().plugin + `app/login/login.component.html`}?target=${this.getBaseUrl().dashboard}word-addin`;
-
-    Office.context.ui.displayDialogAsync(url, {height: 50, width: 50}, function (result) {
+  
+    Office.context.ui.displayDialogAsync(url, { height: 50, width: 50 }, function (result) {
       if (result.status === Office.AsyncResultStatus.Failed) {
-        console.log('result.error', result.error)
+        console.log('result.error', result.error);
+      } else {
+        //close window after 5 seconds
+        setTimeout(function () {
+          result.value.close();
+        }, 5000);
       }
     });
   }
