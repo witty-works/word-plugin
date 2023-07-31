@@ -15,3 +15,4 @@ web:
             root: "dist/word-plugin"
             index:
                 - "index.html"
+            passthru: "/index.html"
