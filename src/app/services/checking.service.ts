@@ -16,10 +16,12 @@ export class CheckingService {
     Prod: {
       api: 'https://default.api.witty.works/',
       dashboard: 'https://dashboard.witty.works/',
+      plugin: 'https://word.witty.works/',
     },
     Dev: {
       api: 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site/',
       dashboard: 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/',
+      plugin: 'https://localhost:4200/word-plugin/',
     },
   };
 

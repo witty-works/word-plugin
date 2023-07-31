@@ -227,6 +227,7 @@ export interface EnableWittyToggle {
 export type BaseUrl = {
   api: string;
   dashboard: string;
+  plugin: string;
 };
 
 export interface IBaseUrls {

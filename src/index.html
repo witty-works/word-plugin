@@ -1,8 +1,9 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>OfficeAngular</title>
 
@@ -14,33 +15,36 @@
   <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
 
   <!-- For more information on Office UI Fabric, visit https://developer.microsoft.com/fabric. -->
-  <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/9.6.1/css/fabric.min.css"/>
+  <link rel="stylesheet"
+    href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/9.6.1/css/fabric.min.css" />
 </head>
+
 <body class="ms-font-m ms-welcome">
-<app-root></app-root>
+  <app-root></app-root>
 
-<script>
+  <script>
 
-  // Show update message for old Office versions that base on IE / Edge legacy
-  if (navigator.userAgent.indexOf("Trident") !== -1 || navigator.userAgent.indexOf("Edge") !== -1) {
-    const ieMessage = document.getElementById("ie-warn");
-    if (ieMessage) {
-      ieMessage.style.display = 'block';
+    // Show update message for old Office versions that base on IE / Edge legacy
+    if (navigator.userAgent.indexOf("Trident") !== -1 || navigator.userAgent.indexOf("Edge") !== -1) {
+      const ieMessage = document.getElementById("ie-warn");
+      if (ieMessage) {
+        ieMessage.style.display = 'block';
+      }
     }
-  }
 
-  const searchParams = new URLSearchParams(window.location.search);
-  if ([...searchParams].length > 0 && searchParams.get('access_token')) {
-    localStorage.setItem('access_token', searchParams.get('access_token'));
-    localStorage.setItem('refresh_token', searchParams.get('refresh_token'));
-    const target = searchParams.get('target')?.split('?')[0];
-    window.open(
-      target ? target : `https://dashboard.witty.works/editor?onboarding=true`,
-      '_self',
-      'noopener'
-    );
-  }
+    const searchParams = new URLSearchParams(window.location.search);
+    if ([...searchParams].length > 0 && searchParams.get('access_token')) {
+      localStorage.setItem('access_token', searchParams.get('access_token'));
+      localStorage.setItem('refresh_token', searchParams.get('refresh_token'));
+      const target = searchParams.get('target')?.split('?')[0];
+      window.open(
+        target ? target : `https://dashboard.witty.works/word-addin`,
+        '_self',
+        'noopener'
+      );
+    }
 
-</script>
+  </script>
 </body>
+
 </html>

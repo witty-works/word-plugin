@@ -64,10 +64,12 @@ export class SpellcheckerComponent implements OnInit {
     Prod: {
       api: 'https://default.api.witty.works/',
       dashboard: 'https://dashboard.witty.works/',
+      plugin: 'https://word.witty.works/',
     },
     Dev: {
       api: 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site/',
       dashboard: 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/',
+      plugin: 'https://localhost:4200/word-plugin/',
     },
   };
 
@@ -76,7 +78,7 @@ export class SpellcheckerComponent implements OnInit {
   }
   
   login() {
-    const url = `${this.getBaseUrl().dashboard}browser-login?redirect_uri=${`https://localhost:4200/word-plugin/app/login/login.component.html`}?target=${this.getBaseUrl().dashboard}editor?onboarding=true`;
+    const url = `${this.getBaseUrl().dashboard}browser-login?redirect_uri=${this.getBaseUrl().plugin + `app/login/login.component.html`}?target=${this.getBaseUrl().dashboard}word-addin`;
 
     Office.context.ui.displayDialogAsync(url, {height: 50, width: 50}, function (result) {
       if (result.status === Office.AsyncResultStatus.Failed) {
