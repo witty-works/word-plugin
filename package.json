@@ -2,7 +2,7 @@
   "name": "witty-word-plugin",
   "version": "1.0.6",
   "scripts": {
-    "build": "ng build --configuration production --base-href=/word-plugin/",
+    "build": "ng build --configuration production --base-href=/",
     "build:test": "ng build --configuration test",
     "build:dev": "ng build",
     "dev-server": "bash -c \"ng serve --ssl --ssl-key ~/.office-addin-dev-certs/localhost.key --ssl-cert ~/.office-addin-dev-certs/localhost.crt\"",
@@ -41,7 +41,7 @@
     "@microsoft/office-js-helpers": "^1.0.2",
     "core-js": "^3.29.1",
     "ngx-spinner": "^15.0.1",
-    "ngx-virtual-scroller": "^4.0.3",
+    "@iharbeck/ngx-virtual-scroller": "^15.2.0",
     "office-ui-fabric-js": "^1.5.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
