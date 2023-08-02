@@ -136,3 +136,6 @@ dist/word-plugin
 
 
 .idea
+
+# Sentry Auth Token
+.sentryclirc
