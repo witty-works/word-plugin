@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule, APP_INITIALIZER, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -15,6 +15,8 @@ import { VirtualScrollerModule } from "@iharbeck/ngx-virtual-scroller";
 import { FormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
 import { ModalModule } from "@independer/ng-modal";
+import { Router } from "@angular/router";
+import * as Sentry from "@sentry/angular-ivy";
 
 @NgModule({
   declarations: [
@@ -36,7 +38,24 @@ import { ModalModule } from "@independer/ng-modal";
     FormsModule,
     ModalModule,
   ],
-  providers: [],
+  providers: [
+    {
+     provide: ErrorHandler,
+     useValue: Sentry.createErrorHandler({
+      showDialog: false,
+     }),
+    },
+    {
+     provide: Sentry.TraceService,
+     deps: [Router],
+    },
+    {
+     provide: APP_INITIALIZER,
+     useFactory: () => () => { },
+     deps: [Sentry.TraceService],
+     multi: true,
+    }
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   bootstrap: [AppComponent]
 })
