@@ -1,0 +1,5 @@
+src/sentry.ts
+witty-works
+word-plugin
+npm run build
+./dist/word-plugin
