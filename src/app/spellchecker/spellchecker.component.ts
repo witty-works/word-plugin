@@ -97,11 +97,11 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   openDashboard() {
-    window.open('https://dashboard.witty.works/en/user/language/customize-witty', '_blank');
+    Office.context.ui.openBrowserWindow('https://dashboard.witty.works/en/user/language/customize-witty');
   }
 
   openWittyHomePage() {
-    window.open('https://witty.works', '_blank');
+    Office.context.ui.openBrowserWindow('https://witty.works');
   }
 
   async checkGrammar(): Promise<void> {
