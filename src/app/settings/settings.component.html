@@ -1,12 +1,15 @@
 <div>
     <nav aria-label="{lang.areaLabelHeader}" class="witty-works-ext-header">
-        <img src="assets/icons/witty-logo.svg" alt="{lang.wittyIconAlt}" role="link" tabindex="0" (keydown.enter)="openWittyHomePage()" (click)="openWittyHomePage()">
-        <img src="assets/icons/settings.svg" alt="{lang.settingsIconAlt}" role="link" tabindex="0" (keydown.enter)="openDashboard()" (click)="openDashboard()">
+        <img src="assets/icons/witty-logo.svg" alt="{lang.wittyIconAlt}" role="link" tabindex="0"
+            (keydown.enter)="openWittyHomePage()" (click)="openWittyHomePage()">
+        <img src="assets/icons/settings.svg" alt="{lang.settingsIconAlt}" role="link" tabindex="0"
+            (keydown.enter)="openDashboard()" (click)="openDashboard()">
     </nav>
 
     <div class='witty-works-ext-separator'></div>
 
-    <section class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-space-between'>
+    <section
+        class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-space-between'>
         <h1 class='witty-works-ext-lato-popup-title'>
             {{lang.quickSettings}}
         </h1>
@@ -15,7 +18,8 @@
     <section class="toggle" aria-labelledby="toggle-description-1">
         <div class="toggler">
             <div class="check-box">
-                <input type="checkbox" id="toggle-checkbox-1" [ngModel]="checkUpperAndLowerCase" (ngModelChange)="checkUpperAndLowerCaseChanged($event)">
+                <input type="checkbox" id="toggle-checkbox-1" [ngModel]="checkUpperAndLowerCase"
+                    (ngModelChange)="checkUpperAndLowerCaseChanged($event)">
             </div>
         </div>
         <label for="toggle-checkbox-1" id="toggle-description-1" class="description">
@@ -26,7 +30,8 @@
     <section class="toggle" aria-labelledby="toggle-description-2">
         <div class="toggler">
             <div class="check-box">
-                <input type="checkbox" id="toggle-checkbox-2" [ngModel]="checkGrammarAndSpelling" (ngModelChange)="checkGrammarAndSpellingChanged($event)">
+                <input type="checkbox" id="toggle-checkbox-2" [ngModel]="checkGrammarAndSpelling"
+                    (ngModelChange)="checkGrammarAndSpellingChanged($event)">
             </div>
         </div>
         <label for="toggle-checkbox-2" id="toggle-description-2" class="description">
@@ -37,7 +42,8 @@
     <section class="toggle" aria-labelledby="toggle-description-3">
         <div class="toggler">
             <div class="check-box">
-                <input type="checkbox" id="toggle-checkbox-3" [ngModel]="showContext" (ngModelChange)="showContextChanged($event)">
+                <input type="checkbox" id="toggle-checkbox-3" [ngModel]="showContext"
+                    (ngModelChange)="showContextChanged($event)">
             </div>
         </div>
         <label for="toggle-checkbox-3" id="toggle-description-3" class="description">
@@ -46,11 +52,8 @@
     </section>
 
     <section class='witty-works-ext-left'>
-        <button
-        class='witty-works-ext-button witty-works-ext-primary-button-red'
-        (click)="openEditor()"
-        >
-          {{lang.goToDashboard}}
+        <button class='witty-works-ext-button witty-works-ext-primary-button-red' (click)="openEditor()">
+            {{lang.goToDashboard}}
         </button>
     </section>
 
@@ -61,12 +64,12 @@
     </section>
 </div>
 
-<section class='witty-works-ext-section' *ngIf="isDevEnv">
-    <h2 class="witty-works-ext-lato-popup-title">{{lang.developmentSettings}}</h2>
+<section class='witty-works-ext-section'>
     <div class='witty-works-ext-left'>
-      <button class='witty-works-ext-button witty-works-ext-primary-button-red' aria-label="{lang.ariaLabelLogOut}" (click)="logout()">
-        {{lang.logOut}}
-      </button>
+        <button class='witty-works-ext-button witty-works-ext-primary-button-red' aria-label="{lang.ariaLabelLogOut}"
+            (click)="logout()">
+            {{lang.logOut}}
+        </button>
     </div>
 </section>
 
