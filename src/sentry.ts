@@ -7,7 +7,7 @@ import { AppModule } from "./app/app.module";
 if (environment.sentry_dsn) {
   Sentry.init({
     environment: environment.environment,
-    release: `${environment.sentry_package_name}@1.0.7`,
+    release: `${environment.sentry_package_name}@${environment.package_version}`,
     dsn: environment.sentry_dsn,
     integrations: [
     new Sentry.BrowserTracing({

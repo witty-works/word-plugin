@@ -4,7 +4,7 @@ import { HttpClient } from "@angular/common/http";
 import { IAlternatives, ICheckResponse } from "../data/types";
 import { ISpellingError } from "../data/data-structures";
 import { AuthService } from './auth.service';
-const { version: appVersion } = require('../../../package.json');
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -47,7 +47,7 @@ export class CheckingService {
     const body = {
           text: sentence,
           lang: 'auto',
-          client: 'word-plugin:' + appVersion,
+          client: 'word-plugin:' + environment.package_version,
           config: { //TODO: check that this is correct!
             disabled_categories: [
             this.checkGrammarAndSpelling ? '' : 'orthography',

@@ -3,6 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
+  package_version: "1.0.7-dev",
   production: false,
   environment: "development",
   sentry_dsn: "",
