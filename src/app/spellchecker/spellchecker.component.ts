@@ -3,9 +3,10 @@ import { CheckingService } from "../services/checking.service";
 import WordUtils from "../utils/word.utils";
 import { ISpellingError } from "../data/data-structures";
 import { ModalComponent } from "@independer/ng-modal/modal.component";
-import { BaseUrl, IAlternatives, IBaseUrls } from "../data/types";
+import { IAlternatives } from "../data/types";
 import { AuthService } from '../services/auth.service';
 import { en, de } from '../translations';
+import { environment } from '../../environments/environment';
 
 /* global Word */
 
@@ -17,7 +18,7 @@ import { en, de } from '../translations';
 export class SpellcheckerComponent implements OnInit {
   accessToken: string = '';
   refreshToken: string = '';
-  isDevEnv = window.location.hostname === 'localhost'
+  environment = window.location.hostname === 'localhost'
 
   isSpellchecking = false;
 
@@ -59,26 +60,9 @@ export class SpellcheckerComponent implements OnInit {
     });
 
   }
-
-  BaseUrls: IBaseUrls = {
-    Prod: {
-      api: 'https://default.api.witty.works/',
-      dashboard: 'https://dashboard.witty.works/',
-      plugin: 'https://word.witty.works/',
-    },
-    Dev: {
-      api: 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site/',
-      dashboard: 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/',
-      plugin: 'https://localhost:4200/word-plugin/',
-    },
-  };
-
-  getBaseUrl(): BaseUrl {
-    return this.isDevEnv ? this.BaseUrls.Dev : this.BaseUrls.Prod;
-  }
   
   login() {
-    const url = `${this.getBaseUrl().dashboard}browser-login?redirect_uri=${this.getBaseUrl().plugin + `app/login/login.component.html`}?target=${this.getBaseUrl().dashboard}word-addin`;
+    const url = `${environment.dashboard}browser-login?redirect_uri=${environment.plugin + `app/login/login.component.html`}?target=${environment.dashboard}word-addin`;
 
     Office.context.ui.displayDialogAsync(url, {height: 50, width: 50}, function (result) {
       if (result.status === Office.AsyncResultStatus.Failed) {

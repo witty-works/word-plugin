@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { SettingsService } from "./settings.service";
 import { HttpClient } from "@angular/common/http";
-import { BaseUrl, IAlternatives, IBaseUrls, ICheckResponse } from "../data/types";
+import { IAlternatives, ICheckResponse } from "../data/types";
 import { ISpellingError } from "../data/data-structures";
 import { AuthService } from './auth.service';
-const { version: appVersion } = require('../../../package.json');
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,24 +12,8 @@ const { version: appVersion } = require('../../../package.json');
 export class CheckingService {
   checkUpperAndLowerCase: boolean = true;
   checkGrammarAndSpelling: boolean = true;
-  BaseUrls: IBaseUrls = {
-    Prod: {
-      api: 'https://default.api.witty.works/',
-      dashboard: 'https://dashboard.witty.works/',
-      plugin: 'https://word.witty.works/',
-    },
-    Dev: {
-      api: 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site/',
-      dashboard: 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/',
-      plugin: 'https://localhost:4200/word-plugin/',
-    },
-  };
 
   isDevEnv = window.location.hostname === 'localhost'
-
-  getBaseUrl(): BaseUrl {
-    return this.isDevEnv ? this.BaseUrls.Dev : this.BaseUrls.Prod;
-  }
 
   constructor(private settingsService: SettingsService, private http: HttpClient, private authService: AuthService) {}
 
@@ -58,12 +42,12 @@ export class CheckingService {
       this.checkGrammarAndSpelling = ctx;
     });
 
-    const url = this.getBaseUrl().api + 'v2.3/check';
+    const url = environment.api + 'v2.3/check';
 
     const body = {
           text: sentence,
           lang: 'auto',
-          client: 'word-plugin:' + appVersion,
+          client: 'word-plugin:' + environment.package_version,
           config: { //TODO: check that this is correct!
             disabled_categories: [
             this.checkGrammarAndSpelling ? '' : 'orthography',
