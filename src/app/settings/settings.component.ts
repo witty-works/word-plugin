@@ -92,5 +92,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   logout() {
     localStorage.setItem('access_token', '');
+    localStorage.setItem('refresh_token', '');
   }
 }
