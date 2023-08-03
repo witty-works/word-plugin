@@ -40,11 +40,10 @@ export const de = {
     spellChecking: 'Grammatik & Rechtschreibung',
     showContext: 'Kontext anzeigen',
     goToDashboard: 'Zum Witty Editor',
-    signedInTo: 'Signed in to DE',
-    developmentSettings: 'Entwicklungs-Einstellungen',
-    ariaLabelLogOut: 'Log out DE',
-    logOut: 'Log out DE',
-    wittyVersion: 'Witty Word Plugin Version: DE',
+    signedInTo: 'Angemeldet bei ',
+    ariaLabelLogOut: '',
+    logOut: 'Abmelden',
+    wittyVersion: 'Witty Word Plugin Version: ',
 };
 
 export const en = {
@@ -90,8 +89,7 @@ export const en = {
     showContext: 'Show context',
     goToDashboard: 'Go to Witty Editor',
     signedInTo: 'Signed in to ',
-    developmentSettings: 'Development Settings',
-    ariaLabelLogOut: 'Log out',
+    ariaLabelLogOut: '',
     logOut: 'Log out',
     wittyVersion: 'Witty Word Plugin Version: ',
 };
