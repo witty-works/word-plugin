@@ -1,7 +1,7 @@
 export const de = {
     //tabs
-    writing: 'Writing DE',
-    settings: 'Settings DE',
+    writing: 'Prüfen',
+    settings: 'Einstellungen',
 
     //spellchecker
     loginToUnlock: 'Jetzt anmelden!',
