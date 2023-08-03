@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { SettingsService } from "./settings.service";
 import { HttpClient } from "@angular/common/http";
-import { BaseUrl, IBaseUrls, ICheckResponse } from "../data/types";
+import { ICheckResponse } from "../data/types";
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,24 +9,7 @@ import { BaseUrl, IBaseUrls, ICheckResponse } from "../data/types";
 export class AuthService {
   accessToken = localStorage.getItem('access_token');
 
-  BaseUrls: IBaseUrls = {
-    Prod: {
-      api: 'https://default.api.witty.works/',
-      dashboard: 'https://dashboard.witty.works/',
-      plugin: 'https://word.witty.works/',
-    },
-    Dev: {
-      api: 'https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site/',
-      dashboard: 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/',
-      plugin: 'https://localhost:4200/word-plugin/',
-    },
-  };
-
   isDevEnv = window.location.hostname === 'localhost'
-
-  getBaseUrl(): BaseUrl {
-    return this.isDevEnv ? this.BaseUrls.Dev : this.BaseUrls.Prod;
-  }
 
   constructor(private http: HttpClient) {}
 
@@ -48,7 +31,7 @@ export class AuthService {
       });
     }
 
-    const url = this.getBaseUrl().api + 'v2.0/auth';
+    const url = environment.api + 'v2.0/auth';
     const httpOptions = {
       headers: {
         Accept: 'application/json',
@@ -67,7 +50,7 @@ export class AuthService {
 
   makeRefreshTokenRequest(): Promise<any> {
     const refreshToken = localStorage.getItem('refresh_token');
-    const url = this.getBaseUrl().dashboard + 'api/refresh-token';
+    const url = environment.dashboard + 'api/refresh-token';
 
     const httpOptions = {
       headers: {
