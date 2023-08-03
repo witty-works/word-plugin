@@ -2,11 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SettingsService } from "../services/settings.service";
 import { Subscription } from "rxjs";
 import { en, de } from '../translations';
-
-// this loads package.json
-// then you destructure that object and take out the 'version' property from it
-// and finally with ': appVersion' you rename it to const appVersion
-const { version: appVersion } = require('../../../package.json');
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-settings',
@@ -47,9 +43,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.appVersion = appVersion;
+    this.appVersion = environment.package_version;
     
-    this.teamName = localStorage.getItem('organization_name') || '';
+    this.teamName = localStorage.getItem('organization_name') ?? '';
 
     this.showContextSubscription = this.settingsService.getShowContextObservable().subscribe(ctx => {
       this.showContext = ctx;
@@ -92,5 +88,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   logout() {
     localStorage.setItem('access_token', '');
+    localStorage.setItem('refresh_token', '');
   }
 }
