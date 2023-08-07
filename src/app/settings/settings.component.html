@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="isLoggedin">
     <nav aria-label="{lang.areaLabelHeader}" class="witty-works-ext-header">
         <img src="assets/icons/witty-logo.svg" alt="{lang.wittyIconAlt}" role="link" tabindex="0" (keydown.enter)="openWittyHomePage()" (click)="openWittyHomePage()">
         <img src="assets/icons/settings.svg" alt="{lang.settingsIconAlt}" role="link" tabindex="0" (keydown.enter)="openDashboard()" (click)="openDashboard()">
@@ -52,7 +52,7 @@
     </section>
 </div>
 
-<section class='witty-works-ext-section' *ngIf="isDevEnv">
+<section class='witty-works-ext-section' *ngIf="isDevEnv && isLoggedin">
     <h2 class="witty-works-ext-lato-popup-title">{{lang.developmentSettings}}</h2>
     <div class='witty-works-ext-left'>
       <button class='witty-works-ext-button witty-works-ext-primary-button-red' aria-label="{lang.ariaLabelLogOut}" (click)="logout()">
@@ -61,7 +61,7 @@
     </div>
 </section>
 
-<footer class="witty-works-ext-lato-popup-text">
+<footer class="witty-works-ext-lato-popup-text" *ngIf="isLoggedin">
     <div class='witty-works-ext-separator'></div>
     {{lang.wittyVersion}} {{ appVersion }}
 </footer>

@@ -83,11 +83,6 @@ export class SpellcheckerComponent implements OnInit {
     Office.context.ui.displayDialogAsync(url, { height: 50, width: 50 }, function (result) {
       if (result.status === Office.AsyncResultStatus.Failed) {
         console.log('result.error', result.error);
-      } else {
-        //close window after 5 seconds
-        setTimeout(function () {
-          result.value.close();
-        }, 5000);
       }
     });
   }
@@ -181,16 +176,11 @@ export class SpellcheckerComponent implements OnInit {
         const errorText = this.getGrammarErrorText(obj.errorIndex);
         const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText, obj.paragraphIndex);
 
-        const errorRange = await WordUtils.getWordRange(context, paragraphRange, " " + errorText + " ");
-        console.log('paragrap', paragraphRange, 'errorText', errorText);
-
-        console.log('errorRange', errorRange);
+        const errorRange = await WordUtils.getWordRange(context, paragraphRange, obj.suggestion.text.length == 0 ? " " + errorText : errorText);
 
         errorRange.insertText(obj.suggestion.text, 'Replace');        
     
-
         errorRange.select('End');
-
 
         const newParagraph = paragraphRange.paragraphs.getFirst();
         newParagraph.load('text');

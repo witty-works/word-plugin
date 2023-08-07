@@ -23,7 +23,6 @@
   <app-root></app-root>
 
   <script>
-
     // Show update message for old Office versions that base on IE / Edge legacy
     if (navigator.userAgent.indexOf("Trident") !== -1 || navigator.userAgent.indexOf("Edge") !== -1) {
       const ieMessage = document.getElementById("ie-warn");
@@ -34,8 +33,15 @@
 
     const searchParams = new URLSearchParams(window.location.search);
     if ([...searchParams].length > 0 && searchParams.get('access_token')) {
+      
       localStorage.setItem('access_token', searchParams.get('access_token'));
       localStorage.setItem('refresh_token', searchParams.get('refresh_token'));
+      const target = searchParams.get('target')?.split('?')[0];
+      window.open(
+        target ? target : `https://dashboard.witty.works/word-addin`,
+        '_self',
+        'noopener'
+      );
     }
 
   </script>
