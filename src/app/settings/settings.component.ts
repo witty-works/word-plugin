@@ -35,15 +35,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
   
   openDashboard() {
-    window.open('https://dashboard.witty.works/en/user/language/customize-witty', '_blank');
-  }
-
-  openEditor() {
-    window.open('https://dashboard.witty.works/en/editor', '_blank'); 
+    Office.context.ui.openBrowserWindow('https://dashboard.witty.works/en/user/language/customize-witty');
   }
 
   openWittyHomePage() {
-    window.open('https://witty.works', '_blank');
+    Office.context.ui.openBrowserWindow('https://witty.works');
   }
 
   ngOnInit() {
