@@ -69,5 +69,5 @@
 
 <footer class="witty-works-ext-lato-popup-text" *ngIf="isLoggedin">
     <div class='witty-works-ext-separator'></div>
-    {{lang.wittyVersion}} {{ appVersion }}
+    {{lang.wittyVersion}} {{ appVersion }} <span class="witty-works-ext-link" (click)="openHelpCenter()">{{lang.help}}</span>
 </footer>

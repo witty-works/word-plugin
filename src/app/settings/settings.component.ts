@@ -39,6 +39,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
     Office.context.ui.openBrowserWindow('https://witty.works');
   }
 
+  openHelpCenter() {
+    Office.context.ui.openBrowserWindow('https://www.witty.works/en/help/wittys-help-center');
+  }
+
   ngOnInit() {
     this.appVersion = environment.package_version;
     
