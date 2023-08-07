@@ -94,6 +94,7 @@ export class SpellcheckerComponent implements OnInit {
 
   logout() { 
     localStorage.setItem('access_token', '');
+    localStorage.setItem('refresh_token', '');
   }
 
   openDashboard() {
@@ -179,10 +180,17 @@ export class SpellcheckerComponent implements OnInit {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
         const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText, obj.paragraphIndex);
-        const errorRange = await WordUtils.getWordRange(context, paragraphRange, errorText);
 
-        errorRange.insertText(obj.suggestion.text, 'Replace');
+        const errorRange = await WordUtils.getWordRange(context, paragraphRange, " " + errorText + " ");
+        console.log('paragrap', paragraphRange, 'errorText', errorText);
+
+        console.log('errorRange', errorRange);
+
+        errorRange.insertText(obj.suggestion.text, 'Replace');        
+    
+
         errorRange.select('End');
+
 
         const newParagraph = paragraphRange.paragraphs.getFirst();
         newParagraph.load('text');
