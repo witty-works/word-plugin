@@ -36,7 +36,7 @@ class DocumentUtils {
         await context.sync();
 
         let matchEntireWord = true;
-        if (Office.context.diagnostics.platform === OfficePlatformType.OfficeOnline || lookupText.includes('\u000b')) {
+        if (Office.context.diagnostics.platform === OfficePlatformType.OfficeOnline || lookupText.includes('\u000b') || lookupText.includes(' ')) {
             const specialCharPattern = /\W/g;
             const match = lookupText.match(specialCharPattern);
             if (match !== null) {
