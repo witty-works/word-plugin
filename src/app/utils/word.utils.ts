@@ -35,13 +35,14 @@ export default class WordUtils {
 
     static async getWordRange(context: Word.RequestContext, range: Word.Range, errorText: string): Promise<Word.Range> {
         range.load('text');
+        range.insertText(' ', 'End');
         await context.sync();
 
         // Word online seems to have issues with searching whole words including special characters:
         // https://github.com/OfficeDev/office-js/issues/3360
         // Thus, disabling whole word match if online and if the word contains a special character
         let useMatchWholeWord = true;
-        if (Office.context.diagnostics.platform === PlatformType.OfficeOnline) {
+        if (Office.context.diagnostics.platform === PlatformType.OfficeOnline || errorText.includes(' ')) {
             let pattern = /\W/g;
             let result = errorText.match(pattern);
             if(result !== null){

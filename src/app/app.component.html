@@ -5,6 +5,6 @@
     </div>
 </div>
 
-<div id="tabs">
+<div id="tabs" *ngIf="isLoggedin">
     <app-tabs [selectedTab]="selectedTab" (tabChangedEvent)="tabChanged($event)"></app-tabs>
 </div>

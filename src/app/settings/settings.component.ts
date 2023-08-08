@@ -11,6 +11,7 @@ import { environment } from '../../environments/environment';
 })
 export class SettingsComponent implements OnInit, OnDestroy {
 
+  isLoggedin = true;
   showContext: boolean = true;
   checkUpperAndLowerCase: boolean = true;
   checkGrammarAndSpelling: boolean = true;
@@ -31,15 +32,15 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
   
   openDashboard() {
-    window.open('https://dashboard.witty.works/en/user/language/customize-witty', '_blank');
-  }
-
-  openEditor() {
-    window.open('https://dashboard.witty.works/en/editor', '_blank'); 
+    Office.context.ui.openBrowserWindow('https://dashboard.witty.works/en/user/language/customize-witty');
   }
 
   openWittyHomePage() {
-    window.open('https://witty.works', '_blank');
+    Office.context.ui.openBrowserWindow('https://witty.works');
+  }
+
+  openHelpCenter() {
+    Office.context.ui.openBrowserWindow('https://www.witty.works/en/help/wittys-help-center');
   }
 
   ngOnInit() {
@@ -89,5 +90,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
   logout() {
     localStorage.setItem('access_token', '');
     localStorage.setItem('refresh_token', '');
+    this.isLoggedin = false;
   }
 }

@@ -44,6 +44,7 @@ export const de = {
     ariaLabelLogOut: '',
     logOut: 'Abmelden',
     wittyVersion: 'Witty Word Plugin Version: ',
+    help: 'Hilfe',
 };
 
 export const en = {
@@ -92,5 +93,6 @@ export const en = {
     ariaLabelLogOut: '',
     logOut: 'Log out',
     wittyVersion: 'Witty Word Plugin Version: ',
+    help: 'Help',
 };
 
