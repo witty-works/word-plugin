@@ -38,7 +38,8 @@ export class ErrorComponent {
   }
   
   getContext(word: string) {
-    let ctxt = TextUtils.getContext(word, (this.context)!);
+    if (!this.context) return;
+    let ctxt = TextUtils.getContext(word, this.context);
     if (ctxt) {
       ctxt = ctxt.replace(/()/g, '<img src="assets/icons/soft-return.svg" class="soft-return-icon" alt="Soft return icon"><br>');
     }

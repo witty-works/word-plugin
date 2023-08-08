@@ -104,7 +104,7 @@ export class SpellcheckerComponent implements OnInit {
             continue;
           }
           try {
-            const errs = await this.spellcheckerService.checkText(paragraph);
+            const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'));
             if (!errs) {
               continue;
             }
