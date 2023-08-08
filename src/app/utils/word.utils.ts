@@ -35,6 +35,7 @@ export default class WordUtils {
 
     static async getWordRange(context: Word.RequestContext, range: Word.Range, errorText: string): Promise<Word.Range> {
         range.load('text');
+        range.insertText(' ', 'End');
         await context.sync();
 
         // Word online seems to have issues with searching whole words including special characters:

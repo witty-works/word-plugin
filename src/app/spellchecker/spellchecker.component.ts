@@ -160,7 +160,7 @@ export class SpellcheckerComponent implements OnInit {
         const errorText = this.getGrammarErrorText(obj.errorIndex);
         const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText, obj.paragraphIndex);
 
-        const errorRange = await WordUtils.getWordRange(context, paragraphRange, obj.suggestion.text.length == 0 ? " " + errorText : errorText);
+        const errorRange = await WordUtils.getWordRange(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
 
         errorRange.insertText(obj.suggestion.text, 'Replace');        
     
