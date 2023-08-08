@@ -66,21 +66,22 @@ export class SpellcheckerComponent implements OnInit {
 
     Office.context.ui.displayDialogAsync(url, {height: 50, width: 50}, function (result) {
       if (result.status === Office.AsyncResultStatus.Failed) {
-        console.log('result.error', result.error)
+        console.log('result.error', result.error);
       }
     });
   }
 
   logout() { 
     localStorage.setItem('access_token', '');
+    localStorage.setItem('refresh_token', '');
   }
 
   openDashboard() {
-    window.open('https://dashboard.witty.works/en/user/language/customize-witty', '_blank');
+    Office.context.ui.openBrowserWindow('https://dashboard.witty.works/en/user/language/customize-witty');
   }
 
   openWittyHomePage() {
-    window.open('https://witty.works', '_blank');
+    Office.context.ui.openBrowserWindow('https://witty.works');
   }
 
   async checkGrammar(): Promise<void> {
@@ -158,9 +159,10 @@ export class SpellcheckerComponent implements OnInit {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
         const paragraphRange = await WordUtils.fetchParagraph(context, paragraphText, obj.paragraphIndex);
-        const errorRange = await WordUtils.fetchTextBounds(context, paragraphRange, errorText);
+        const errorRange = await WordUtils.fetchTextBounds(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
 
-        errorRange.insertText(obj.suggestion.text, 'Replace');
+        errorRange.insertText(obj.suggestion.text, 'Replace');        
+    
         errorRange.select('End');
 
         const newParagraph = paragraphRange.paragraphs.getFirst();

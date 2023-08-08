@@ -38,6 +38,7 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 1em;
+  margin-right: 1em;
 
   img {
     cursor: pointer;
@@ -124,4 +125,10 @@
   font-size: 14px;
   line-height: 20px; /* or 214% */
   color: $black;
+}
+
+.witty-works-ext-link {
+  color: $wittyPurple;
+  cursor: pointer;
+  text-decoration: underline;
 }

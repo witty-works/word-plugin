@@ -70,7 +70,7 @@ export class ErrorComponent {
 
   onClick(url: string | undefined) {
     this.showLearningBite = !this.showLearningBite;
-    url && window.open(url.split('?')[0], '_blank');
+    url && Office.context.ui.openBrowserWindow(url);
   }
 
   get containerStyle() {
