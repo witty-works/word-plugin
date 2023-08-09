@@ -1,5 +1,3 @@
 src/manifest.xml,src/manifest-prod.xml,src/environments/environment.ts,src/environments/environment.prod.ts
 witty-works
 word-plugin
-npm run build
-./dist/word-plugin
