@@ -1,2 +1,11 @@
-<div class="tab" [class.selected]="selectedTab === 'spellchecker'" (click)="tabChanged('spellchecker')">{{lang.writing}}</div>
-<div class="tab" [class.selected]="selectedTab === 'settings'" (click)="tabChanged('settings')">{{lang.settings}}</div>
+<div class="tab" 
+     [class.selected]="selectedTab === 'spellchecker'" 
+     (click)="tabChanged('spellchecker')"
+     (keydown.enter)="tabChanged('spellchecker')" 
+     tabindex="0">{{lang.writing}}</div>
+
+<div class="tab" 
+     [class.selected]="selectedTab === 'settings'" 
+     (click)="tabChanged('settings')"
+     (keydown.enter)="tabChanged('settings')" 
+     tabindex="0">{{lang.settings}}</div>
