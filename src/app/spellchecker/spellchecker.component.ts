@@ -142,7 +142,7 @@ export class SpellcheckerComponent implements OnInit {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText, obj.paragraphIndex);
+        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText);
         const errorRange = await WordUtils.getWordRange(context, paragraphRange, errorText);
 
         errorRange.select('Select');
@@ -158,7 +158,7 @@ export class SpellcheckerComponent implements OnInit {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText, obj.paragraphIndex);
+        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText);
 
         const errorRange = await WordUtils.getWordRange(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
 
