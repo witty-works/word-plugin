@@ -68,6 +68,19 @@ export class CheckingService {
     return this.http.post<any>(url, body, httpOptions)
       .toPromise()
       .catch(error => {
+        if (error.status === 403) {
+          this.authService.makeAuthRequest().then((response) => {
+            if (response.access_token && response.refresh_token) {
+              localStorage.setItem('access_token', response.access_token);
+              localStorage.setItem('refresh_token', response.refresh_token);
+              this.checkText(sentence);
+            } else {
+              localStorage.setItem('access_token', '');
+              localStorage.setItem('refresh_token', '');
+              Promise.resolve({} as ICheckResponse);
+            }
+          });
+        }
         // console.error('CORS Error:', error);
         throw error;
       });

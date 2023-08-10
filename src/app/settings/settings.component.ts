@@ -11,7 +11,7 @@ import { environment } from '../../environments/environment';
 })
 export class SettingsComponent implements OnInit, OnDestroy {
 
-  isLoggedin = true;
+  isLoggedin = false;
   showContext: boolean = true;
   checkUpperAndLowerCase: boolean = true;
   checkGrammarAndSpelling: boolean = true;
@@ -45,6 +45,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.appVersion = environment.package_version;
+    this.isLoggedin = !!localStorage.getItem('access_token');
     
     this.teamName = localStorage.getItem('organization_name') ?? '';
 

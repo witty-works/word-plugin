@@ -14,7 +14,7 @@ export class AppComponent {
     this.isLoggedin = !!localStorage.getItem('access_token'); 
   }
 
-  isLoggedin = true;
+  isLoggedin = false;
 
   ngOnInit() {
     this.isLoggedin = !!localStorage.getItem('access_token'); 
