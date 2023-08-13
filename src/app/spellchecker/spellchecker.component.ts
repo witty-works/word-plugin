@@ -26,7 +26,7 @@ export class SpellcheckerComponent implements OnInit {
 
   isLoggedin = true;
 
-  lang = Office.context.displayLanguage.split('-')[0].toLowerCase() === 'de' ? de : en;
+  lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   paragraphs: string[] = [];
 

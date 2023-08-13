@@ -16,7 +16,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   checkUpperAndLowerCase: boolean = true;
   checkGrammarAndSpelling: boolean = true;
   teamName = '';
-  lang = Office.context.displayLanguage.split('-')[0].toLowerCase() === 'de' ? de : en;
+  lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   public appVersion = '-';
 
