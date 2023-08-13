@@ -32,7 +32,7 @@ export class ErrorComponent {
   isOpen = false;
   suggestions: IAlternatives[] = [];
   showLearningBite: boolean = false;
-  lang = Office.context.displayLanguage.split('-')[0].toLowerCase() === 'de' ? de : en;
+  lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   constructor(private spellcheckerService: CheckingService) {
   }

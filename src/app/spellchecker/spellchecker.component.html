@@ -18,30 +18,28 @@
     </div>
 
     <div class='witty-works-ext-full-padding'>
-        <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-start'>
-            <div class='witty-works-ext-margin-right'>
-                <img src="assets/icons/star.svg" alt="{lang.starIconAlt}">
-            </div>
-            <div class='witty-works-ext-lato-popover-text'>
-                {{lang.biasDetection}}
-            </div>
-        </div>
-        <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-start'>
-            <div class='witty-works-ext-margin-right'>
-                <img src="assets/icons/star.svg" alt="Star">
-            </div>
-            <div class='witty-works-ext-lato-popover-text'>
-                {{lang.inclusiveAlternatives}}
-            </div>
-        </div>
-        <div class='witty-works-ext-container-row witty-works-ext-justify-start'>
-            <div class='witty-works-ext-margin-right'>
-                <img src="assets/icons/star.svg" alt="Star">
-            </div>
-            <div class='witty-works-ext-lato-popover-text'>
-                {{lang.teamFeatures}}
-            </div>
-        </div>
+        <ul aria-label="Features">
+            <li class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-start'>
+                <div class='witty-works-ext-margin-right'>
+                    <img src="assets/icons/star.svg" alt="{lang.starIconAlt}">
+                </div>
+                <span class='witty-works-ext-lato-popover-text'>{{lang.biasDetection}}</span>
+            </li>
+            
+            <li class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-start'>
+                <div class='witty-works-ext-margin-right'>
+                    <img src="assets/icons/star.svg" alt="Star">
+                </div>
+                <span class='witty-works-ext-lato-popover-text'>{{lang.inclusiveAlternatives}}</span>
+            </li>
+            
+            <li class='witty-works-ext-container-row witty-works-ext-justify-start'>
+                <div class='witty-works-ext-margin-right'>
+                    <img src="assets/icons/star.svg" alt="Star">
+                </div>
+                <span class='witty-works-ext-lato-popover-text'>{{lang.teamFeatures}}</span>
+            </li>
+        </ul>
     </div>
 
     <div class='witty-works-ext-wittyworks-container witty-works-ext-full-padding witty-works-ext-light-gray-background witty-works-ext-left'>
@@ -50,9 +48,9 @@
         </button>
         <div class='witty-works-ext-lato-popup-text witty-works-ext-margin-top-half'>
             {{lang.dontHaveAccount}}
-            <span class='witty-works-ext-lato-popup-text-purple witty-works-ext-cursor-pointer' (click)="login()">
+            <button class='witty-works-ext-lato-popup-text-purple witty-works-ext-cursor-pointer witty-works-ext-link' (click)="login()">
                 {{lang.signUp}}
-            </span>
+            </button>
         </div>
     </div>
 
@@ -60,39 +58,38 @@
 
 
 <div *ngIf="isLoggedin">
-<button class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="checkGrammar()">{{lang.wittyCheck}}</button>
+    <button tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="checkGrammar()">{{lang.wittyCheck}}</button>
 
-<div *ngIf="spellingErrors.length > 0" class="number-spelling-errors">
-    {{ spellingErrors.length }} {{lang.suggstions}}:
-</div>
-<app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphs" (highlightEvent)="highlight($event)"
-    (acceptSuggestionEvent)="acceptSuggestion($event)"
-    *ngIf="!isFirstRun && spellingErrors.length > 0"></app-errors-list>
+    <div *ngIf="spellingErrors.length > 0" class="number-spelling-errors">
+        {{ spellingErrors.length }} {{lang.suggstions}}:
+    </div>
+    <app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphs" (highlightEvent)="highlight($event)"
+        (acceptSuggestionEvent)="acceptSuggestion($event)"
+        *ngIf="!isFirstRun && spellingErrors.length > 0"></app-errors-list>
 
-<div class="full-size-notification" *ngIf="isFirstRun">
-    <span>{{lang.clickWittyCheck}}</span>
-</div>
+    <div class="full-size-notification" *ngIf="isFirstRun">
+        <span>{{lang.clickWittyCheck}}</span>
+    </div>
 
-<div class="full-size-notification" *ngIf="!isFirstRun && spellingErrors.length === 0">
-    <span>{{lang.noFurtherSuggestions}}</span>
-</div>
+    <div class="full-size-notification" *ngIf="!isFirstRun && spellingErrors.length === 0">
+        <span>{{lang.noFurtherSuggestions}}</span>
+    </div>
 
-<ngx-spinner bdColor="#f1f2f2" size="medium" color="#f06464" type="line-scale" [fullScreen]="true"
-    [showSpinner]="isSpellchecking">
-    <!-- <p>{{lang.analyzing}}</p> -->
-</ngx-spinner>
+    <ngx-spinner bdColor="#f1f2f2" size="medium" color="#f06464" type="line-scale" [fullScreen]="true"
+        [showSpinner]="isSpellchecking">
+    </ngx-spinner>
 
-<modal #errorModal>
-    <modal-header>
-        <h4>{{lang.error}}</h4>
-    </modal-header>
-    <modal-content>
-        <p>{{ error }}</p>
-        <p style="margin-top: 24px;">{{lang.tryAgain}}</p>
-    </modal-content>
-    <modal-footer>
-        <button class="secondary" (click)="errorModal.close(false)" style="margin-right: 12px;">{{lang.dontAnalyzeAgain}}</button>
-        <button (click)="errorModal.close(true)">{{lang.analyzeAgain}}</button>
-    </modal-footer>
-</modal>
+    <modal #errorModal>
+        <modal-header>
+            <h4>{{lang.error}}</h4>
+        </modal-header>
+        <modal-content>
+            <p>{{ error }}</p>
+            <p style="margin-top: 24px;">{{lang.tryAgain}}</p>
+        </modal-content>
+        <modal-footer>
+            <button class="secondary" (click)="errorModal.close(false)" style="margin-right: 12px;">{{lang.dontAnalyzeAgain}}</button>
+            <button (click)="errorModal.close(true)">{{lang.analyzeAgain}}</button>
+        </modal-footer>
+    </modal>
 </div>

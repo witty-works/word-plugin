@@ -3,7 +3,17 @@ name: app
 type: nodejs:18
 
 hooks:
-    build: npm run build
+    build: |
+        set -e
+        npm run build
+        if [ ! -z "$SENTRY_SOURCEMAPS" ]
+        then
+            export CURRENT_VERSION=`grep -oPm1 "(?<=<Version>)[^<]+" src/manifest-prod.xml`
+            echo $CURRENT_VERSION
+
+            ./node_modules/.bin/sentry-cli sourcemaps inject --org witty-works --project word-plugin dist/word-plugin
+            ./node_modules/.bin/sentry-cli sourcemaps upload --org witty-works --project word-plugin dist/word-plugin --release $CURRENT_VERSION
+        fi
 
 web:
     commands:
