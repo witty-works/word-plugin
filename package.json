@@ -21,7 +21,7 @@
     "validate": "office-toolbox validate -m ./src/manifest.xml",
     "validate:prod": "office-toolbox validate -m ./src/manifest-prod.xml"
   },
-  "license": "propietary",
+  "license": "proprietary",
   "config": {
     "app-to-debug": "word",
     "app-type-to-debug": "desktop",
