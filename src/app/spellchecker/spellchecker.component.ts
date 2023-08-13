@@ -24,7 +24,7 @@ export class SpellcheckerComponent implements OnInit {
 
   isFirstRun = true;
 
-  isLoggedin = true;
+  isLoggedin = false;
 
   lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
@@ -110,7 +110,6 @@ export class SpellcheckerComponent implements OnInit {
               continue;
             }
             errs.results.forEach(e => {
-              console.log('event', e);
               if(e.text === ' \v') return; //TODO: handle white space typography error in the future
               this.spellingErrors.push({
                 paragraph: paragraphIndex,
