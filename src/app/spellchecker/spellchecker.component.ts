@@ -142,8 +142,8 @@ export class SpellcheckerComponent implements OnInit {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText, obj.paragraphIndex);
-        const errorRange = await WordUtils.getWordRange(context, paragraphRange, errorText);
+        const paragraphRange = await WordUtils.fetchParagraph(context, paragraphText, obj.paragraphIndex);
+        const errorRange = await WordUtils.fetchTextBounds(context, paragraphRange, errorText);
 
         errorRange.select('Select');
         await context.sync();
@@ -158,9 +158,8 @@ export class SpellcheckerComponent implements OnInit {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText, obj.paragraphIndex);
-
-        const errorRange = await WordUtils.getWordRange(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
+        const paragraphRange = await WordUtils.fetchParagraph(context, paragraphText, obj.paragraphIndex);
+        const errorRange = await WordUtils.fetchTextBounds(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
 
         errorRange.insertText(obj.suggestion.text, 'Replace');        
     
