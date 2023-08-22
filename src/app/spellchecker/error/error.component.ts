@@ -4,6 +4,9 @@ import TextUtils from "../../utils/text.utils";
 import { CheckingService } from "../../services/checking.service";
 import {IAlternatives} from "../../data/types";
 import { en, de } from '../../translations';
+import { useAnalytics } from 'src/app/analytics/analytics';
+
+const analytics = useAnalytics();
 
 @Component({
   selector: 'app-error',
@@ -32,10 +35,12 @@ export class ErrorComponent {
   isOpen = false;
   suggestions: IAlternatives[] = [];
   showLearningBite: boolean = false;
+  
   lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   constructor(private spellcheckerService: CheckingService) {
   }
+  
   
   getContext(word: string) {
     if (!this.context) return;
@@ -48,10 +53,12 @@ export class ErrorComponent {
 
   async toggle(): Promise<void> {
     if (!this.isOpen) {
+      analytics.popoverLogs(this.data, 'popover_open');
       this.isOpen = true;
       this.suggestions = await this.spellcheckerService.getSuggestions(this.error!);
       this.sendHighlight()
     } else {
+      analytics.popoverLogs(this.data, 'popover_close');
       this.isOpen = false;
     }
   }
@@ -70,6 +77,7 @@ export class ErrorComponent {
 
   onClick(url: string | undefined) {
     this.showLearningBite = !this.showLearningBite;
+    analytics.popoverLogs(this.data, 'learning_bites');
     url && Office.context.ui.openBrowserWindow(url);
   }
 

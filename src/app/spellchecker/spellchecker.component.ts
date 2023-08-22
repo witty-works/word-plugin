@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
 import WordUtils from "../utils/word.utils";
 import { ISpellingError } from "../data/data-structures";
@@ -7,9 +7,11 @@ import { IAlternatives } from "../data/types";
 import { AuthService } from '../services/auth.service';
 import { en, de } from '../translations';
 import { environment } from '../../environments/environment';
+import { useAnalytics } from '../analytics/analytics';
+
+const analytics = useAnalytics();
 
 /* global Word */
-
 @Component({
   selector: 'app-spellchecker',
   templateUrl: './spellchecker.component.html',
@@ -25,7 +27,7 @@ export class SpellcheckerComponent implements OnInit {
   isFirstRun = true;
 
   isLoggedin = false;
-
+  
   lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   paragraphs: string[] = [];
@@ -35,6 +37,8 @@ export class SpellcheckerComponent implements OnInit {
   lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string};
 
   @ViewChild('errorModal') errorModal?: ModalComponent;
+
+  @Input() data: any;
 
   error = "";
 
@@ -57,6 +61,8 @@ export class SpellcheckerComponent implements OnInit {
       localStorage.setItem('organization_name', response.organization_name);
       localStorage.setItem('organization_config_hash', response.organization_config_hash);
       localStorage.setItem('config_hash', response.config_hash);
+      localStorage.setItem('user_id', response?.id);
+      localStorage.setItem('organization_id', response?.organization_id);
     });
 
   }
@@ -77,10 +83,12 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   openDashboard() {
+    analytics.openLinkLog('dashboard_open');
     Office.context.ui.openBrowserWindow('https://dashboard.witty.works/en/user/language/customize-witty');
   }
 
   openWittyHomePage() {
+    analytics.openLinkLog('homepage_open');
     Office.context.ui.openBrowserWindow('https://witty.works');
   }
 
@@ -109,6 +117,8 @@ export class SpellcheckerComponent implements OnInit {
             if (!errs) {
               continue;
             }
+            const analytics = useAnalytics();
+            analytics.checkLog(errs, null, paragraph.length, 'check');
             errs.results.forEach(e => {
               if(e.text === ' \v') return; //TODO: handle white space typography error in the future
               this.spellingErrors.push({
@@ -153,6 +163,8 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   acceptSuggestion(obj: {paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
+    analytics.alternativeLog(this.data, obj.suggestion.text);
+
     Word.run(async (context) => {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
