@@ -216,3 +216,13 @@
   line-height: 20px; /* or 214% */
   color: $black;
 }
+
+.witty-works-ext-link {
+  color: $wittyPurple;
+  cursor: pointer;
+  text-decoration: underline;
+  background-color: transparent !important;
+  font-size: 14px;
+  margin-left: -0.6em;
+  margin-top: -0.4em;
+}

@@ -11,12 +11,12 @@ import { environment } from '../../environments/environment';
 })
 export class SettingsComponent implements OnInit, OnDestroy {
 
-  isLoggedin = true;
+  isLoggedin = false;
   showContext: boolean = true;
   checkUpperAndLowerCase: boolean = true;
   checkGrammarAndSpelling: boolean = true;
   teamName = '';
-  lang = Office.context.displayLanguage.split('-')[0].toLowerCase() === 'de' ? de : en;
+  lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   public appVersion = '-';
 
@@ -45,6 +45,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.appVersion = environment.package_version;
+    this.isLoggedin = !!localStorage.getItem('access_token');
     
     this.teamName = localStorage.getItem('organization_name') ?? '';
 

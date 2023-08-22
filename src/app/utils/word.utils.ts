@@ -1,19 +1,14 @@
-// this code is based on https://github.com/divvun/divvun-gramcheck-web/blob/master/msoffice/src/utils/index.ts
+import OfficePlatformType = Office.PlatformType;
 
 import PlatformType = Office.PlatformType;
 
-export default class WordUtils {
-    static async getParagraphRange(context: Word.RequestContext, paragraph: string): Promise<Word.Range> {
+export default class DocumentUtils {
+    static async fetchParagraph(context: Word.RequestContext, paragraph: string): Promise<Word.Range> {
         const body = context.document.body;
         context.load(body);
         await context.sync();
 
-        // NOTE: This had to be done because regex splitting is
-        // not working ok with some browsers
-        // And the reason it should be done like this is the desktop
-        // version of Word which unlike the online one
-        // cannot search for more than 255 chars at a time
-        const chunks = WordUtils.splitStringToChunks(paragraph, 255);
+        const chunks = DocumentUtils.divideTextIntoSegments(paragraph, 255);
 
         let fullRange: Word.Range | null = null;
         for (let index = 0; index < chunks.length; index++) {
@@ -53,65 +48,62 @@ export default class WordUtils {
         return fullRange;
     }    
 
-    static async getWordRange(context: Word.RequestContext, range: Word.Range, errorText: string): Promise<Word.Range> {
-        range.load('text');
-        range.insertText(' ', 'End');
+    static async fetchTextBounds(context: Word.RequestContext, withinRange: Word.Range, lookupText: string): Promise<Word.Range> {
+        withinRange.load('text');
+        withinRange.insertText(' ', 'End');
         await context.sync();
 
-        // Word online seems to have issues with searching whole words including special characters:
-        // https://github.com/OfficeDev/office-js/issues/3360
-        // Thus, disabling whole word match if online and if the word contains a special character
-        let useMatchWholeWord = true;
-        if (Office.context.diagnostics.platform === PlatformType.OfficeOnline || errorText.includes('\u000b')) {
-            let pattern = /\W/g;
-            let result = errorText.match(pattern);
-            if(result !== null){
-                useMatchWholeWord = false;
-                console.log("Disable whole word match for word: " + errorText);
+        let matchEntireWord = true;
+        if (Office.context.diagnostics.platform === OfficePlatformType.OfficeOnline || lookupText.includes('\u000b') || lookupText.includes(' ')) {
+            const specialCharPattern = /\W/g;
+            const match = lookupText.match(specialCharPattern);
+            if (match !== null) {
+                matchEntireWord = false;
+                console.log(`Whole word matching disabled for: ${lookupText}`);
             }
         }
 
-        const errorTextRangeCollection = range.search(errorText, {
+        const searchTextRanges = withinRange.search(lookupText, {
             matchCase: true,
-            matchWholeWord: useMatchWholeWord,
+            matchWholeWord: matchEntireWord,
         });
 
-        const foundErrorRange = errorTextRangeCollection.getFirstOrNullObject();
-        foundErrorRange.load('isNullObject');
+        const locatedTextRange = searchTextRanges.getFirstOrNullObject();
+        locatedTextRange.load('isNullObject');
         await context.sync();
 
-        if (!foundErrorRange || foundErrorRange.isNullObject) {
-            return Promise.reject(new Error('The range for the error was not found: ' + errorText));
+        if (!locatedTextRange || locatedTextRange.isNullObject) {
+            throw new Error(`Cannot find the range for text: ${lookupText}`);
         }
 
-        return foundErrorRange;
+        return locatedTextRange;
     }
 
-    static splitStringToChunks(string: string, chunkLength: number): string[] {
-        const chunks: string[] = [];
+    static divideTextIntoSegments(text: string, segmentSize: number): string[] {
+        const segments: string[] = [];
 
-        let tempString: string = '';
-        let counter: number = 1;
-        for (const char of string) {
-            const invalidChar = WordUtils.isInvalidSearchCharacter(char);
-            if (counter > chunkLength || (counter > 0 && invalidChar)) {
-                chunks.push(tempString);
-                tempString = '';
-                counter = 1;
+        let segmentBuilder: string = '';
+        let count: number = 1;
+        for (const character of text) {
+            const isInvalid = DocumentUtils.checkInvalidCharacter(character);
+            if (count > segmentSize || (count > 0 && isInvalid)) {
+                segments.push(segmentBuilder);
+                segmentBuilder = '';
+                count = 1;
             }
-            if (!invalidChar) {
-                tempString += char;
-                counter++;
+            if (!isInvalid) {
+                segmentBuilder += character;
+                count++;
             }
         }
 
-        chunks.push(tempString);
+        segments.push(segmentBuilder);
 
-        return chunks;
+        return segments;
     }
 
-    static isInvalidSearchCharacter(char: string): boolean {
-        const code = char.charCodeAt(0);
-        return (code >= 0 && code <= 0x1F) || code === 0x7f || (code >= 0x80 && code <= 0x9F);
+    static checkInvalidCharacter(character: string): boolean {
+        const charCode = character.charCodeAt(0);
+        return (charCode >= 0 && charCode <= 0x1F) || charCode === 0x7f || (charCode >= 0x80 && charCode <= 0x9F);
     }
 }

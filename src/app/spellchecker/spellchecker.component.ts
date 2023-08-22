@@ -7,6 +7,7 @@ import { IAlternatives } from "../data/types";
 import { AuthService } from '../services/auth.service';
 import { en, de } from '../translations';
 import { environment } from '../../environments/environment';
+import DocumentUtils from '../utils/word.utils';
 
 /* global Word */
 
@@ -24,9 +25,9 @@ export class SpellcheckerComponent implements OnInit {
 
   isFirstRun = true;
 
-  isLoggedin = true;
+  isLoggedin = false;
 
-  lang = Office.context.displayLanguage.split('-')[0].toLowerCase() === 'de' ? de : en;
+  lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   paragraphs: string[] = [];
 
@@ -110,7 +111,6 @@ export class SpellcheckerComponent implements OnInit {
               continue;
             }
             errs.results.forEach(e => {
-              console.log('event', e);
               if(e.text === ' \v') return; //TODO: handle white space typography error in the future
               this.spellingErrors.push({
                 paragraph: paragraphIndex,
@@ -142,8 +142,8 @@ export class SpellcheckerComponent implements OnInit {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText);
-        const errorRange = await WordUtils.getWordRange(context, paragraphRange, errorText);
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
+        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, errorText);
 
         errorRange.select('Select');
         await context.sync();
@@ -158,9 +158,9 @@ export class SpellcheckerComponent implements OnInit {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.getParagraphRange(context, paragraphText);
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
 
-        const errorRange = await WordUtils.getWordRange(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
+        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
 
         errorRange.insertText(obj.suggestion.text, 'Replace');        
     

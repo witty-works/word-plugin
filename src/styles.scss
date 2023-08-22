@@ -21,7 +21,6 @@ body {
 @import "scss/checkbox.scss";
 
 button {
-  outline: transparent;
   position: relative;
   font-family: $lato;
   font-style: normal;
@@ -31,7 +30,6 @@ button {
   box-sizing: border-box;
   border: 1px solid transparent;
   display: inline-block;
-  text-decoration: none;
   text-align: left;
   cursor: pointer;
   vertical-align: top;

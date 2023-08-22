@@ -58,7 +58,7 @@
     </section>
 </div>
 
-<section class='witty-works-ext-section' *ngIf="isDevEnv && isLoggedin">
+<section class='witty-works-ext-section' *ngIf="isLoggedin">
     <div class='witty-works-ext-left'>
         <button class='witty-works-ext-button witty-works-ext-primary-button-red' aria-label="{lang.ariaLabelLogOut}"
             (click)="logout()">
@@ -68,6 +68,9 @@
 </section>
 
 <footer class="witty-works-ext-lato-popup-text" *ngIf="isLoggedin">
-    <div class='witty-works-ext-separator'></div>
-    {{lang.wittyVersion}} {{ appVersion }} <span class="witty-works-ext-link" (click)="openHelpCenter()">{{lang.help}}</span>
+    <div class="witty-works-ext-separator"></div>
+    <div class="witty-works-ext-wittyworks-container">
+        {{lang.wittyVersion}} {{ appVersion }} 
+        <button class="witty-works-ext-link" (click)="openHelpCenter()">{{lang.help}}</button>
+    </div>
 </footer>
