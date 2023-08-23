@@ -3,7 +3,7 @@ import { CheckingService } from "../services/checking.service";
 import WordUtils from "../utils/word.utils";
 import { ISpellingError } from "../data/data-structures";
 import { ModalComponent } from "@independer/ng-modal/modal.component";
-import { IAlternatives } from "../data/types";
+import { IAlternatives, IAlert, IAuthResponse, ICheckResponse } from "../data/types";
 import { AuthService } from '../services/auth.service';
 import { en, de } from '../translations';
 import { environment } from '../../environments/environment';
@@ -36,9 +36,11 @@ export class SpellcheckerComponent implements OnInit {
 
   lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string};
 
-  @ViewChild('errorModal') errorModal?: ModalComponent;
+  alerts: IAlert[] = [];
+  authResponse: IAuthResponse | null = null;
+  checkEndpointResponse: ICheckResponse | null = null;
 
-  @Input() data: any;
+  @ViewChild('errorModal') errorModal?: ModalComponent;
 
   error = "";
 
@@ -58,6 +60,7 @@ export class SpellcheckerComponent implements OnInit {
     //probably not needed -> just do auth if check fails, but good for testing
     this.authService.makeAuthRequest().then((response) => {
       if (!response) return;
+      this.authResponse = response;
       localStorage.setItem('organization_name', response.organization_name);
       localStorage.setItem('organization_config_hash', response.organization_config_hash);
       localStorage.setItem('config_hash', response.config_hash);
@@ -117,8 +120,32 @@ export class SpellcheckerComponent implements OnInit {
             if (!errs) {
               continue;
             }
-            const analytics = useAnalytics();
+            this.checkEndpointResponse = errs;
             analytics.checkLog(errs, null, paragraph.length, 'check');
+
+            const newAlerts = errs.results
+            .map((result) => ({
+              id: `${result.text}-${result.category}-${result.start}${result.end}`,
+              startOffset: result.start,
+              endOffset: result.end,
+              popOverIsOpen: false,
+              organizationId: this.authResponse?.organization_id,
+              userId: this.authResponse?.id,
+              plan: this.authResponse?.plan,
+              data: {
+                language: this.checkEndpointResponse?.language || 'en',
+                category: result.category,
+                subcategory: result.subcategory,
+                context: result.context,
+                text: result.text,
+                label: result.label,
+                explanation: result.explanation,
+                alternatives: result.alternatives,
+                gravity: result.gravity,
+              },
+            }))
+            this.alerts = this.alerts.concat(newAlerts);          
+
             errs.results.forEach(e => {
               if(e.text === ' \v') return; //TODO: handle white space typography error in the future
               this.spellingErrors.push({
@@ -163,14 +190,15 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   acceptSuggestion(obj: {paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
-    analytics.alternativeLog(this.data, obj.suggestion.text);
-
     Word.run(async (context) => {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
         const paragraphRange = await WordUtils.fetchParagraph(context, paragraphText, obj.paragraphIndex);
         const errorRange = await WordUtils.fetchTextBounds(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
+
+        const alertRelevantToSuggestion = this.alerts.find(a => a.data.text === errorText);
+        alertRelevantToSuggestion && analytics.alternativeLog(alertRelevantToSuggestion, obj.suggestion.text);
 
         errorRange.insertText(obj.suggestion.text, 'Replace');        
     

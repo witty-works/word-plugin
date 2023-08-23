@@ -13,7 +13,6 @@ export const captureEvent = (eventName: string, eventData: object) => {
     const organizationId = localStorage.getItem('organization_id');
     const appId = 'test-app-id'
 
-    console.log('captureEvent', eventName, eventData, userId, organizationId, appId);
     const ph = new PostHog(POSTHOG_API_KEY_EU, {
       host: 'https://eu.posthog.com',
       bootstrap : {
@@ -37,7 +36,6 @@ export const captureEvent = (eventName: string, eventData: object) => {
 };
 
 export const getResponseData = (logResponse: IAlert) => {
-  console.log('getResponseData', logResponse);
   if (!logResponse) return {};
   return {
     response__id: logResponse.id,

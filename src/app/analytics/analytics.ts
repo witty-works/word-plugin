@@ -1,14 +1,10 @@
 import {
     IAlert,
-    IVoteLogRequest,
     IAlternativeLogItems,
     ICheckLogItems,
-    IIgnoreLogItems,
     ILogItems,
     IAuthResponse,
     ICheckResponse,
-    IDashboardLogRequest,
-    ICheckResultLogItems,
     ICheckResponseResult,
   } from '../data/types';
 import {
