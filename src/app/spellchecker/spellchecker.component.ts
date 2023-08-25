@@ -121,7 +121,29 @@ export class SpellcheckerComponent implements OnInit {
               continue;
             }
             this.checkEndpointResponse = errs;
-            analytics.checkLog(errs, null, paragraph.length, 'check');
+            const checkLogEventId = Math.random().toString(36).substring(2, 15);
+
+            analytics.checkLog(errs, null, paragraph.length, 'check', false, checkLogEventId);
+
+            if(this.authResponse?.plan !== 'witty_free') {
+              const errsWithoutOrthography = {
+                ...errs,
+                results: errs.results.filter((result: any) => {
+                  return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
+                }),
+              };
+                    
+              errsWithoutOrthography.results.forEach((result: any) => {
+                analytics.checkResultLog(
+                  result,
+                  this.authResponse,
+                  paragraph.length,
+                  'check_result',
+                  false,
+                  checkLogEventId,
+                )
+              });
+            }
 
             const newAlerts = errs.results
             .map((result) => ({
