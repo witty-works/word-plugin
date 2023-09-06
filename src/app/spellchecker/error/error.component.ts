@@ -2,8 +2,12 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ISpellingError } from "../../data/data-structures";
 import TextUtils from "../../utils/text.utils";
 import { CheckingService } from "../../services/checking.service";
-import {IAlternatives} from "../../data/types";
+import { SpellcheckerComponent } from "../spellchecker.component";
+import {IAlert, IAlternatives} from "../../data/types";
 import { en, de } from '../../translations';
+import { useAnalytics } from 'src/app/analytics/analytics';
+
+const analytics = useAnalytics();
 
 @Component({
   selector: 'app-error',
@@ -21,8 +25,6 @@ export class ErrorComponent {
   @Input()
   showContext: boolean = true;
 
-  @Input() data: any;
-
   @Output()
   highlightEvent = new EventEmitter();
 
@@ -32,10 +34,14 @@ export class ErrorComponent {
   isOpen = false;
   suggestions: IAlternatives[] = [];
   showLearningBite: boolean = false;
+  
+  alerts: IAlert[] = this.spellcheckerComponent.alerts;
+  
   lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
-  constructor(private spellcheckerService: CheckingService) {
+  constructor(private spellcheckerService: CheckingService, private spellcheckerComponent: SpellcheckerComponent) {
   }
+  
   
   getContext(word: string) {
     if (!this.context) return;
@@ -47,12 +53,18 @@ export class ErrorComponent {
   }
 
   async toggle(): Promise<void> {
+    this.suggestions = await this.spellcheckerService.getSuggestions(this.error!);
+    const alertRelevantToSuggestion = this.alerts.find((alert) => {
+      return alert.data.text === this.error?.word;
+    });
+
     if (!this.isOpen) {
       this.isOpen = true;
-      this.suggestions = await this.spellcheckerService.getSuggestions(this.error!);
+      alertRelevantToSuggestion && analytics.popoverLogs(alertRelevantToSuggestion, 'popover_open');
       this.sendHighlight()
     } else {
       this.isOpen = false;
+      alertRelevantToSuggestion && analytics.popoverLogs(alertRelevantToSuggestion, 'popover_close');
     }
   }
 
@@ -70,6 +82,10 @@ export class ErrorComponent {
 
   onClick(url: string | undefined) {
     this.showLearningBite = !this.showLearningBite;
+    const alertRelevantToSuggestion = this.alerts.find((alert) => {
+      return alert.data.text === this.error?.word;
+    });
+    alertRelevantToSuggestion && analytics.popoverLogs(alertRelevantToSuggestion, 'learning_bites');
     url && Office.context.ui.openBrowserWindow(url);
   }
 

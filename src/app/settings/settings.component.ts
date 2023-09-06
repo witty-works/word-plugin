@@ -3,6 +3,9 @@ import { SettingsService } from "../services/settings.service";
 import { Subscription } from "rxjs";
 import { en, de } from '../translations';
 import { environment } from '../../environments/environment';
+import { useAnalytics } from '../analytics/analytics';
+
+const analytics = useAnalytics();
 
 @Component({
   selector: 'app-settings',
@@ -32,14 +35,17 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
   
   openDashboard() {
+    analytics.openLinkLog('dashboard_open');
     Office.context.ui.openBrowserWindow('https://dashboard.witty.works/en/user/language/customize-witty');
   }
 
   openWittyHomePage() {
+    analytics.openLinkLog('homepage_open');
     Office.context.ui.openBrowserWindow('https://witty.works');
   }
 
   openHelpCenter() {
+    analytics.openLinkLog('helpcenter_open');
     Office.context.ui.openBrowserWindow('https://www.witty.works/en/help/wittys-help-center');
   }
 
