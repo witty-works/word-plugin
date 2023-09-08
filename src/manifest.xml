@@ -5,7 +5,7 @@
   xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
   xsi:type="TaskPaneApp">
   <Id>5452ee64-ed62-411c-b9da-8e8acc512614</Id>
-  <Version>1.0.10</Version>
+  <Version>1.0.1</Version>
   <ProviderName>Witty Works AG</ProviderName>
   <DefaultLocale>en</DefaultLocale>
   <DisplayName DefaultValue="Witty Inclusive Writing DEV" />
@@ -95,5 +95,15 @@
           DefaultValue="TaskpaneButton.Tooltip" />
       </bt:LongStrings>
     </Resources>
+    <WebApplicationInfo>
+      <Id>3117be5a-3323-453f-810d-8795bac7f31d</Id>
+      <Resource>api://localhost:4200/3117be5a-3323-453f-810d-8795bac7f31d</Resource>
+      <Scopes>
+        <Scope>openid</Scope>
+        <Scope>user.read</Scope>
+        <Scope>email</Scope>
+        <Scope>profile</Scope>
+      </Scopes>
+    </WebApplicationInfo>
   </VersionOverrides>
 </OfficeApp>
