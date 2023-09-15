@@ -32,6 +32,7 @@ export const de = {
     arrowDownIconAlt: 'Erklärung öffnen',
     videoIconAlt: 'Ein Erklärungsvideo ist verfügbar',
     arrowRightAlt: 'Erklärungen schliessen',
+    ignore: 'Ignorieren',
 
     //settings
     settingsIconAlt: 'Witty Dashboard Einstellungen öffnen',
@@ -81,6 +82,7 @@ export const en = {
     arrowDownIconAlt: 'Open explanation',
     videoIconAlt: 'A video is available for more learning',
     arrowRightAlt: 'Close explanation',
+    ignore: 'Ignore',
 
     //settings
     settingsIconAlt: 'Open Witty Dashboard settings',
