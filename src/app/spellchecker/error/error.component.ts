@@ -37,7 +37,7 @@ export class ErrorComponent {
   
   alerts: IAlert[] = this.spellcheckerComponent.alerts;
   
-  lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+  lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   constructor(private spellcheckerService: CheckingService, private spellcheckerComponent: SpellcheckerComponent) {
   }
