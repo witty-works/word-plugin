@@ -32,7 +32,6 @@ class DocumentUtils {
 
     static async fetchTextBounds(context: Word.RequestContext, withinRange: Word.Range, lookupText: string): Promise<Word.Range> {
         withinRange.load('text');
-        withinRange.insertText(' ', 'End');
         await context.sync();
 
         let matchEntireWord = true;
