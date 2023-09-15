@@ -11,7 +11,7 @@ export class AuthService {
 
   isDevEnv = window.location.hostname === 'localhost'
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   async makeAuthRequest(): Promise<any> {
     // const accessToken = localStorage.getItem('access_token');
@@ -43,7 +43,7 @@ export class AuthService {
     };
 
     console.log('AUTH: url', url, 'httpOptions', httpOptions);
-  
+
     try {
       return await this.http.post<any>(url, {}, httpOptions)
         .toPromise();
