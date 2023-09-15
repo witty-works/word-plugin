@@ -54,10 +54,6 @@ export class ErrorComponent {
 
   async toggle(): Promise<void> {
     this.suggestions = await this.spellcheckerService.getSuggestions(this.error!);
-
-    // let accessToken = await Office.auth.getAccessToken();
-    // this.suggestions[0].text = accessToken;
-
     const alertRelevantToSuggestion = this.alerts.find((alert) => {
       return alert.data.text === this.error?.word;
     });
