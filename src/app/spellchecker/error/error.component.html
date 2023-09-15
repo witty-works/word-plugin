@@ -60,6 +60,11 @@
               <div class="tag" *ngIf="!suggestion.hovered">{{suggestion.context}}</div>
             </div>       
           </ng-container>
+          <div class="witty-works-ext-button-wrapper">
+            <button (click)="ignore()" class="witty-works-ext-button witty-works-ext-primary-button-red witty-works-ext-margin-top">
+              {{lang.ignore}}
+            </button>
+          </div>
         </section>
     </div>
 </ng-container>

@@ -195,6 +195,15 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
 
+  updateSpellingErrors() {
+    this.spellingErrors = this.spellingErrors.map((error, index) => {
+      return {
+        ...error,
+        index: index
+      }
+    });
+  }
+  
   async highlight(obj: {paragraphIndex: number, errorIndex: number }) {
     await Word.run(async (context) => {
       try {

@@ -89,6 +89,13 @@ export class ErrorComponent {
     url && Office.context.ui.openBrowserWindow(url);
   }
 
+  ignore() {
+    this.spellcheckerComponent.spellingErrors = this.spellcheckerComponent.spellingErrors.filter((error) => {
+      return error.word !== this.error?.word;
+    });
+    this.spellcheckerComponent.updateSpellingErrors();
+  }
+
   get containerStyle() {
     return {
       backgroundColor: this.getExplanationColor(this.error?.details.gravity),
