@@ -49,13 +49,16 @@ export class CheckingService {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        // Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyJ9.eyJhdWQiOiIzMTE3YmU1YS0zMzIzLTQ1M2YtODEwZC04Nzk1YmFjN2YzMWQiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vN2JkMjJlODQtMzRiMS00YjdiLWI2ZjctNGNkN2RhMGE1ZTRhL3YyLjAiLCJpYXQiOjE2OTQ3ODQ5NjEsIm5i`,
         Authorization: `Bearer ${accessToken}`,
       }
     };
   
+    console.log('url', url, 'body', body, 'httpOptions', httpOptions);
     return this.http.post<any>(url, body, httpOptions)
       .toPromise()
       .catch(error => {
+        console.log('error', error);
         if (error.status === 403) {
           this.authService.makeAuthRequest().then((response) => {
             if (response.access_token && response.refresh_token) {

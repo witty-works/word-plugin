@@ -13,25 +13,27 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  makeAuthRequest(): Promise<any> {
-    const accessToken = localStorage.getItem('access_token');
-    const refreshToken = localStorage.getItem('refresh_token');
+  async makeAuthRequest(): Promise<any> {
+    // const accessToken = localStorage.getItem('access_token');
+    const accessToken = await Office.auth.getAccessToken();
+    // const refreshToken = localStorage.getItem('refresh_token');
 
-    if (!accessToken && refreshToken) {
-      this.makeRefreshTokenRequest().then((response) => {
-        if (response.access_token && response.refresh_token) {
-          localStorage.setItem('access_token', response.access_token);
-          localStorage.setItem('refresh_token', response.refresh_token);
-          this.makeAuthRequest();
-        } else {
-          localStorage.setItem('access_token', '');
-          localStorage.setItem('refresh_token', '');
-          Promise.resolve({} as ICheckResponse);
-        }
-      });
-    }
+    // if (!accessToken && refreshToken) {
+    //   this.makeRefreshTokenRequest().then((response) => {
+    //     if (response.access_token && response.refresh_token) {
+    //       localStorage.setItem('access_token', response.access_token);
+    //       localStorage.setItem('refresh_token', response.refresh_token);
+    //       this.makeAuthRequest();
+    //     } else {
+    //       localStorage.setItem('access_token', '');
+    //       localStorage.setItem('refresh_token', '');
+    //       Promise.resolve({} as ICheckResponse);
+    //     }
+    //   });
+    // }
 
-    const url = environment.api + 'v2.0/auth';
+    // const url = environment.api + 'v2.0/auth';
+    const url = 'https://pr-879-r66nqla-him65foajgj5c.fr-4.platformsh.site' + 'v2.0/auth';
     const httpOptions = {
       headers: {
         Accept: 'application/json',
@@ -39,13 +41,13 @@ export class AuthService {
         Authorization: `Bearer ${accessToken}`,
       }
     };
+
+    console.log('AUTH: url', url, 'httpOptions', httpOptions);
   
-    return this.http.post<any>(url, {}, httpOptions)
-      .toPromise()
-      .catch(error => {
-        // console.error('CORS Error:', error);
-        // throw error;
-      });
+    try {
+      return await this.http.post<any>(url, {}, httpOptions)
+        .toPromise();
+    } catch (error) { }
   }
 
   makeRefreshTokenRequest(): Promise<any> {
