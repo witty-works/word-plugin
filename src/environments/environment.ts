@@ -9,9 +9,9 @@ export const environment = {
   sentry_dsn: "",
   sentry_api_url: "https://localhost:4200",
   sentry_sample_rate: 0.0,
-  sentry_traces_sample_rate: 0.0, 
+  sentry_traces_sample_rate: 0.0,
   sentry_package_name: "word-plugin",
-  api: "https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site/",
+  api: "https://dev-54ta5gq-2ycn7tlsdvd2o.fr-4.platformsh.site/",
   dashboard: "https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/",
   plugin: "https://localhost:4200/word-plugin/",
 };
