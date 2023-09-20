@@ -11,12 +11,12 @@ export class AppComponent {
 
   tabChanged(type: TabType) {
     this.selectedTab = type;
-    this.isLoggedin = !!localStorage.getItem('access_token'); 
+    this.isLoggedin = true;
   }
 
-  isLoggedin = false;
+  isLoggedin = true;
 
   ngOnInit() {
-    this.isLoggedin = !!localStorage.getItem('access_token'); 
+    this.isLoggedin = true;
   }
 }

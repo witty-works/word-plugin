@@ -14,22 +14,23 @@ export class CheckingService {
 
   constructor(private settingsService: SettingsService, private http: HttpClient, private authService: AuthService) {}
 
-  checkText(sentence: string): Promise<ICheckResponse> {
-    const accessToken = localStorage.getItem('access_token');
-    const refreshToken = localStorage.getItem('refresh_token');
-    if ((!accessToken || !sentence) && refreshToken) {
-      this.authService.makeRefreshTokenRequest().then((response) => {
-        if (response.access_token && response.refresh_token) {
-          localStorage.setItem('access_token', response.access_token);
-          localStorage.setItem('refresh_token', response.refresh_token);
-          this.checkText(sentence);
-        } else {
-          localStorage.setItem('access_token', '');
-          localStorage.setItem('refresh_token', '');
-          Promise.resolve({} as ICheckResponse);
-        }
-      });
-    }
+  async checkText(sentence: string): Promise<ICheckResponse> {
+    // const accessToken = localStorage.getItem('access_token');
+    // const refreshToken = localStorage.getItem('refresh_token');
+    // if ((!accessToken || !sentence) && refreshToken) {
+    //   this.authService.makeRefreshTokenRequest().then((response) => {
+    //     if (response.access_token && response.refresh_token) {
+    //       localStorage.setItem('access_token', response.access_token);
+    //       localStorage.setItem('refresh_token', response.refresh_token);
+    //       this.checkText(sentence);
+    //     } else {
+    //       localStorage.setItem('access_token', '');
+    //       localStorage.setItem('refresh_token', '');
+    //       Promise.resolve({} as ICheckResponse);
+    //     }
+    //   });
+    // }
+    const accessToken = await Office.auth.getAccessToken();
 
     const url = environment.api + 'v2.3/check';
 
