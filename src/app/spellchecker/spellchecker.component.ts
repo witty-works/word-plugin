@@ -26,7 +26,7 @@ export class SpellcheckerComponent implements OnInit {
 
   isFirstRun = true;
 
-  isLoggedin = false;
+  isLoggedin = true;
   
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
@@ -46,8 +46,8 @@ export class SpellcheckerComponent implements OnInit {
 
   constructor(private spellcheckerService: CheckingService, private authService: AuthService) {}
 
-  ngOnInit() {
-    const accessToken = localStorage.getItem('access_token') || '';
+  async ngOnInit() {
+    const accessToken = await Office.auth.getAccessToken();
     this.isLoggedin = !!accessToken;
 
     window.addEventListener('storage', (event) => {

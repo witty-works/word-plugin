@@ -14,7 +14,7 @@ const analytics = useAnalytics();
 })
 export class SettingsComponent implements OnInit, OnDestroy {
 
-  isLoggedin = false;
+  isLoggedin = true;
   showContext: boolean = true;
   checkUpperAndLowerCase: boolean = true;
   checkGrammarAndSpelling: boolean = true;
@@ -51,7 +51,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.appVersion = environment.package_version;
-    this.isLoggedin = !!localStorage.getItem('access_token');
+    this.isLoggedin = true;
     
     this.teamName = localStorage.getItem('organization_name') ?? '';
 
@@ -97,6 +97,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
   logout() {
     localStorage.setItem('access_token', '');
     localStorage.setItem('refresh_token', '');
-    this.isLoggedin = false;
+    this.isLoggedin = true;
   }
 }
