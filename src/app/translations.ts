@@ -78,7 +78,7 @@ export const en = {
 
     //error
     tryInstead: 'Try instead ...',
-    learnMore: 'Dig deepper',
+    learnMore: 'Dig deeper',
     arrowDownIconAlt: 'Open explanation',
     videoIconAlt: 'A video is available for more learning',
     arrowRightAlt: 'Close explanation',
