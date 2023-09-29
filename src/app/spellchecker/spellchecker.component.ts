@@ -166,7 +166,7 @@ export class SpellcheckerComponent implements OnInit {
                 gravity: result.gravity,
               },
             }))
-            this.alerts = this.alerts.concat(newAlerts);          
+            this.alerts = this.alerts.concat(newAlerts);
 
             errs.results.forEach(e => {
               if(e.text === ' \v') return; //TODO: handle white space typography error in the future
