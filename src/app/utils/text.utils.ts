@@ -6,7 +6,7 @@ export default class TextUtils {
         const matches = text.match(regExp);
         if (!matches) return undefined;
 
-        const forbiddenChars = /[äöüÄÖÜàéèòìÀÉÈÒÌ\w]/;
+        const forbiddenChars = /[äöüÄÖÜàéèòìÀÉÈÒÌ]/;
 
         for (const match of matches) {
             const index = text.indexOf(match);
