@@ -1,6 +1,7 @@
 export default class TextUtils {
     static getContext(searchTerm: string, text: string): string | undefined {
-        const regExpString = String.raw`((?:[a-z]+[^a-z]+)|(?:[^a-z]+[a-z]+)){0,3}(${TextUtils.escapeRegExp(searchTerm)})((?:[a-z]+[^a-z]+)|(?:[^a-z]+[a-z]+)){0,3}`;
+        const escapedSearchTerm = TextUtils.escapeRegExp(searchTerm);
+        const regExpString = String.raw`((?:[a-z]+[^a-z]+)|(?:[^a-z]+[a-z]+)){0,3}(?<![a-z])${escapedSearchTerm}(?![a-z])((?:[a-z]+[^a-z]+)|(?:[^a-z]+[a-z]+)){0,3}`;
         const regExp = new RegExp(regExpString, 'gm');
 
         const matches = text.match(regExp);
