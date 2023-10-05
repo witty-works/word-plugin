@@ -9,23 +9,12 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class CheckingService {
-  checkUpperAndLowerCase: boolean = true;
-  checkGrammarAndSpelling: boolean = true;
-
   isDevEnv = window.location.hostname === 'localhost'
 
   constructor(private settingsService: SettingsService, private http: HttpClient) {}
 
   async checkText(sentence: string): Promise<ICheckResponse> {
     const accessToken = await Office.auth.getAccessToken();
-
-    this.settingsService.getCheckUpperAndLowerCaseObservable().subscribe(ctx => {
-      this.checkUpperAndLowerCase = ctx;
-    });
-  
-    this.settingsService.getCheckGrammarAndSpellingObservable().subscribe(ctx => {
-      this.checkGrammarAndSpelling = ctx;
-    });
 
     const url = environment.api + 'v2.3/check';
 
@@ -35,8 +24,7 @@ export class CheckingService {
           client: 'word-plugin:' + environment.package_version,
           config: { //TODO: check that this is correct!
             disabled_categories: [
-            this.checkGrammarAndSpelling ? '' : 'orthography',
-            this.checkUpperAndLowerCase ? '' : 'casing',
+            'orthography',
           ]},
           config_hash: localStorage.getItem('config_hash'), //dont use config_hash and organization_config_hash for now
           organization_config_hash: localStorage.getItem('organization_config_hash'),

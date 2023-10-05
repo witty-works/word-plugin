@@ -16,16 +16,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   isLoggedin = true;
   showContext: boolean = true;
-  checkUpperAndLowerCase: boolean = true;
-  checkGrammarAndSpelling: boolean = true;
   teamName = '';
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   public appVersion = '-';
 
   private showContextSubscription?: Subscription;
-  private checkUpperAndLowerCaseSubscription?: Subscription;
-  private checkGrammarAndSpellingSubscription?: Subscription;
 
   constructor(private settingsService: SettingsService) {
   }
@@ -63,40 +59,16 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.showContextSubscription = this.settingsService.getShowContextObservable().subscribe(ctx => {
       this.showContext = ctx;
     });
-
-    this.checkUpperAndLowerCaseSubscription = this.settingsService.getCheckUpperAndLowerCaseObservable().subscribe(ctx => {
-      this.checkUpperAndLowerCase = ctx;
-    });
-
-    this.checkGrammarAndSpellingSubscription = this.settingsService.getCheckGrammarAndSpellingObservable().subscribe(ctx => {
-      this.checkGrammarAndSpelling = ctx;
-    });
   }
 
   ngOnDestroy() {
     if (this.showContextSubscription) {
       this.showContextSubscription.unsubscribe();
     }
-
-    if (this.checkUpperAndLowerCaseSubscription) {
-      this.checkUpperAndLowerCaseSubscription.unsubscribe();
-    }
-
-    if (this.checkGrammarAndSpellingSubscription) {
-      this.checkGrammarAndSpellingSubscription.unsubscribe();
-    }
   }
 
   showContextChanged(value: boolean) {
     this.settingsService.setShowContext(value);
-  }
-
-  checkUpperAndLowerCaseChanged(value: boolean) {
-    this.settingsService.setCheckUpperAndLowerCase(value);
-  }
-
-  checkGrammarAndSpellingChanged(value: boolean) {
-    this.settingsService.setCheckGrammarAndSpelling(value);
   }
 
   // logout() {
