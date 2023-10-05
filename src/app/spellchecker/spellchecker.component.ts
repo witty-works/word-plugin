@@ -1,12 +1,12 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
-import WordUtils from "../utils/word.utils";
 import { ISpellingError } from "../data/data-structures";
 import { ModalComponent } from "@independer/ng-modal/modal.component";
 import { IAlternatives, IAlert, IAuthResponse, ICheckResponse } from "../data/types";
 import { AuthService } from '../services/auth.service';
 import { en, de } from '../translations';
 import { environment } from '../../environments/environment';
+import DocumentUtils from '../utils/word.utils';
 import { useAnalytics } from '../analytics/analytics';
 
 const analytics = useAnalytics();
@@ -209,8 +209,8 @@ export class SpellcheckerComponent implements OnInit {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.fetchParagraph(context, paragraphText, obj.paragraphIndex);
-        const errorRange = await WordUtils.fetchTextBounds(context, paragraphRange, errorText);
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
+        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, errorText);
 
         errorRange.select('Select');
         await context.sync();
@@ -225,8 +225,9 @@ export class SpellcheckerComponent implements OnInit {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.fetchParagraph(context, paragraphText, obj.paragraphIndex);
-        const errorRange = await WordUtils.fetchTextBounds(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
+
+        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
 
         const alertRelevantToSuggestion = this.alerts.find(a => a.data.text === errorText);
         alertRelevantToSuggestion && analytics.alternativeLog(alertRelevantToSuggestion, obj.suggestion.text);

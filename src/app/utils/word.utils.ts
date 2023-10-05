@@ -1,34 +1,52 @@
 import OfficePlatformType = Office.PlatformType;
 
-class DocumentUtils {
-    static async fetchParagraph(context: Word.RequestContext, paraText: string, paraPosition: number): Promise<Word.Range> {
-        const docBody = context.document.body;
-        context.load(docBody, 'paragraphs');
+import PlatformType = Office.PlatformType;
+
+export default class DocumentUtils {
+    static async fetchParagraph(context: Word.RequestContext, paragraph: string): Promise<Word.Range> {
+        const body = context.document.body;
+        context.load(body);
         await context.sync();
 
-        const allParas = docBody.paragraphs.items;
-        if (paraPosition < 0 || paraPosition >= allParas.length) {
-            throw new Error('Incorrect paragraph position');
+        const chunks = DocumentUtils.divideTextIntoSegments(paragraph, 255);
+
+        let fullRange: Word.Range | null = null;
+        for (let index = 0; index < chunks.length; index++) {
+            const chunk = chunks[index];
+
+            if (chunk.trim() === "") {
+                continue;
+            }
+
+            const paragraphRangeCollection = body.search(chunk, {
+                matchCase: true,
+            });
+
+            const paragraphRange = paragraphRangeCollection.getFirstOrNullObject(); //get paragraph at index here        
+
+            paragraphRange.load('isNullObject');
+
+            await context.sync();
+
+            if (!paragraphRange || paragraphRange.isNullObject) {
+                return Promise.reject(new Error('Could not find range for chunk: ' + chunk));
+
+            }
+
+            if (!fullRange) {
+                fullRange = paragraphRange;
+            } else {
+                fullRange = fullRange.expandTo(paragraphRange);
+            }
+
         }
 
-        const desiredPara = allParas[paraPosition];
-        desiredPara.load('text');
-        await context.sync();
-
-        if (!desiredPara.text.includes(paraText)) {
-            throw new Error('Paragraph not present in the given context');
+        if (!fullRange) {
+            return Promise.reject(new Error('Context paragraph not found'));
         }
 
-        const paraBounds = desiredPara.getRange();
-        paraBounds.load('isNullObject');
-        await context.sync();
-
-        if (paraBounds.isNullObject) {
-            throw new Error('Cannot determine bounds for the paragraph');
-        }
-
-        return paraBounds;
-    }
+        return fullRange;
+    }    
 
     static async fetchTextBounds(context: Word.RequestContext, withinRange: Word.Range, lookupText: string): Promise<Word.Range> {
         withinRange.load('text');
@@ -90,5 +108,3 @@ class DocumentUtils {
         return (charCode >= 0 && charCode <= 0x1F) || charCode === 0x7f || (charCode >= 0x80 && charCode <= 0x9F);
     }
 }
-
-export default DocumentUtils;
