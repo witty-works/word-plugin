@@ -18,8 +18,8 @@ const analytics = useAnalytics();
   styleUrls: ['./spellchecker.component.scss']
 })
 export class SpellcheckerComponent implements OnInit {
-  accessToken: string = '';
-  refreshToken: string = '';
+  // accessToken: string = '';
+  // refreshToken: string = '';
   environment = window.location.hostname === 'localhost'
 
   isSpellchecking = false;
@@ -50,12 +50,12 @@ export class SpellcheckerComponent implements OnInit {
     const accessToken = await Office.auth.getAccessToken();
     this.isLoggedin = !!accessToken;
 
-    window.addEventListener('storage', (event) => {
-      if (event.key === 'access_token') {
-        this.isLoggedin = !!accessToken;
-        window.location.reload();
-      }
-    });    
+    // window.addEventListener('storage', (event) => {
+    //   if (event.key === 'access_token') {
+    //     this.isLoggedin = !!accessToken;
+    //     window.location.reload();
+    //   }
+    // });    
     
     //probably not needed -> just do auth if check fails, but good for testing
     this.authService.makeAuthRequest().then((response) => {
@@ -80,10 +80,10 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
 
-  logout() { 
-    localStorage.setItem('access_token', '');
-    localStorage.setItem('refresh_token', '');
-  }
+  // logout() { 
+  //   localStorage.setItem('access_token', '');
+  //   localStorage.setItem('refresh_token', '');
+  // }
 
   openDashboard() {
     analytics.openLinkLog('dashboard_open');

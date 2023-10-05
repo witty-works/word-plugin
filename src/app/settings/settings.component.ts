@@ -66,9 +66,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.settingsService.setShowContext(value);
   }
 
-  logout() {
-    localStorage.setItem('access_token', '');
-    localStorage.setItem('refresh_token', '');
-    this.isLoggedin = true;
-  }
+  // logout() {
+  //   localStorage.setItem('access_token', '');
+  //   localStorage.setItem('refresh_token', '');
+  //   this.isLoggedin = true;
+  // }
 }
