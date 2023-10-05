@@ -35,11 +35,11 @@ class DocumentUtils {
         await context.sync();
 
         let matchEntireWord = true;
-        const lookupTextFirstCharSpecial = lookupText.charAt(0).match(/[_:*\/-]/g);
+        const lookupTextFirstCharSpecial = lookupText.charAt(0).match(/[_:*/-]/g);
 
         if (Office.context.diagnostics.platform === OfficePlatformType.OfficeOnline || lookupText.includes('\u000b') || lookupText.includes(' ') || lookupTextFirstCharSpecial) {
             const specialCharPattern = /\W/g;
-            const match = lookupText.match(specialCharPattern) || lookupTextFirstCharSpecial;
+            const match = lookupText.match(specialCharPattern) ?? lookupTextFirstCharSpecial;
             if (match !== null) {
                 matchEntireWord = false;
                 console.log(`Whole word matching disabled for: ${lookupText}`);
