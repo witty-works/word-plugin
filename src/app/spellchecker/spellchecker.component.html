@@ -65,7 +65,8 @@
     </div>
     <app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphs" (highlightEvent)="highlight($event)"
         (acceptSuggestionEvent)="acceptSuggestion($event)"
-        *ngIf="!isFirstRun && spellingErrors.length > 0"></app-errors-list>
+        *ngIf="!isFirstRun && spellingErrors.length > 0">
+    </app-errors-list>
 
     <div class="full-size-notification" *ngIf="isFirstRun">
         <span>{{lang.clickWittyCheck}}</span>
