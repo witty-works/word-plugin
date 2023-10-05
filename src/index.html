@@ -34,18 +34,19 @@
         ieMessage.style.display = 'block';
       }
     }
+    console.log('SCRIPT window.location.href', window.location.href);
 
-    const searchParams = new URLSearchParams(window.location.search);
-    if ([...searchParams].length > 0 && searchParams.get('access_token')) {
-      localStorage.setItem('access_token', searchParams.get('access_token'));
-      localStorage.setItem('refresh_token', searchParams.get('refresh_token'));
-      const target = searchParams.get('target')?.split('?')[0];
-      window.open(
-        target ? target : `https://dashboard.witty.works/word-addin`,
-        '_self',
-        'noopener'
-      );
-    }
+    // const searchParams = new URLSearchParams(window.location.search);
+    // if ([...searchParams].length > 0 && searchParams.get('access_token')) {
+    //   localStorage.setItem('access_token', searchParams.get('access_token'));
+    //   localStorage.setItem('refresh_token', searchParams.get('refresh_token'));
+    //   const target = searchParams.get('target')?.split('?')[0];
+    //   window.open(
+    //     target ? target : `https://dashboard.witty.works/word-addin`,
+    //     '_self',
+    //     'noopener'
+    //   );
+    // }
 
   </script>
 </body>
