@@ -8,7 +8,7 @@ import { en, de } from '../translations';
   styleUrls: ['./tabs.component.scss']
 })
 export class TabsComponent {
-  lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+  lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   @Input()
   selectedTab: TabType = 'spellchecker';
@@ -21,6 +21,6 @@ export class TabsComponent {
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('access_token');
+    return true;
   }
 }

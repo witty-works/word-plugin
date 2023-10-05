@@ -138,6 +138,12 @@
   padding: 0.4em;
 }
 
+.witty-works-ext-primary-button-red {
+  background: $orange;
+  border-radius: 8px;
+  color: $white;
+}
+
 .witty-works-ext-margin-left {
   margin-left: 0.5em;
 }
@@ -146,6 +152,7 @@
   display: flex;
   flex-direction: row;
   white-space: nowrap;
+  align-items: center;
 }
 
 .witty-works-ext-button-wrapper.hovered {
@@ -159,4 +166,25 @@
 
 .witty-works-ext-button-wrapper.hovered .tag {
   display: none;
+}
+
+.witty-works-ext-ignore-color-transformer {
+  filter: invert(38%) sepia(2%) saturate(0%) hue-rotate(73deg) brightness(100%)
+    contrast(89%);
+
+  &:hover {
+    filter: invert(39%) sepia(86%) saturate(747%) hue-rotate(323deg)
+      brightness(109%) contrast(80%);
+    color: $orange;
+    cursor: pointer;
+  }
+}
+
+.witty-works-ext-lato-popover-text-gray {
+  font-family: $lato;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px; /* or 214% */
+  color: $extraDarkGray;
 }

@@ -37,7 +37,7 @@ export class ErrorComponent {
   
   alerts: IAlert[] = this.spellcheckerComponent.alerts;
   
-  lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+  lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   constructor(private spellcheckerService: CheckingService, private spellcheckerComponent: SpellcheckerComponent) {
   }
@@ -87,6 +87,13 @@ export class ErrorComponent {
     });
     alertRelevantToSuggestion && analytics.popoverLogs(alertRelevantToSuggestion, 'learning_bites');
     url && Office.context.ui.openBrowserWindow(url);
+  }
+
+  ignore() {
+    this.spellcheckerComponent.spellingErrors = this.spellcheckerComponent.spellingErrors.filter((error) => {
+      return error.word !== this.error?.word;
+    });
+    this.spellcheckerComponent.updateSpellingErrors();
   }
 
   get containerStyle() {

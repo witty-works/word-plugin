@@ -26,9 +26,9 @@ export class SpellcheckerComponent implements OnInit {
 
   isFirstRun = true;
 
-  isLoggedin = false;
+  isLoggedin = true;
   
-  lang = Office.context.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+  lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   paragraphs: string[] = [];
 
@@ -46,8 +46,8 @@ export class SpellcheckerComponent implements OnInit {
 
   constructor(private spellcheckerService: CheckingService, private authService: AuthService) {}
 
-  ngOnInit() {
-    const accessToken = localStorage.getItem('access_token') || '';
+  async ngOnInit() {
+    const accessToken = await Office.auth.getAccessToken();
     this.isLoggedin = !!accessToken;
 
     window.addEventListener('storage', (event) => {
@@ -166,7 +166,7 @@ export class SpellcheckerComponent implements OnInit {
                 gravity: result.gravity,
               },
             }))
-            this.alerts = this.alerts.concat(newAlerts);          
+            this.alerts = this.alerts.concat(newAlerts);
 
             errs.results.forEach(e => {
               if(e.text === ' \v') return; //TODO: handle white space typography error in the future
@@ -195,6 +195,15 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
 
+  updateSpellingErrors() {
+    this.spellingErrors = this.spellingErrors.map((error, index) => {
+      return {
+        ...error,
+        index: index
+      }
+    });
+  }
+  
   async highlight(obj: {paragraphIndex: number, errorIndex: number }) {
     await Word.run(async (context) => {
       try {

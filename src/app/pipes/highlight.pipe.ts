@@ -8,7 +8,7 @@ export class HighlightPipe implements PipeTransform {
 
   transform(value: any, error: any): unknown {
     if(!value || !error.word) return value;
-    const re = new RegExp(`(?<![äöüÄÖÜàéèòìÀÉÈÒÌ\\w])(${TextUtils.escapeRegExp(error.word)})(?![äöüÄÖÜàéèòìÀÉÈÒÌ\\w])`, 'gm');
+    const re = new RegExp(`(?<![äöüÄÖÜàéèòìÀÉÈÒÌ\w])(${TextUtils.escapeRegExp(error.word)})(?![äöüÄÖÜàéèòìÀÉÈÒÌ\w])`, 'g');
     const color = this.getExplanationColor(error.details.gravity);
     value = value.replace(re, `<span class="highlighted-text highlighted-text--${color}">$1</span>`);
     return value;

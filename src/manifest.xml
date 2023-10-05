@@ -5,7 +5,7 @@
   xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
   xsi:type="TaskPaneApp">
   <Id>5452ee64-ed62-411c-b9da-8e8acc512614</Id>
-  <Version>1.0.1</Version>
+  <Version>1.1.1</Version>
   <ProviderName>Witty Works AG</ProviderName>
   <DefaultLocale>en</DefaultLocale>
   <DisplayName DefaultValue="Witty Inclusive Writing DEV" />
@@ -16,7 +16,7 @@
   <SupportUrl DefaultValue="https://www.witty.works/en/help/wittys-help-center" />
   <AppDomains>
     <AppDomain>https://www.witty.works</AppDomain>
-    <AppDomain>https://dev-54ta5gq-him65foajgj5c.fr-4.platformsh.site</AppDomain>
+    <AppDomain>https://dev-54ta5gq-2ycn7tlsdvd2o.fr-4.platformsh.site</AppDomain>
     <AppDomain>https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site</AppDomain>
     <AppDomain>https://pr-879-r66nqla-him65foajgj5c.fr-4.platformsh.site</AppDomain>
     <AppDomain>https://dashboard.witty.works</AppDomain>
