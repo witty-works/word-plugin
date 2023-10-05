@@ -85,11 +85,6 @@ export class SpellcheckerComponent implements OnInit {
   //   localStorage.setItem('refresh_token', '');
   // }
 
-  openDashboard() {
-    analytics.openLinkLog('dashboard_open');
-    Office.context.ui.openBrowserWindow('https://dashboard.witty.works/en/user/language/customize-witty');
-  }
-
   openWittyHomePage() {
     analytics.openLinkLog('homepage_open');
     Office.context.ui.openBrowserWindow('https://witty.works');

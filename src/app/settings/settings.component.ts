@@ -32,7 +32,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
   
   openDashboard() {
     analytics.openLinkLog('dashboard_open');
-    Office.context.ui.openBrowserWindow('https://dashboard.witty.works/en/user/language/customize-witty');
+    const url = `${environment.dashboard}user/language/customize-witty`;
+    Office.context.ui.displayDialogAsync(url, {height: 50, width: 50}, function (result) {
+      if (result.status === Office.AsyncResultStatus.Failed) {
+        console.log('result.error', result.error);
+      }
+    });
   }
 
   openWittyHomePage() {
