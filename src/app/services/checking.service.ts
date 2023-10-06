@@ -42,16 +42,6 @@ export class CheckingService {
     return this.http.post<any>(url, body, httpOptions)
       .toPromise()
       .catch(error => {
-        if (error.status === 403) {
-          //prompt user to register on dashboard
-          const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
-
-          Office.context.ui.displayDialogAsync(url, { height: 50, width: 50 }, function (result) {
-            if (result.status === Office.AsyncResultStatus.Failed) {
-              console.log('result.error', result.error);
-            }
-          });
-        }
         throw error;
       });
   }

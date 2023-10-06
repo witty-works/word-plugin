@@ -124,6 +124,18 @@ export class SpellcheckerComponent implements OnInit {
               continue;
             }
             this.checkEndpointResponse = errs;
+console.log(this.checkEndpointResponse.results.length > 0, this.checkEndpointResponse.results[0].alternatives)
+            if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {
+              const accessToken = await Office.auth.getAccessToken();
+              //prompt user to register on dashboard
+              const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
+      
+              Office.context.ui.displayDialogAsync(url, { height: 50, width: 50 }, function (result) {
+                if (result.status === Office.AsyncResultStatus.Failed) {
+                  console.log('result.error', result.error);
+                }
+              });
+            }
             const checkLogEventId = Math.random().toString(36).substring(2, 15);
 
             analytics.checkLog(errs, null, paragraph.length, 'check', false, checkLogEventId);
