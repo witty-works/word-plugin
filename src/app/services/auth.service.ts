@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { ICheckResponse } from "../data/types";
 import { environment } from '../../environments/environment';
-import { error } from 'protractor';
 
 @Injectable({
   providedIn: 'root'
