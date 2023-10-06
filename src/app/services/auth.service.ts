@@ -31,9 +31,9 @@ export class AuthService {
         console.log('auth error', error);
         if (error.status === 403) {
           //prompt user to register on dashboard
-          const url = 'https://pr-558-6nvmcgq-56xlfiudba6c2.fr-4.platformsh.site' + '/office-register?token=' + accessToken; //TODO
-          console.log('url', url)
-          Office.context.ui.displayDialogAsync(url, {height: 50, width: 50}, function (result) {
+          const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
+
+          Office.context.ui.displayDialogAsync(url, { height: 50, width: 50 }, function (result) {
             if (result.status === Office.AsyncResultStatus.Failed) {
               console.log('result.error', result.error);
             }
@@ -41,7 +41,7 @@ export class AuthService {
         }
         throw error;
       }
-    ); 
+      );
   }
 
   // makeRefreshTokenRequest(): Promise<any> {
