@@ -34,12 +34,9 @@
         ieMessage.style.display = 'block';
       }
     }
-    
-    console.log('SCRIPT window.location.href', window.location.href);
-    const isWittyDasboard = window.location.href.includes('customize-witty');
+
     const searchParams = new URLSearchParams(window.location.search);
-    console.log('isWittyDasboard', isWittyDasboard, "!searchParams.get('token')", !searchParams.get('token'))
-    if (isWittyDasboard && !searchParams.get('token')) {
+    if (searchParams.get('status') === 'success') {
       const target = searchParams.get('target')?.split('?')[0];
       window.open(
         target ? target : `https://dashboard.witty.works/word-addin`,

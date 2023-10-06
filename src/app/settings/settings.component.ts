@@ -30,9 +30,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
     return window.location.hostname === 'localhost';
   }
   
-  openDashboard() {
+  async openDashboard() {
     analytics.openLinkLog('dashboard_open');
-    const url = `${environment.dashboard}user/language/customize-witty`;
+    const accessToken = await Office.auth.getAccessToken();
+    console.log('accessToken', accessToken);
+    const url = `${environment.dashboard}office-login?token=${accessToken}`;
     Office.context.ui.displayDialogAsync(url, {height: 50, width: 50}, function (result) {
       if (result.status === Office.AsyncResultStatus.Failed) {
         console.log('result.error', result.error);
