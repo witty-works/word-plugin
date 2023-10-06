@@ -1,13 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
 import { ISpellingError } from "../data/data-structures";
-import { ModalComponent } from "@independer/ng-modal/modal.component";
 import { IAlternatives, IAlert, IAuthResponse, ICheckResponse } from "../data/types";
 import { AuthService } from '../services/auth.service';
 import { en, de } from '../translations';
 import { environment } from '../../environments/environment';
 import DocumentUtils from '../utils/word.utils';
 import { useAnalytics } from '../analytics/analytics';
+import { DialogRef, DialogService } from "@ngneat/dialog";
 
 const analytics = useAnalytics();
 
@@ -40,11 +40,19 @@ export class SpellcheckerComponent implements OnInit {
   authResponse: IAuthResponse | null = null;
   checkEndpointResponse: ICheckResponse | null = null;
 
-  @ViewChild('errorModal') errorModal?: ModalComponent;
+  @ViewChild('errorDialog') errorDialog?: TemplateRef<any>;
 
-  error = "";
 
-  constructor(private spellcheckerService: CheckingService, private authService: AuthService) {}
+  errorIntro = "";
+  errorMessage = "";
+  dialogRef?: DialogRef;
+
+  constructor(
+    private spellcheckerService: CheckingService, 
+    private authService: AuthService,
+    private dialogService: DialogService
+    ) {
+    }
 
   async ngOnInit() {
     const accessToken = await Office.auth.getAccessToken();
@@ -274,21 +282,25 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   private handleError(e: any) {
-    this.errorModal!.closed.subscribe(args => {
-      if (!!args.result) {
-        this.checkGrammar();
-      }
-    });
+
     if (e instanceof Error) {
       if (e.message.startsWith("Could not find range for chunk: ")) {
-        // this.error = e.message.replace("Could not find range for chunk: ", "..");
+        this.errorIntro = "Betg chattà il paragraf";
+        this.errorMessage = e.message.replace("Could not find range for chunk: ", "");
       } else if(e.message.startsWith("The range for the error was not found: ")) {
-        // this.error = e.message.replace("The range for the error was not found: ", "..");
+        this.errorIntro = "Betg chattà il pled";
+        this.errorMessage = e.message.replace("The range for the error was not found: ", "");
       } else {
-        this.error = e.message;
+        this.errorIntro = "Errur nunenconuschenta"
+        this.errorMessage = e.message;
       }
 
-      this.errorModal!.open();
+      this.dialogRef = this.dialogService.open(this.errorDialog!);
+      this.dialogRef.afterClosed$.subscribe((result) => {
+        if (!!result) {
+          this.checkGrammar();
+        }
+      });
       console.error(e.message);
     } else {
       console.error(e);

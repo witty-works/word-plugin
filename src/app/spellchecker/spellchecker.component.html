@@ -76,21 +76,19 @@
         <span>{{lang.noFurtherSuggestions}}</span>
     </div>
 
-    <ngx-spinner bdColor="#f1f2f2" size="medium" color="#f06464" type="line-scale" [fullScreen]="true"
-        [showSpinner]="isSpellchecking">
-    </ngx-spinner>
+    <ngx-spinner bdColor="#f1f2f2" size="medium" color="#f06464" type="line-scale" [fullScreen]="true"[showSpinner]="isSpellchecking"></ngx-spinner>
 
-    <modal #errorModal>
-        <modal-header>
+    <ng-template #errorDialog>
+        <header>
             <h4>{{lang.error}}</h4>
-        </modal-header>
-        <modal-content>
-            <p>{{ error }}</p>
+        </header>
+        <div>
+            <p>{{ errorIntro }}: <em>{{ errorMessage }}</em></p>
             <p style="margin-top: 24px;">{{lang.tryAgain}}</p>
-        </modal-content>
-        <modal-footer>
-            <button class="secondary" (click)="errorModal.close(false)" style="margin-right: 12px;">{{lang.dontAnalyzeAgain}}</button>
-            <button (click)="errorModal.close(true)">{{lang.analyzeAgain}}</button>
-        </modal-footer>
-    </modal>
+        </div>
+        <footer>
+            <button class="secondary" (click)="dialogRef?.close(undefined)" style="margin-right: 12px;">{{lang.dontAnalyzeAgain}}</button>
+            <button (click)="dialogRef?.close('search')">{{lang.analyzeAgain}}</button>
+        </footer>
+    </ng-template>
 </div>
