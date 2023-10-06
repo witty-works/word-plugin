@@ -36,10 +36,10 @@
     }
 
     const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.get('status') === 'success') {
+    if (searchParams.get('status')) {
       const target = searchParams.get('target')?.split('?')[0];
       window.open(
-        target ? target : `https://dashboard.witty.works/word-addin`,
+        target ? target : `https://dashboard.witty.works/word-addin?status=${searchParams.get('status')}`,
         '_self',
         'noopener'
       );
