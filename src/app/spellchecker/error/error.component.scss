@@ -78,12 +78,20 @@
   padding: 1.5em;
 }
 
+.witty-works-ext-justify-center {
+  justify-content: center;
+}
+
 .witty-works-ext-justify-start {
   justify-content: flex-start;
 }
 
 .witty-works-ext-margin-top {
   margin-top: 1em;
+}
+
+.witty-works-ext-margin-bottom {
+  margin-bottom: 1em;
 }
 
 .witty-works-ext-lato-popover-text {
@@ -187,4 +195,10 @@
   font-size: 16px;
   line-height: 20px; /* or 214% */
   color: $extraDarkGray;
+}
+
+.witty-works-ext-error-counter {
+  margin-left: 1em;
+  margin-right: 1em;
+  color: #656565;
 }

@@ -17,7 +17,7 @@ const analytics = useAnalytics();
 export class ErrorComponent {
 
   @Input()
-  error?: ISpellingError;
+  error?: ISpellingError; //should be array of errors
 
   @Input()
   context?: string;

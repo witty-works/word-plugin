@@ -210,9 +210,12 @@ export class SpellcheckerComponent implements OnInit {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
         const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
-        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, errorText);
+        const errorRanges = await DocumentUtils.fetchTextBounds(context, paragraphRange, errorText);
 
-        errorRange.select('Select');
+        // Loop through all matched error ranges and select/highlight them
+        for (const range of errorRanges) {
+            range.select('Select');
+        }
         await context.sync();
       } catch (e) {
         this.handleError(e);
@@ -227,14 +230,16 @@ export class SpellcheckerComponent implements OnInit {
         const errorText = this.getGrammarErrorText(obj.errorIndex);
         const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
 
-        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
+        const errorRanges = await DocumentUtils.fetchTextBounds(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
 
         const alertRelevantToSuggestion = this.alerts.find(a => a.data.text === errorText);
         alertRelevantToSuggestion && analytics.alternativeLog(alertRelevantToSuggestion, obj.suggestion.text);
 
-        errorRange.insertText(obj.suggestion.text, 'Replace');        
-    
-        errorRange.select('End');
+        // Loop through all matching error ranges and replace with the suggestion
+        for (const errorRange of errorRanges) {
+            errorRange.insertText(obj.suggestion.text, 'Replace');        
+            errorRange.select('End');
+        }
 
         const newParagraph = paragraphRange.paragraphs.getFirst();
         newParagraph.load('text');

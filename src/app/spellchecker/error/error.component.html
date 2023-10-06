@@ -10,8 +10,17 @@
         
 
         <section class="suggestions" *ngIf="isOpen">
+          <!-- if more than one error -->
+          <div class="witty-works-ext-container-row witty-works-ext-justify-center witty-works-ext-margin-bottom">
+            <!-- if not first error -->
+            <!-- on click decrement -->
+            <img src="assets/icons/chevron-left.svg" alt="{lang.chevronLeftAlt}"> 
+              <div class="witty-works-ext-error-counter">1/6</div>
+              <!-- on click increment -->
+            <img src="assets/icons/chevron-right.svg" alt="{lang.chevronRightAlt}">
+          </div>  
         <div
-          class="witty-works-ext-wittyworks-container witty-works-ext-container-rounded witty-works-ext-full-padding witty-works-ext-justify-start"
+          class="witty-works-ext-wittyworks-container witty-works-ext-container-rounded witty-works-ext-full-padding"
           [ngStyle]="containerStyle"
         >
             <div class="witty-works-ext-lato-popover-text witty-works-ext-justify-space-between witty-works-ext-wittyworks-container">
@@ -45,6 +54,7 @@
           <div class="suggestion-title witty-works-ext-margin-top" *ngIf="suggestions.length > 0">{{lang.tryInstead}}</div>
           <ng-container *ngFor="let suggestion of suggestions.slice(0, 5)">     
             <div class="witty-works-ext-button-wrapper" [class.hovered]="suggestion.hovered">
+              <!-- make sure to decrement the index on click -->
               <button 
                 (click)="acceptSuggestion(suggestion)" 
                 (mouseenter)="suggestion.hovered = true" 

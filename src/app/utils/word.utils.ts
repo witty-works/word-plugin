@@ -48,7 +48,7 @@ export default class DocumentUtils {
         return fullRange;
     }    
 
-    static async fetchTextBounds(context: Word.RequestContext, withinRange: Word.Range, lookupText: string): Promise<Word.Range> {
+    static async fetchTextBounds(context: Word.RequestContext, withinRange: Word.Range, lookupText: string): Promise<Word.Range[]> {
         withinRange.load('text');
         await context.sync();
 
@@ -69,15 +69,14 @@ export default class DocumentUtils {
             matchWholeWord: matchEntireWord,
         });
 
-        const locatedTextRange = searchTextRanges.getFirstOrNullObject();
-        locatedTextRange.load('isNullObject');
+        searchTextRanges.load('items');
         await context.sync();
 
-        if (!locatedTextRange || locatedTextRange.isNullObject) {
+        if (!searchTextRanges || searchTextRanges.items.length === 0) {
             throw new Error(`Cannot find the range for text: ${lookupText}`);
         }
-
-        return locatedTextRange;
+        // Return all matched ranges
+        return searchTextRanges.items;
     }
 
     static divideTextIntoSegments(text: string, segmentSize: number): string[] {
