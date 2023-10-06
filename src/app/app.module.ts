@@ -14,7 +14,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { VirtualScrollerModule } from "@iharbeck/ngx-virtual-scroller";
 import { FormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
-import { ModalModule } from "@independer/ng-modal";
+import { provideDialogConfig } from '@ngneat/dialog';
 import { Router } from "@angular/router";
 import * as Sentry from "@sentry/angular-ivy";
 
@@ -36,9 +36,17 @@ import * as Sentry from "@sentry/angular-ivy";
     VirtualScrollerModule,
     AppRoutingModule,
     FormsModule,
-    ModalModule,
   ],
   providers: [
+    provideDialogConfig({
+      closeButton: true,
+      enableClose: false,
+      backdrop: true,
+      resizable: false,
+      draggable: false,
+      windowClass: 'modal-dialog',
+      width: 'calc(100vw - 40px)'
+    }),
     {
      provide: ErrorHandler,
      useValue: Sentry.createErrorHandler({
