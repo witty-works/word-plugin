@@ -11,7 +11,7 @@ import { environment } from '../../environments/environment';
 export class CheckingService {
   isDevEnv = window.location.hostname === 'localhost'
 
-  constructor(private settingsService: SettingsService, private http: HttpClient) {}
+  constructor(private settingsService: SettingsService, private http: HttpClient) { }
 
   async checkText(sentence: string): Promise<ICheckResponse> {
     const accessToken = await Office.auth.getAccessToken();
@@ -19,15 +19,16 @@ export class CheckingService {
     const url = environment.api + 'v2.3/check';
 
     const body = {
-          text: sentence,
-          lang: 'auto',
-          client: 'word-plugin:' + environment.package_version,
-          config: { //TODO: check that this is correct!
-            disabled_categories: [
-            'orthography',
-          ]},
-          config_hash: localStorage.getItem('config_hash'), //dont use config_hash and organization_config_hash for now
-          organization_config_hash: localStorage.getItem('organization_config_hash'),
+      text: sentence,
+      lang: 'auto',
+      client: 'word-plugin:' + environment.package_version,
+      config: { //TODO: check that this is correct!
+        disabled_categories: [
+          'orthography',
+        ]
+      },
+      config_hash: localStorage.getItem('config_hash'), //dont use config_hash and organization_config_hash for now
+      organization_config_hash: localStorage.getItem('organization_config_hash'),
     }
 
     const httpOptions = {
@@ -37,14 +38,14 @@ export class CheckingService {
         Authorization: `Bearer ${accessToken}`,
       }
     };
-  
+
     return this.http.post<any>(url, body, httpOptions)
       .toPromise()
       .catch(error => {
         throw error;
       });
   }
-  
+
   getSuggestions(word: ISpellingError): Promise<IAlternatives[]> {
     return Promise.resolve(word.details.alternatives);
   }
