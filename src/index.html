@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OfficeAngular</title>
+  <title>Witty Word Add-in</title>
 
   <base href="/">
 
@@ -37,13 +37,13 @@
 
     const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.get('status')) {
-      const target = searchParams.get('target')?.split('?')[0];
       window.open(
-        target ? target : `https://dashboard.witty.works/word-addin?status=${searchParams.get('status')}`,
+        `${environment.dashboard}word-addin?status=${searchParams.get('status')}`,
         '_self',
         'noopener'
       );
     }
   </script>
 </body>
+
 </html>
