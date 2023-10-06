@@ -124,7 +124,6 @@ export class SpellcheckerComponent implements OnInit {
               continue;
             }
             this.checkEndpointResponse = errs;
-console.log(this.checkEndpointResponse.results.length > 0, this.checkEndpointResponse.results[0].alternatives)
             if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {
               const accessToken = await Office.auth.getAccessToken();
               //prompt user to register on dashboard
