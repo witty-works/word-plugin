@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OfficeAngular</title>
+  <title>Witty Word Add-in</title>
 
   <base href="/">
 
@@ -36,18 +36,13 @@
     }
 
     const searchParams = new URLSearchParams(window.location.search);
-    if ([...searchParams].length > 0 && searchParams.get('access_token')) {
-      
-      localStorage.setItem('access_token', searchParams.get('access_token'));
-      localStorage.setItem('refresh_token', searchParams.get('refresh_token'));
-      const target = searchParams.get('target')?.split('?')[0];
+    if (searchParams.get('status')) {
       window.open(
-        target ? target : `https://dashboard.witty.works/word-addin`,
+        `${environment.dashboard}word-addin?status=${searchParams.get('status')}`,
         '_self',
         'noopener'
       );
     }
-
   </script>
 </body>
 

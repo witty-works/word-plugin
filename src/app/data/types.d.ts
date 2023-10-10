@@ -79,7 +79,7 @@ export interface ICheckResponseResult {
   limit_reached: boolean;
 }
 
-//AUTH/REFRESHTOKEN ENDPOINT
+//AUTH ENDPOINT
 export interface IAuthResponse {
   config: ResponseConfig;
   organization_config: ResponseConfig;
@@ -102,11 +102,11 @@ export interface IDomains {
   list: string[];
   type: string;
 }
-export interface IRefreshTokenResponse {
-  email: string;
-  refresh_token: string;
-  access_token: string;
-}
+// export interface IRefreshTokenResponse {
+//   email: string;
+//   refresh_token: string;
+//   access_token: string;
+// }
 
 //HIGHLIGHTS
 export interface Position {

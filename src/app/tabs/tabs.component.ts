@@ -21,6 +21,6 @@ export class TabsComponent {
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('access_token');
+    return true;
   }
 }

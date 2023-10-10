@@ -95,5 +95,15 @@
           DefaultValue="TaskpaneButton.Tooltip" />
       </bt:LongStrings>
     </Resources>
+    <WebApplicationInfo>
+      <Id>3117be5a-3323-453f-810d-8795bac7f31d</Id>
+      <Resource>api://localhost:4200/3117be5a-3323-453f-810d-8795bac7f31d</Resource>
+      <Scopes>
+        <Scope>openid</Scope>
+        <Scope>user.read</Scope>
+        <Scope>email</Scope>
+        <Scope>profile</Scope>
+      </Scopes>
+    </WebApplicationInfo>
   </VersionOverrides>
 </OfficeApp>

@@ -18,15 +18,15 @@ const analytics = useAnalytics();
   styleUrls: ['./spellchecker.component.scss']
 })
 export class SpellcheckerComponent implements OnInit {
-  accessToken: string = '';
-  refreshToken: string = '';
+  // accessToken: string = '';
+  // refreshToken: string = '';
   environment = window.location.hostname === 'localhost'
 
   isSpellchecking = false;
 
   isFirstRun = true;
 
-  isLoggedin = false;
+  isLoggedin = true;
   
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
@@ -54,16 +54,16 @@ export class SpellcheckerComponent implements OnInit {
     ) {
     }
 
-  ngOnInit() {
-    const accessToken = localStorage.getItem('access_token') || '';
+  async ngOnInit() {
+    const accessToken = await Office.auth.getAccessToken();
     this.isLoggedin = !!accessToken;
 
-    window.addEventListener('storage', (event) => {
-      if (event.key === 'access_token') {
-        this.isLoggedin = !!accessToken;
-        window.location.reload();
-      }
-    });    
+    // window.addEventListener('storage', (event) => {
+    //   if (event.key === 'access_token') {
+    //     this.isLoggedin = !!accessToken;
+    //     window.location.reload();
+    //   }
+    // });    
     
     //probably not needed -> just do auth if check fails, but good for testing
     this.authService.makeAuthRequest().then((response) => {
@@ -88,15 +88,10 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
 
-  logout() { 
-    localStorage.setItem('access_token', '');
-    localStorage.setItem('refresh_token', '');
-  }
-
-  openDashboard() {
-    analytics.openLinkLog('dashboard_open');
-    Office.context.ui.openBrowserWindow('https://dashboard.witty.works/en/user/language/customize-witty');
-  }
+  // logout() { 
+  //   localStorage.setItem('access_token', '');
+  //   localStorage.setItem('refresh_token', '');
+  // }
 
   openWittyHomePage() {
     analytics.openLinkLog('homepage_open');
@@ -129,6 +124,17 @@ export class SpellcheckerComponent implements OnInit {
               continue;
             }
             this.checkEndpointResponse = errs;
+            if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {
+              const accessToken = await Office.auth.getAccessToken();
+              //prompt user to register on dashboard
+              const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
+      
+              Office.context.ui.displayDialogAsync(url, { height: 50, width: 50 }, function (result) {
+                if (result.status === Office.AsyncResultStatus.Failed) {
+                  console.log('result.error', result.error);
+                }
+              });
+            }
             const checkLogEventId = Math.random().toString(36).substring(2, 15);
 
             analytics.checkLog(errs, null, paragraph.length, 'check', false, checkLogEventId);
