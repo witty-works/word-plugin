@@ -11,12 +11,5 @@ export class AppComponent {
 
   tabChanged(type: TabType) {
     this.selectedTab = type;
-    this.isLoggedin = true;
-  }
-
-  isLoggedin = true;
-
-  ngOnInit() {
-    this.isLoggedin = true;
   }
 }

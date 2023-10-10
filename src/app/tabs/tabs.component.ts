@@ -19,8 +19,4 @@ export class TabsComponent {
   tabChanged(type: TabType) {
     this.tabChangedEvent.emit(type);
   }
-
-  isLoggedIn(): boolean {
-    return true;
-  }
 }

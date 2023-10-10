@@ -14,7 +14,6 @@ const analytics = useAnalytics();
 })
 export class SettingsComponent implements OnInit, OnDestroy {
 
-  isLoggedin = true;
   showContext: boolean = true;
   teamName = '';
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
@@ -35,7 +34,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     const accessToken = await Office.auth.getAccessToken();
     console.log('accessToken', accessToken);
     const url = `${environment.dashboard}office-login?token=${accessToken}`;
-    Office.context.ui.displayDialogAsync(url, {height: 50, width: 50}, function (result) {
+    Office.context.ui.displayDialogAsync(url, {height: 80, width: 80}, function (result) {
       if (result.status === Office.AsyncResultStatus.Failed) {
         console.log('result.error', result.error);
       }
@@ -54,7 +53,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.appVersion = environment.package_version;
-    this.isLoggedin = true;
     
     this.teamName = localStorage.getItem('organization_name') ?? '';
 
@@ -76,6 +74,5 @@ export class SettingsComponent implements OnInit, OnDestroy {
   // logout() {
   //   localStorage.setItem('access_token', '');
   //   localStorage.setItem('refresh_token', '');
-  //   this.isLoggedin = true;
   // }
 }
