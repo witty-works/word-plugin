@@ -96,5 +96,15 @@
           DefaultValue="TaskpaneButton.Tooltip" />
       </bt:LongStrings>
     </Resources>
+    <WebApplicationInfo>
+      <Id>7a317bba-b140-43a6-81f9-520ff2a4cfc1</Id>
+      <Resource>api://word.witty.works/7a317bba-b140-43a6-81f9-520ff2a4cfc1</Resource>
+      <Scopes>
+        <Scope>openid</Scope>
+        <Scope>user.read</Scope>
+        <Scope>email</Scope>
+        <Scope>profile</Scope>
+      </Scopes>
+    </WebApplicationInfo>
   </VersionOverrides>
 </OfficeApp>
