@@ -14,18 +14,14 @@ const analytics = useAnalytics();
 })
 export class SettingsComponent implements OnInit, OnDestroy {
 
-  isLoggedin = false;
+  isLoggedin = true;
   showContext: boolean = true;
-  checkUpperAndLowerCase: boolean = true;
-  checkGrammarAndSpelling: boolean = true;
   teamName = '';
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   public appVersion = '-';
 
   private showContextSubscription?: Subscription;
-  private checkUpperAndLowerCaseSubscription?: Subscription;
-  private checkGrammarAndSpellingSubscription?: Subscription;
 
   constructor(private settingsService: SettingsService) {
   }
@@ -34,9 +30,16 @@ export class SettingsComponent implements OnInit, OnDestroy {
     return window.location.hostname === 'localhost';
   }
   
-  openDashboard() {
+  async openDashboard() {
     analytics.openLinkLog('dashboard_open');
-    Office.context.ui.openBrowserWindow('https://dashboard.witty.works/en/user/language/customize-witty');
+    const accessToken = await Office.auth.getAccessToken();
+    console.log('accessToken', accessToken);
+    const url = `${environment.dashboard}office-login?token=${accessToken}`;
+    Office.context.ui.displayDialogAsync(url, {height: 50, width: 50}, function (result) {
+      if (result.status === Office.AsyncResultStatus.Failed) {
+        console.log('result.error', result.error);
+      }
+    });
   }
 
   openWittyHomePage() {
@@ -51,20 +54,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.appVersion = environment.package_version;
-    this.isLoggedin = !!localStorage.getItem('access_token');
+    this.isLoggedin = true;
     
     this.teamName = localStorage.getItem('organization_name') ?? '';
 
     this.showContextSubscription = this.settingsService.getShowContextObservable().subscribe(ctx => {
       this.showContext = ctx;
-    });
-
-    this.checkUpperAndLowerCaseSubscription = this.settingsService.getCheckUpperAndLowerCaseObservable().subscribe(ctx => {
-      this.checkUpperAndLowerCase = ctx;
-    });
-
-    this.checkGrammarAndSpellingSubscription = this.settingsService.getCheckGrammarAndSpellingObservable().subscribe(ctx => {
-      this.checkGrammarAndSpelling = ctx;
     });
   }
 
@@ -72,31 +67,15 @@ export class SettingsComponent implements OnInit, OnDestroy {
     if (this.showContextSubscription) {
       this.showContextSubscription.unsubscribe();
     }
-
-    if (this.checkUpperAndLowerCaseSubscription) {
-      this.checkUpperAndLowerCaseSubscription.unsubscribe();
-    }
-
-    if (this.checkGrammarAndSpellingSubscription) {
-      this.checkGrammarAndSpellingSubscription.unsubscribe();
-    }
   }
 
   showContextChanged(value: boolean) {
     this.settingsService.setShowContext(value);
   }
 
-  checkUpperAndLowerCaseChanged(value: boolean) {
-    this.settingsService.setCheckUpperAndLowerCase(value);
-  }
-
-  checkGrammarAndSpellingChanged(value: boolean) {
-    this.settingsService.setCheckGrammarAndSpelling(value);
-  }
-
-  logout() {
-    localStorage.setItem('access_token', '');
-    localStorage.setItem('refresh_token', '');
-    this.isLoggedin = false;
-  }
+  // logout() {
+  //   localStorage.setItem('access_token', '');
+  //   localStorage.setItem('refresh_token', '');
+  //   this.isLoggedin = true;
+  // }
 }

@@ -1,13 +1,13 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
-import WordUtils from "../utils/word.utils";
 import { ISpellingError } from "../data/data-structures";
-import { ModalComponent } from "@independer/ng-modal/modal.component";
 import { IAlternatives, IAlert, IAuthResponse, ICheckResponse } from "../data/types";
 import { AuthService } from '../services/auth.service';
 import { en, de } from '../translations';
 import { environment } from '../../environments/environment';
+import DocumentUtils from '../utils/word.utils';
 import { useAnalytics } from '../analytics/analytics';
+import { DialogRef, DialogService } from "@ngneat/dialog";
 
 const analytics = useAnalytics();
 
@@ -18,15 +18,15 @@ const analytics = useAnalytics();
   styleUrls: ['./spellchecker.component.scss']
 })
 export class SpellcheckerComponent implements OnInit {
-  accessToken: string = '';
-  refreshToken: string = '';
+  // accessToken: string = '';
+  // refreshToken: string = '';
   environment = window.location.hostname === 'localhost'
 
   isSpellchecking = false;
 
   isFirstRun = true;
 
-  isLoggedin = false;
+  isLoggedin = true;
   
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
@@ -40,22 +40,30 @@ export class SpellcheckerComponent implements OnInit {
   authResponse: IAuthResponse | null = null;
   checkEndpointResponse: ICheckResponse | null = null;
 
-  @ViewChild('errorModal') errorModal?: ModalComponent;
+  @ViewChild('errorDialog') errorDialog?: TemplateRef<any>;
 
-  error = "";
 
-  constructor(private spellcheckerService: CheckingService, private authService: AuthService) {}
+  errorIntro = "";
+  errorMessage = "";
+  dialogRef?: DialogRef;
 
-  ngOnInit() {
-    const accessToken = localStorage.getItem('access_token') || '';
+  constructor(
+    private spellcheckerService: CheckingService, 
+    private authService: AuthService,
+    private dialogService: DialogService
+    ) {
+    }
+
+  async ngOnInit() {
+    const accessToken = await Office.auth.getAccessToken();
     this.isLoggedin = !!accessToken;
 
-    window.addEventListener('storage', (event) => {
-      if (event.key === 'access_token') {
-        this.isLoggedin = !!accessToken;
-        window.location.reload();
-      }
-    });    
+    // window.addEventListener('storage', (event) => {
+    //   if (event.key === 'access_token') {
+    //     this.isLoggedin = !!accessToken;
+    //     window.location.reload();
+    //   }
+    // });    
     
     //probably not needed -> just do auth if check fails, but good for testing
     this.authService.makeAuthRequest().then((response) => {
@@ -80,15 +88,10 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
 
-  logout() { 
-    localStorage.setItem('access_token', '');
-    localStorage.setItem('refresh_token', '');
-  }
-
-  openDashboard() {
-    analytics.openLinkLog('dashboard_open');
-    Office.context.ui.openBrowserWindow('https://dashboard.witty.works/en/user/language/customize-witty');
-  }
+  // logout() { 
+  //   localStorage.setItem('access_token', '');
+  //   localStorage.setItem('refresh_token', '');
+  // }
 
   openWittyHomePage() {
     analytics.openLinkLog('homepage_open');
@@ -121,6 +124,17 @@ export class SpellcheckerComponent implements OnInit {
               continue;
             }
             this.checkEndpointResponse = errs;
+            if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {
+              const accessToken = await Office.auth.getAccessToken();
+              //prompt user to register on dashboard
+              const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
+      
+              Office.context.ui.displayDialogAsync(url, { height: 50, width: 50 }, function (result) {
+                if (result.status === Office.AsyncResultStatus.Failed) {
+                  console.log('result.error', result.error);
+                }
+              });
+            }
             const checkLogEventId = Math.random().toString(36).substring(2, 15);
 
             analytics.checkLog(errs, null, paragraph.length, 'check', false, checkLogEventId);
@@ -166,7 +180,7 @@ export class SpellcheckerComponent implements OnInit {
                 gravity: result.gravity,
               },
             }))
-            this.alerts = this.alerts.concat(newAlerts);          
+            this.alerts = this.alerts.concat(newAlerts);
 
             errs.results.forEach(e => {
               if(e.text === ' \v') return; //TODO: handle white space typography error in the future
@@ -209,8 +223,8 @@ export class SpellcheckerComponent implements OnInit {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.fetchParagraph(context, paragraphText, obj.paragraphIndex);
-        const errorRange = await WordUtils.fetchTextBounds(context, paragraphRange, errorText);
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
+        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, errorText);
 
         errorRange.select('Select');
         await context.sync();
@@ -225,8 +239,9 @@ export class SpellcheckerComponent implements OnInit {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
         const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await WordUtils.fetchParagraph(context, paragraphText, obj.paragraphIndex);
-        const errorRange = await WordUtils.fetchTextBounds(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
+
+        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
 
         const alertRelevantToSuggestion = this.alerts.find(a => a.data.text === errorText);
         alertRelevantToSuggestion && analytics.alternativeLog(alertRelevantToSuggestion, obj.suggestion.text);
@@ -278,21 +293,25 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   private handleError(e: any) {
-    this.errorModal!.closed.subscribe(args => {
-      if (!!args.result) {
-        this.checkGrammar();
-      }
-    });
+
     if (e instanceof Error) {
       if (e.message.startsWith("Could not find range for chunk: ")) {
-        // this.error = e.message.replace("Could not find range for chunk: ", "..");
+        this.errorIntro = "Betg chattà il paragraf";
+        this.errorMessage = e.message.replace("Could not find range for chunk: ", "");
       } else if(e.message.startsWith("The range for the error was not found: ")) {
-        // this.error = e.message.replace("The range for the error was not found: ", "..");
+        this.errorIntro = "Betg chattà il pled";
+        this.errorMessage = e.message.replace("The range for the error was not found: ", "");
       } else {
-        this.error = e.message;
+        this.errorIntro = "Errur nunenconuschenta"
+        this.errorMessage = e.message;
       }
 
-      this.errorModal!.open();
+      this.dialogRef = this.dialogService.open(this.errorDialog!);
+      this.dialogRef.afterClosed$.subscribe((result) => {
+        if (!!result) {
+          this.checkGrammar();
+        }
+      });
       console.error(e.message);
     } else {
       console.error(e);

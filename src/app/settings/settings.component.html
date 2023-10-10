@@ -15,30 +15,6 @@
         </h1>
     </section>
 
-    <section class="toggle" aria-labelledby="toggle-description-1">
-        <div class="toggler">
-            <div class="check-box">
-                <input type="checkbox" id="toggle-checkbox-1" [ngModel]="checkUpperAndLowerCase"
-                    (ngModelChange)="checkUpperAndLowerCaseChanged($event)">
-            </div>
-        </div>
-        <label for="toggle-checkbox-1" id="toggle-description-1" class="description">
-            {{lang.caseSensitivity}}
-        </label>
-    </section>
-
-    <section class="toggle" aria-labelledby="toggle-description-2">
-        <div class="toggler">
-            <div class="check-box">
-                <input type="checkbox" id="toggle-checkbox-2" [ngModel]="checkGrammarAndSpelling"
-                    (ngModelChange)="checkGrammarAndSpellingChanged($event)">
-            </div>
-        </div>
-        <label for="toggle-checkbox-2" id="toggle-description-2" class="description">
-            {{lang.spellChecking}}
-        </label>
-    </section>
-
     <section class="toggle" aria-labelledby="toggle-description-3">
         <div class="toggler">
             <div class="check-box">
@@ -58,19 +34,19 @@
     </section>
 </div>
 
-<section class='witty-works-ext-section' *ngIf="isLoggedin">
+<!-- <section class='witty-works-ext-section' *ngIf="isLoggedin">
     <div class='witty-works-ext-left'>
         <button class='witty-works-ext-button witty-works-ext-primary-button-red' aria-label="{lang.ariaLabelLogOut}"
             (click)="logout()">
             {{lang.logOut}}
         </button>
     </div>
-</section>
+</section> -->
 
 <footer class="witty-works-ext-lato-popup-text" *ngIf="isLoggedin">
     <div class="witty-works-ext-separator"></div>
     <div class="witty-works-ext-wittyworks-container">
-        {{lang.wittyVersion}} {{ appVersion }} 
+        {{lang.wittyVersion}} {{ appVersion }}
         <button class="witty-works-ext-link" (click)="openHelpCenter()">{{lang.help}}</button>
     </div>
 </footer>
