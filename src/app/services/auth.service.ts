@@ -33,7 +33,7 @@ export class AuthService {
           //prompt user to register on dashboard
           const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
 
-          Office.context.ui.displayDialogAsync(url, { height: 50, width: 50 }, function (result) {
+          Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
             if (result.status === Office.AsyncResultStatus.Failed) {
               console.log('result.error', result.error);
             }
