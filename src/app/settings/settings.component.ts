@@ -14,7 +14,6 @@ const analytics = useAnalytics();
 })
 export class SettingsComponent implements OnInit, OnDestroy {
 
-  isLoggedin = true;
   showContext: boolean = true;
   teamName = '';
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
@@ -54,7 +53,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.appVersion = environment.package_version;
-    this.isLoggedin = true;
     
     this.teamName = localStorage.getItem('organization_name') ?? '';
 
@@ -76,6 +74,5 @@ export class SettingsComponent implements OnInit, OnDestroy {
   // logout() {
   //   localStorage.setItem('access_token', '');
   //   localStorage.setItem('refresh_token', '');
-  //   this.isLoggedin = true;
   // }
 }

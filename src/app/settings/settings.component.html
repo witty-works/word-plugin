@@ -1,4 +1,4 @@
-<div *ngIf="isLoggedin">
+<div>
     <nav aria-label="{lang.areaLabelHeader}" class="witty-works-ext-header">
         <img src="assets/icons/witty-logo.svg" alt="{lang.wittyIconAlt}" role="link" tabindex="0"
             (keydown.enter)="openWittyHomePage()" (click)="openWittyHomePage()">
@@ -34,16 +34,7 @@
     </section>
 </div>
 
-<!-- <section class='witty-works-ext-section' *ngIf="isLoggedin">
-    <div class='witty-works-ext-left'>
-        <button class='witty-works-ext-button witty-works-ext-primary-button-red' aria-label="{lang.ariaLabelLogOut}"
-            (click)="logout()">
-            {{lang.logOut}}
-        </button>
-    </div>
-</section> -->
-
-<footer class="witty-works-ext-lato-popup-text" *ngIf="isLoggedin">
+<footer class="witty-works-ext-lato-popup-text">
     <div class="witty-works-ext-separator"></div>
     <div class="witty-works-ext-wittyworks-container">
         {{lang.wittyVersion}} {{ appVersion }}

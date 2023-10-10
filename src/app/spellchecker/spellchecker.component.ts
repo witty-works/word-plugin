@@ -26,7 +26,7 @@ export class SpellcheckerComponent implements OnInit {
 
   isFirstRun = true;
 
-  isLoggedin = true;
+  isLoggedin = false;
   
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
@@ -54,28 +54,25 @@ export class SpellcheckerComponent implements OnInit {
     ) {
     }
 
-  async ngOnInit() {
-    const accessToken = await Office.auth.getAccessToken();
-    this.isLoggedin = !!accessToken;
+  async ngOnInit() { 
+    this.register();
 
-    // window.addEventListener('storage', (event) => {
-    //   if (event.key === 'access_token') {
-    //     this.isLoggedin = !!accessToken;
-    //     window.location.reload();
-    //   }
-    // });    
-    
-    //probably not needed -> just do auth if check fails, but good for testing
+  }
+
+  register() {
     this.authService.makeAuthRequest().then((response) => {
-      if (!response) return;
+      if (!response) {
+        this.isLoggedin = false;
+        return;
+      }
       this.authResponse = response;
+      this.isLoggedin = true;
       localStorage.setItem('organization_name', response.organization_name);
       localStorage.setItem('organization_config_hash', response.organization_config_hash);
       localStorage.setItem('config_hash', response.config_hash);
       localStorage.setItem('user_id', response?.id);
       localStorage.setItem('organization_id', response?.organization_id);
     });
-
   }
   
   login() {

@@ -1,64 +1,6 @@
-<div *ngIf="!isLoggedin">
-    <nav aria-label="{lang.areaLabelHeader}" class="witty-works-ext-header">
-        <img src="assets/icons/witty-logo.svg" alt="{lang.wittyIconAlt}" role="link" tabindex="0" (keydown.enter)="openWittyHomePage()" (click)="openWittyHomePage()">
-    </nav>
-
-    <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-full-padding witty-works-ext-justify-start witty-works-ext-margin-top witty-works-ext-cursor-pointer witty-works-ext-full-padding witty-works-ext-light-gray-background'>
-        <div class='witty-works-ext-margin-right'>
-            <img src="assets/icons/sad-face.svg" alt="{lang.sadFaceIconAlt}">
-        </div>
-        <div class='witty-works-ext-lato-popover-text witty-works-ext-margin-left'>
-            {{lang.loginToUnlock}}
-            <div class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer'>
-                <div class='witty-works-ext-margin-right'>
-                    {{lang.signedOutText}}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class='witty-works-ext-full-padding'>
-        <ul aria-label="Features">
-            <li class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-start'>
-                <div class='witty-works-ext-margin-right'>
-                    <img src="assets/icons/star.svg" alt="{lang.starIconAlt}">
-                </div>
-                <span class='witty-works-ext-lato-popover-text'>{{lang.biasDetection}}</span>
-            </li>
-            
-            <li class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-start'>
-                <div class='witty-works-ext-margin-right'>
-                    <img src="assets/icons/star.svg" alt="Star">
-                </div>
-                <span class='witty-works-ext-lato-popover-text'>{{lang.inclusiveAlternatives}}</span>
-            </li>
-            
-            <li class='witty-works-ext-container-row witty-works-ext-justify-start'>
-                <div class='witty-works-ext-margin-right'>
-                    <img src="assets/icons/star.svg" alt="Star">
-                </div>
-                <span class='witty-works-ext-lato-popover-text'>{{lang.teamFeatures}}</span>
-            </li>
-        </ul>
-    </div>
-
-    <div class='witty-works-ext-wittyworks-container witty-works-ext-full-padding witty-works-ext-light-gray-background witty-works-ext-left'>
-        <button class='witty-works-ext-button witty-works-ext-primary-button-red' (click)="login()">
-            {{lang.signIn}}
-        </button>
-        <div class='witty-works-ext-lato-popup-text witty-works-ext-margin-top-half'>
-            {{lang.dontHaveAccount}}
-            <button class='witty-works-ext-lato-popup-text-purple witty-works-ext-cursor-pointer witty-works-ext-link' (click)="login()">
-                {{lang.signUp}}
-            </button>
-        </div>
-    </div>
-
-</div>
-
-
-<div *ngIf="isLoggedin">
-    <button tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="checkGrammar()">{{lang.wittyCheck}}</button>
+<div>
+    <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="checkGrammar()">{{lang.wittyCheck}}</button>
+    <button *ngIf="!isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="register()">{{lang.register}}</button>
 
     <div *ngIf="spellingErrors.length > 0" class="number-spelling-errors">
         {{ spellingErrors.length }} {{lang.suggstions}}:
@@ -68,7 +10,7 @@
         *ngIf="!isFirstRun && spellingErrors.length > 0">
     </app-errors-list>
 
-    <div class="full-size-notification" *ngIf="isFirstRun">
+    <div class="full-size-notification" *ngIf="isFirstRun && isLoggedin">
         <span>{{lang.clickWittyCheck}}</span>
     </div>
 
