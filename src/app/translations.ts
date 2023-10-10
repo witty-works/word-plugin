@@ -25,6 +25,7 @@ export const de = {
     tryAgain: 'Bitte versuche es erneut.',
     dontAnalyzeAgain: 'Nein, Text nicht erneut analysieren',
     analyzeAgain: 'Ja, analysieren den Text erneut',
+    register: 'Registrieren',
 
     //error
     tryInstead: 'Versuche es nochmal',
@@ -75,6 +76,7 @@ export const en = {
     tryAgain: 'Please try again.',
     dontAnalyzeAgain: 'No, do not analyze the text again',
     analyzeAgain: 'Yes, analyze the text again',
+    register: 'Register',
 
     //error
     tryInstead: 'Try instead ...',
