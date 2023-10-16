@@ -26,6 +26,8 @@ export const de = {
     dontAnalyzeAgain: 'Nein, Text nicht erneut analysieren',
     analyzeAgain: 'Ja, analysieren den Text erneut',
     register: 'Registrieren',
+    wittyInfos: 'Willkommen bei Witty for Word, der inklusiven Schreibhilfe für Microsoft Word.',
+    pleaseRegister: 'Bitte registriere, um Texte auf inklusive Sprache prüfen zu können.',
 
     //error
     tryInstead: 'Versuche es nochmal',
@@ -52,7 +54,7 @@ export const de = {
 export const en = {
     //tabs
     writing: 'Writing',
-    settings: 'Settings',    
+    settings: 'Settings',
 
     //spellchecker
     loginToUnlock: 'Log in now!',
@@ -77,6 +79,8 @@ export const en = {
     dontAnalyzeAgain: 'No, do not analyze the text again',
     analyzeAgain: 'Yes, analyze the text again',
     register: 'Register',
+    wittyInfos: 'Welcome to Witty for Word, the inclusive language writing assistance for Microsoft Word.',
+    pleaseRegister: 'Please register to be able check your writing for inclusive language.',
 
     //error
     tryInstead: 'Try instead ...',
