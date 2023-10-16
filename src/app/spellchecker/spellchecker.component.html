@@ -1,13 +1,25 @@
 <div>
-    <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="checkGrammar()">{{lang.wittyCheck}}</button>
-    <button *ngIf="!isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="register()">{{lang.register}}</button>
+    <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
+        (click)="checkGrammar()">{{lang.wittyCheck}}</button>
+
+    <div *ngIf="!isLoggedin" tabindex="0" class="number-spelling-errors">
+        <p>{{lang.wittyInfos}}</p>
+
+        <br />
+
+        <p>{{lang.pleaseRegister}}</p>
+
+        <br />
+
+        <button class="witty-works-ext-button witty-works-ext-primary-button-red"
+            (click)="register()">{{lang.register}}</button>
+    </div>
 
     <div *ngIf="spellingErrors.length > 0" class="number-spelling-errors">
         {{ spellingErrors.length }} {{lang.suggstions}}:
     </div>
     <app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphs" (highlightEvent)="highlight($event)"
-        (acceptSuggestionEvent)="acceptSuggestion($event)"
-        *ngIf="!isFirstRun && spellingErrors.length > 0">
+        (acceptSuggestionEvent)="acceptSuggestion($event)" *ngIf="!isFirstRun && spellingErrors.length > 0">
     </app-errors-list>
 
     <div class="full-size-notification" *ngIf="isFirstRun && isLoggedin">
@@ -18,7 +30,8 @@
         <span>{{lang.noFurtherSuggestions}}</span>
     </div>
 
-    <ngx-spinner bdColor="#f1f2f2" size="medium" color="#f06464" type="line-scale" [fullScreen]="true"[showSpinner]="isSpellchecking"></ngx-spinner>
+    <ngx-spinner bdColor="#f1f2f2" size="medium" color="#f06464" type="line-scale" [fullScreen]="true"
+        [showSpinner]="isSpellchecking"></ngx-spinner>
 
     <ng-template #errorDialog>
         <header>
@@ -29,7 +42,8 @@
             <p style="margin-top: 24px;">{{lang.tryAgain}}</p>
         </div>
         <footer>
-            <button class="secondary" (click)="dialogRef?.close(undefined)" style="margin-right: 12px;">{{lang.dontAnalyzeAgain}}</button>
+            <button class="secondary" (click)="dialogRef?.close(undefined)"
+                style="margin-right: 12px;">{{lang.dontAnalyzeAgain}}</button>
             <button (click)="dialogRef?.close('search')">{{lang.analyzeAgain}}</button>
         </footer>
     </ng-template>
