@@ -30,18 +30,29 @@ export class AuthService {
       .catch(error => {
         console.log('auth error', error);
         if (error.status === 403) {
-          //prompt user to register on dashboard
-          const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
+          const registerStatus = localStorage.getItem('registerStatus');
+          const authFailCounter = localStorage.getItem('authFailCounter') ?? '0';
+          if (registerStatus === 'success' && parseInt(authFailCounter) <= 5) {
+            const newCounter = parseInt(authFailCounter) + 1;
+            localStorage.setItem('authFailCounter', newCounter.toString());
+            setTimeout(() => {
+              this.makeAuthRequest();
+            }, 1000);
+          } else {
+            const url = (registerStatus === 'success' && parseInt(authFailCounter) > 5) 
+              ? `${environment.dashboard}word-addin?status=failure`
+              : `${ environment.dashboard}office-register?token=${accessToken}`;
 
-          Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
-            if (result.status === Office.AsyncResultStatus.Failed) {
-              console.log('result.error', result.error);
-            }
-          });
+            Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
+              if (result.status === Office.AsyncResultStatus.Failed) {
+                console.log('result.error', result.error);
+              }
+            });
+          }
         }
         throw error;
       }
-      );
+    );
   }
 
   // makeRefreshTokenRequest(): Promise<any> {
