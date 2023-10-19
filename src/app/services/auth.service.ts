@@ -13,35 +13,41 @@ export class AuthService {
   constructor(private http: HttpClient) { }
 
   async makeAuthRequest(): Promise<any> {
-    const accessToken = await Office.auth.getAccessToken(); //should always exist
+    try {
+      const accessToken = await Office.auth.getAccessToken(); //should always exist
 
-    const url = environment.api + 'v2.0/auth';
-    const httpOptions = {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      }
-    };
-
-    console.log('AUTH: url', url, 'httpOptions', httpOptions);
-    return await this.http.post<any>(url, {}, httpOptions)
-      .toPromise()
-      .catch(error => {
-        console.log('auth error', error);
-        if (error.status === 403) {
-          //prompt user to register on dashboard
-          const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
-
-          Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
-            if (result.status === Office.AsyncResultStatus.Failed) {
-              console.log('result.error', result.error);
-            }
-          });
+      const url = environment.api + 'v2.0/auth';
+      const httpOptions = {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
         }
+      };
+
+      console.log('AUTH: url', url, 'httpOptions', httpOptions);
+      return await this.http.post<any>(url, {}, httpOptions)
+        .toPromise()
+        .catch(error => {
+          console.log('auth error', error);
+          if (error.status === 403) {
+            //prompt user to register on dashboard
+            const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
+
+            Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
+              if (result.status === Office.AsyncResultStatus.Failed) {
+                console.log('result.error', result.error);
+              }
+            });
+          }
+          throw error;
+        }
+
+        );
+      } catch (error) {
+        console.log('auth error', error);
         throw error;
       }
-      );
   }
 
   // makeRefreshTokenRequest(): Promise<any> {

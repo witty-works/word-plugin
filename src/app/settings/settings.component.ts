@@ -30,15 +30,20 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
   
   async openDashboard() {
-    analytics.openLinkLog('dashboard_open');
-    const accessToken = await Office.auth.getAccessToken();
-    console.log('accessToken', accessToken);
-    const url = `${environment.dashboard}office-login?token=${accessToken}`;
-    Office.context.ui.displayDialogAsync(url, {height: 80, width: 80}, function (result) {
-      if (result.status === Office.AsyncResultStatus.Failed) {
-        console.log('result.error', result.error);
-      }
-    });
+    try {
+      analytics.openLinkLog('dashboard_open');
+      const accessToken = await Office.auth.getAccessToken();
+      console.log('accessToken', accessToken);
+      const url = `${environment.dashboard}office-login?token=${accessToken}`;
+      Office.context.ui.displayDialogAsync(url, {height: 80, width: 80}, function (result) {
+        if (result.status === Office.AsyncResultStatus.Failed) {
+          console.log('result.error', result.error);
+        }
+      });
+    } catch (error) {
+      console.log('openDashboard error', error);
+      throw error;
+    }
   }
 
   openWittyHomePage() {
