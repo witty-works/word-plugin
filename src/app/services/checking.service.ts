@@ -45,7 +45,11 @@ export class CheckingService {
           throw error;
         });
     } catch (error) {
-      console.log('checkText error', error);
+      const ieMessage = document.getElementById("ie-warn");
+      if (ieMessage) {
+        ieMessage.style.display = 'block';
+      }
+
       throw error;
     }
   }
