@@ -36,9 +36,14 @@
     }
 
     const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.get('status')) {
+    const status = searchParams.get('status');
+    if (status) {
+      localStorage.setItem('registerStatus', status);
+      if (status === 'success') {
+        localStorage.setItem('authFailCounter', '0')
+      }
       window.open(
-        `${environment.dashboard}word-addin?status=${searchParams.get('status')}`,
+        `${environment.dashboard}word-addin?status=${status}`,
         '_self',
         'noopener'
       );
