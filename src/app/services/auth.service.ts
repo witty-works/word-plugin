@@ -13,36 +13,51 @@ export class AuthService {
   constructor(private http: HttpClient) { }
 
   async makeAuthRequest(): Promise<any> {
-    const accessToken = await Office.auth.getAccessToken(); //should always exist
+    try {
+      const accessToken = await Office.auth.getAccessToken(); //should always exist
 
-    const url = environment.api + 'v2.0/auth';
-    const httpOptions = {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      }
-    };
-
-    console.log('AUTH: url', url, 'httpOptions', httpOptions);
-    return await this.http.post<any>(url, {}, httpOptions)
-      .toPromise()
-      .catch(error => {
-        console.log('auth error', error);
-        if (error.status === 403) {
-          //prompt user to register on dashboard
-          const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
-
-          Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
-            if (result.status === Office.AsyncResultStatus.Failed) {
-              console.log('result.error', result.error);
-            }
-          });
+      const url = environment.api + 'v2.0/auth';
+      const httpOptions = {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
         }
-        throw error;
+      };
+
+      return await this.http.post<any>(url, {}, httpOptions)
+        .toPromise()
+        .catch(error => {
+          if (error.status === 403) {
+            const registerStatus = localStorage.getItem('registerStatus');
+            const authFailCounter = localStorage.getItem('authFailCounter') ?? '0';
+            if (registerStatus === 'success' && parseInt(authFailCounter) <= 5) {
+              const newCounter = parseInt(authFailCounter) + 1;
+              localStorage.setItem('authFailCounter', newCounter.toString());
+              setTimeout(() => {
+                this.makeAuthRequest();
+              }, 1000);
+            } else {
+              const url = (registerStatus === 'success' && parseInt(authFailCounter) > 5) 
+                ? `${environment.dashboard}word-addin?status=failure`
+                : `${ environment.dashboard}office-register?token=${accessToken}`;
+
+              Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
+                if (result.status === Office.AsyncResultStatus.Failed) {
+                  console.log('result.error', result.error);
+                }
+              });
+            }
+            throw error;
+          }
+        });
+      } catch (error) {
+        const ieMessage = document.getElementById("ie-warn");
+        if (ieMessage) {
+          ieMessage.style.display = 'block';
+        }
       }
-      );
-  }
+    }
 
   // makeRefreshTokenRequest(): Promise<any> {
   //   const refreshToken = localStorage.getItem('refresh_token');
