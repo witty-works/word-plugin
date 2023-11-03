@@ -1,7 +1,5 @@
 import OfficePlatformType = Office.PlatformType;
 
-import PlatformType = Office.PlatformType;
-
 export default class DocumentUtils {
     static async fetchParagraph(context: Word.RequestContext, paragraph: string): Promise<Word.Range> {
         const body = context.document.body;

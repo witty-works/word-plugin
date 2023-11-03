@@ -9,9 +9,12 @@ if (environment.production) {
   enableProdMode();
 }
 
-Office.initialize = () => {
-  // Bootstrap the app
+Office.onReady((info) => {
+  console.log(`Office.js is now ready in ${info.host} on ${info.platform}`);
+
   platformBrowserDynamic()
     .bootstrapModule(AppModule)
-    .catch(error => console.error(error));
-};
+    .catch(error => {
+      console.error('Error bootstrapping the app:', error);
+    });
+});

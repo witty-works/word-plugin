@@ -11,8 +11,6 @@
 
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-  <!-- Office JavaScript API -->
-  <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
 
   <!-- For more information on Office UI Fabric, visit https://developer.microsoft.com/fabric. -->
   <link rel="stylesheet"
@@ -27,7 +25,25 @@
   <app-root></app-root>
 
   <script>
-    // Show update message for old Office versions that base on IE / Edge legacy
+    let officeInitializePromise;
+
+    officeInitializePromise = new Promise((resolve) => {
+      console.log('Loading Office.js');
+      const script = document.createElement('script');
+      script.src = "https://appsforoffice.microsoft.com/lib/1/hosted/office.js";
+      script.onload = () => {
+        Office.onReady(() => {
+          window.history.replaceState = replaceState;
+          window.history.pushState = pushState;          
+          resolve();
+        });
+      };
+
+      document.body.appendChild(script);
+    });
+
+    const replaceState = window.history.replaceState;
+    const pushState = window.history.pushState;
     if (navigator.userAgent.indexOf("Trident") !== -1 || navigator.userAgent.indexOf("Edge") !== -1) {
       const ieMessage = document.getElementById("ie-warn");
       if (ieMessage) {
@@ -40,7 +56,7 @@
     if (status) {
       localStorage.setItem('registerStatus', status);
       if (status === 'success') {
-        localStorage.setItem('authFailCounter', '0')
+        localStorage.setItem('authFailCounter', '0');
       }
       window.open(
         `${environment.dashboard}word-addin?status=${status}`,
