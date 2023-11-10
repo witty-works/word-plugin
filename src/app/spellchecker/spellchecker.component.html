@@ -2,7 +2,11 @@
     <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
         (click)="checkGrammar()">{{lang.wittyCheck}}</button>
 
-    <div *ngIf="!isLoggedin" tabindex="0" class="number-spelling-errors">
+    <div *ngIf="!isLoggedin && !isLoggedInWord" tabindex="0" class="number-spelling-errors">
+         <p>{{lang.wittyInfos}}</p>
+    </div>
+
+    <div *ngIf="!isLoggedin && isLoggedInWord" tabindex="0" class="number-spelling-errors">
         <p>{{lang.wittyInfos}}</p>
 
         <br />

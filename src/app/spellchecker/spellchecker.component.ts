@@ -26,6 +26,8 @@ export class SpellcheckerComponent implements OnInit {
 
   isFirstRun = true;
 
+  isLoggedInWord = true;
+
   isLoggedin = false;
   
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
@@ -61,11 +63,16 @@ export class SpellcheckerComponent implements OnInit {
 
   register() {
     this.authService.makeAuthRequest().then((response) => {
-      if (!response) {
+      if (response.code === 13001) { //not logged in word
+        this.isLoggedInWord = false;
+        return;
+      } 
+      if (response.status === 403) { //could not authenticate dashboard
         this.isLoggedin = false;
         return;
       }
       this.authResponse = response;
+      this.isLoggedInWord = true;
       this.isLoggedin = true;
       localStorage.setItem('organization_name', response.organization_name);
       localStorage.setItem('organization_config_hash', response.organization_config_hash);
