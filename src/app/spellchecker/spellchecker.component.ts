@@ -199,6 +199,9 @@ export class SpellcheckerComponent implements OnInit {
           } catch (e: any) {
             if (e.name === 'HttpErrorResponse' && e.status === 422) {
               continue;
+            } else if (e.code === 13001) {
+              this.isLoggedInWord = false;
+              this.isLoggedin = false;
             }
             console.error(e);
           }
