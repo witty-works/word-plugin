@@ -2,7 +2,11 @@
     <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
         (click)="checkGrammar()">{{lang.wittyCheck}}</button>
 
-    <div *ngIf="!isLoggedin" tabindex="0" class="number-spelling-errors">
+    <div *ngIf="!isLoggedin && !isLoggedInWord" tabindex="0" class="number-spelling-errors">
+         <p>{{lang.wittyInfos}}</p>
+    </div>
+
+    <div *ngIf="!isLoggedin && isLoggedInWord" tabindex="0" class="number-spelling-errors">
         <p>{{lang.wittyInfos}}</p>
 
         <br />
@@ -15,18 +19,18 @@
             (click)="register()">{{lang.register}}</button>
     </div>
 
-    <div *ngIf="spellingErrors.length > 0" class="number-spelling-errors">
+    <div *ngIf="isLoggedInWord && spellingErrors.length > 0" class="number-spelling-errors">
         {{ spellingErrors.length }} {{lang.suggstions}}:
     </div>
     <app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphs" (highlightEvent)="highlight($event)"
-        (acceptSuggestionEvent)="acceptSuggestion($event)" *ngIf="!isFirstRun && spellingErrors.length > 0">
+        (acceptSuggestionEvent)="acceptSuggestion($event)" *ngIf="isLoggedInWord && !isFirstRun && spellingErrors.length > 0">
     </app-errors-list>
 
-    <div class="full-size-notification" *ngIf="isFirstRun && isLoggedin">
+    <div class="full-size-notification" *ngIf="isLoggedInWord && isFirstRun && isLoggedin">
         <span>{{lang.clickWittyCheck}}</span>
     </div>
 
-    <div class="full-size-notification" *ngIf="!isFirstRun && spellingErrors.length === 0">
+    <div class="full-size-notification" *ngIf="isLoggedInWord && !isFirstRun && spellingErrors.length === 0">
         <span>{{lang.noFurtherSuggestions}}</span>
     </div>
 

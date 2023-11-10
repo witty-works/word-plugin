@@ -44,12 +44,19 @@ export class CheckingService {
         .catch(error => {
           throw error;
         });
-    } catch (error) {
-      const ieMessage = document.getElementById("ie-warn");
-      if (ieMessage) {
-        ieMessage.style.display = 'block';
+    } catch (error: any) {
+      console.log(error);
+      if (error.code === 13001) {
+        const message = document.getElementById("warn-not-signed-in-word");
+        if (message) {
+            message.style.display = 'block';
+        }
+      } else {
+        const ieMessage = document.getElementById("ie-warn");
+        if (ieMessage) {
+          ieMessage.style.display = 'block';
+        }
       }
-
       throw error;
     }
   }

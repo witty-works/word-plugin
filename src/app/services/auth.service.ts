@@ -51,11 +51,14 @@ export class AuthService {
             throw error;
           }
         });
-      } catch (error) {
-        const ieMessage = document.getElementById("ie-warn");
-        if (ieMessage) {
-          ieMessage.style.display = 'block';
+      } catch (error: any) {
+        if (error.code === 13001) {
+          const message = document.getElementById("warn-not-signed-in-word");
+          if (message) {
+              message.style.display = 'block';
+          }
         }
+        return error;
       }
     }
 
