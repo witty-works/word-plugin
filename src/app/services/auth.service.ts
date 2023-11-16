@@ -39,7 +39,7 @@ export class AuthService {
               }, 1000);
             } else {
               const url = (registerStatus === 'success' && parseInt(authFailCounter) > 5) 
-                ? `${environment.dashboard}word-addin?status=failure`
+                ? `${environment.dashboard}word-addin?status=failed`
                 : `${ environment.dashboard}office-register?token=${accessToken}`;
 
               Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {

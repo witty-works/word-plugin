@@ -5,7 +5,7 @@
   xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
   xsi:type="TaskPaneApp">
   <Id>af4610e1-eaec-4197-ad3b-b40f459d3e32</Id>
-  <Version>1.2.4</Version>
+  <Version>1.2.5</Version>
   <ProviderName>Witty Works AG</ProviderName>
   <DefaultLocale>en</DefaultLocale>
   <DisplayName DefaultValue="Witty Inclusive Writing" />
