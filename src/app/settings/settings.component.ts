@@ -41,10 +41,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
         }
       });
     } catch (error) {
-      const ieMessage = document.getElementById("ie-warn");
-      if (ieMessage) {
-        ieMessage.style.display = 'block';
-      }
       throw error;
     }
   }

@@ -71,6 +71,10 @@ export class SpellcheckerComponent implements OnInit {
         this.isLoggedin = false;
         return;
       }
+      if(response.code === 13013) { //edge case: throttled
+        this.isLoggedin = false;
+        return;
+      }
       this.authResponse = response;
       this.isLoggedInWord = true;
       this.isLoggedin = true;
@@ -208,10 +212,7 @@ export class SpellcheckerComponent implements OnInit {
 
         }
       } catch (e) {
-        const ieMessage = document.getElementById("ie-warn");
-        if (ieMessage) {
-          ieMessage.style.display = 'block';
-        }
+        this.handleError(e);
       } finally {
         this.isSpellchecking = false;
       }

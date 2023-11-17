@@ -14,7 +14,11 @@ export class AuthService {
 
   async makeAuthRequest(): Promise<any> {
     try {
-      const accessToken = await Office.auth.getAccessToken(); //should always exist
+      const accessToken = await Office.auth.getAccessToken({
+        allowSignInPrompt: true,
+        allowConsentPrompt: true,
+        forMSGraphAccess: true
+      });
 
       const url = environment.api + 'v2.0/auth';
       const httpOptions = {
@@ -24,24 +28,19 @@ export class AuthService {
           Authorization: `Bearer ${accessToken}`,
         }
       };
-
       return await this.http.post<any>(url, {}, httpOptions)
         .toPromise()
         .catch(error => {
           if (error.status === 403) {
-            const registerStatus = localStorage.getItem('registerStatus');
             const authFailCounter = localStorage.getItem('authFailCounter') ?? '0';
-            if (registerStatus === 'success' && parseInt(authFailCounter) <= 5) {
+            if (parseInt(authFailCounter) <= 5) {
               const newCounter = parseInt(authFailCounter) + 1;
               localStorage.setItem('authFailCounter', newCounter.toString());
               setTimeout(() => {
                 this.makeAuthRequest();
               }, 1000);
             } else {
-              const url = (registerStatus === 'success' && parseInt(authFailCounter) > 5) 
-                ? `${environment.dashboard}word-addin?status=failed`
-                : `${ environment.dashboard}office-register?token=${accessToken}`;
-
+              const url = `${environment.dashboard}office-register?token=${accessToken}`;
               Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
                 if (result.status === Office.AsyncResultStatus.Failed) {
                   console.log('result.error', result.error);
