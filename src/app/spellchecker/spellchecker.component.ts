@@ -71,6 +71,10 @@ export class SpellcheckerComponent implements OnInit {
         this.isLoggedin = false;
         return;
       }
+      if(response.code === 13013) { //edge case: throttled
+        this.isLoggedin = false;
+        return;
+      }
       this.authResponse = response;
       this.isLoggedInWord = true;
       this.isLoggedin = true;

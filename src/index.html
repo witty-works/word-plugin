@@ -41,11 +41,9 @@
     }
 
     const searchParams = new URLSearchParams(window.location.search);
-
     const dashboardUrl = window.location.href.includes('localhost') ? 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/' : 'https://dashboard.witty.works/';
     const status = searchParams.get('status');
     if (status) {
-      localStorage.setItem('registerStatus', status);
       if (status === 'success') {
         localStorage.setItem('authFailCounter', '0')
       }
