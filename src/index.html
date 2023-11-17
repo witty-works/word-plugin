@@ -42,7 +42,7 @@
 
     const searchParams = new URLSearchParams(window.location.search);
 
-    const dasboardUrl = window.location.href.includes('localhost') ? 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/' : 'https://dashboard.witty.works/';
+    const dashboardUrl = window.location.href.includes('localhost') ? 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/' : 'https://dashboard.witty.works/';
     const status = searchParams.get('status');
     if (status) {
       localStorage.setItem('registerStatus', status);
@@ -50,7 +50,7 @@
         localStorage.setItem('authFailCounter', '0')
       }
       window.open(
-        `${dasboardUrl}word-addin?status=${status}`,
+        `${dashboardUrl}word-addin?status=${status}`,
         '_self',
         'noopener'
       );
