@@ -14,7 +14,11 @@ export class AuthService {
 
   async makeAuthRequest(): Promise<any> {
     try {
-      const accessToken = await Office.auth.getAccessToken(); //should always exist
+      const accessToken = await Office.auth.getAccessToken({
+        allowSignInPrompt: true,
+        allowConsentPrompt: true,
+        forMSGraphAccess: true
+      });
 
       const url = environment.api + 'v2.0/auth';
       const httpOptions = {
@@ -24,7 +28,6 @@ export class AuthService {
           Authorization: `Bearer ${accessToken}`,
         }
       };
-
       return await this.http.post<any>(url, {}, httpOptions)
         .toPromise()
         .catch(error => {
@@ -40,7 +43,7 @@ export class AuthService {
             } else {
               const url = (registerStatus === 'success' && parseInt(authFailCounter) > 5) 
                 ? `${environment.dashboard}word-addin?status=failed`
-                : `${ environment.dashboard}office-register?token=${accessToken}`;
+                : `${environment.dashboard}office-register?token=${accessToken}`;
 
               Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
                 if (result.status === Office.AsyncResultStatus.Failed) {

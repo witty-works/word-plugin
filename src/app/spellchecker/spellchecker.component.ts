@@ -208,10 +208,7 @@ export class SpellcheckerComponent implements OnInit {
 
         }
       } catch (e) {
-        const ieMessage = document.getElementById("ie-warn");
-        if (ieMessage) {
-          ieMessage.style.display = 'block';
-        }
+        this.handleError(e);
       } finally {
         this.isSpellchecking = false;
       }

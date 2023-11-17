@@ -15,7 +15,11 @@ export class CheckingService {
 
   async checkText(sentence: string): Promise<ICheckResponse> {
     try {
-      const accessToken = await Office.auth.getAccessToken();
+      const accessToken = await Office.auth.getAccessToken({
+        allowSignInPrompt: true,
+        allowConsentPrompt: true,
+        forMSGraphAccess: true
+      });
 
       const url = environment.api + 'v2.3/check';
 
@@ -50,11 +54,6 @@ export class CheckingService {
         const message = document.getElementById("warn-not-signed-in-word");
         if (message) {
             message.style.display = 'block';
-        }
-      } else {
-        const ieMessage = document.getElementById("ie-warn");
-        if (ieMessage) {
-          ieMessage.style.display = 'block';
         }
       }
       throw error;
