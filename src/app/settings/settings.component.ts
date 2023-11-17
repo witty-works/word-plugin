@@ -17,7 +17,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   showContext: boolean = true;
   teamName = '';
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-
+  isLoggedIn = false;
   public appVersion = '-';
 
   private showContextSubscription?: Subscription;
@@ -41,10 +41,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
         }
       });
     } catch (error) {
-      const ieMessage = document.getElementById("ie-warn");
-      if (ieMessage) {
-        ieMessage.style.display = 'block';
-      }
       throw error;
     }
   }
@@ -67,6 +63,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.showContextSubscription = this.settingsService.getShowContextObservable().subscribe(ctx => {
       this.showContext = ctx;
     });
+    this.isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
   }
 
   ngOnDestroy() {
