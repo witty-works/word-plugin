@@ -65,19 +65,23 @@ export class SpellcheckerComponent implements OnInit {
     this.authService.makeAuthRequest().then((response) => {
       if (response.code === 13001) { //not logged in word
         this.isLoggedInWord = false;
+        localStorage.setItem('is_logged_in', 'false');
         return;
       } 
       if (response.status === 403) { //could not authenticate dashboard
         this.isLoggedin = false;
+        localStorage.setItem('is_logged_in', 'false');
         return;
       }
       if(response.code === 13013) { //edge case: throttled
         this.isLoggedin = false;
+        localStorage.setItem('is_logged_in', 'false');
         return;
       }
       this.authResponse = response;
       this.isLoggedInWord = true;
       this.isLoggedin = true;
+      localStorage.setItem('is_logged_in', 'true');
       localStorage.setItem('organization_name', response.organization_name);
       localStorage.setItem('organization_config_hash', response.organization_config_hash);
       localStorage.setItem('config_hash', response.config_hash);
