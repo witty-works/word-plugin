@@ -26,10 +26,11 @@
   </div>
   <div id="warn-not-signed-in-word"
     style="display: none;margin: 20px;padding: 20px;background-color: #1ebbee;color: white;font-size: 16px;">
-    Could not authenticate, make sure you are signed into word
+    <p>Could not authenticate, make sure you are signed into Word.</p>
+    <br />
+    <p>Once you are signed in, please close and re-open the Witty for Word add-in.</p>
   </div>
   <app-root></app-root>
-
   <script>
     // Show update message for old Office versions that base on IE / Edge legacy
     if (navigator.userAgent.indexOf("Trident") !== -1 || navigator.userAgent.indexOf("Edge") !== -1) {
@@ -40,14 +41,14 @@
     }
 
     const searchParams = new URLSearchParams(window.location.search);
+    const dashboardUrl = window.location.href.includes('localhost') ? 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/' : 'https://dashboard.witty.works/';
     const status = searchParams.get('status');
     if (status) {
-      localStorage.setItem('registerStatus', status);
       if (status === 'success') {
         localStorage.setItem('authFailCounter', '0')
       }
       window.open(
-        `${environment.dashboard}word-addin?status=${status}`,
+        `${dashboardUrl}word-addin?status=${status}`,
         '_self',
         'noopener'
       );
