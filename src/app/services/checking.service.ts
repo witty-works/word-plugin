@@ -50,7 +50,7 @@ export class CheckingService {
         });
     } catch (error: any) {
       console.log(error);
-      if (error.code === 13001) {
+      if (error.code === 13001 || error.code === 13002 || error.code === 13000) {
         const message = document.getElementById("warn-not-signed-in-word");
         if (message) {
             message.style.display = 'block';
