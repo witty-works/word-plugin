@@ -63,7 +63,7 @@ export class SpellcheckerComponent implements OnInit {
 
   register() {
     this.authService.makeAuthRequest().then((response) => {
-      if (response.code === 13001 || response.code === 13002 || response.code === 13000) { //not logged in word, did not consent to add-in permissions
+      if (response.code === 13001 || response.code === 13002 || response.code === 13000 || response.code === 5001) { //not logged in word, did not consent to add-in permissions
         this.isLoggedInWord = false;
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
@@ -77,10 +77,6 @@ export class SpellcheckerComponent implements OnInit {
       if(response.code === 13013) { //edge case: throttled
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
-        return;
-      }
-      if(response.code === 13013) { //edge case: throttled
-        this.isLoggedin = false;
         return;
       }
       console.log('ESCAPED', response)
