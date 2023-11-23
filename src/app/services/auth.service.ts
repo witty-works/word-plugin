@@ -33,7 +33,7 @@ export class AuthService {
         .catch(error => {
           if (error.status === 403) {
             const authFailCounter = localStorage.getItem('authFailCounter') ?? '0';
-            if (parseInt(authFailCounter) <= 5) {
+            if (parseInt(authFailCounter) <= 2) { //has to be 2 to avoid reaching api limit 
               const newCounter = parseInt(authFailCounter) + 1;
               localStorage.setItem('authFailCounter', newCounter.toString());
               setTimeout(() => {
