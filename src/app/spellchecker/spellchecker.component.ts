@@ -63,17 +63,27 @@ export class SpellcheckerComponent implements OnInit {
 
   register() {
     this.authService.makeAuthRequest().then((response) => {
-      if (response.code === 13001) { //not logged in word
+      if (response.code === 13001 || response.code === 13002 || response.code === 13000 || response.code === 5001) { //not logged in word, did not consent to add-in permissions
         this.isLoggedInWord = false;
+        this.isLoggedin = false;
+        localStorage.setItem('is_logged_in', 'false');
         return;
       } 
       if (response.status === 403) { //could not authenticate dashboard
         this.isLoggedin = false;
+        localStorage.setItem('is_logged_in', 'false');
         return;
       }
+      if(response.code === 13013) { //edge case: throttled
+        this.isLoggedin = false;
+        localStorage.setItem('is_logged_in', 'false');
+        return;
+      }
+      console.log('ESCAPED', response)
       this.authResponse = response;
       this.isLoggedInWord = true;
       this.isLoggedin = true;
+      localStorage.setItem('is_logged_in', 'true');
       localStorage.setItem('organization_name', response.organization_name);
       localStorage.setItem('organization_config_hash', response.organization_config_hash);
       localStorage.setItem('config_hash', response.config_hash);
@@ -199,16 +209,16 @@ export class SpellcheckerComponent implements OnInit {
           } catch (e: any) {
             if (e.name === 'HttpErrorResponse' && e.status === 422) {
               continue;
+            } else if (e.code === 13001) {
+              this.isLoggedInWord = false;
+              this.isLoggedin = false;
             }
             console.error(e);
           }
 
         }
       } catch (e) {
-        const ieMessage = document.getElementById("ie-warn");
-        if (ieMessage) {
-          ieMessage.style.display = 'block';
-        }
+        this.handleError(e);
       } finally {
         this.isSpellchecking = false;
       }
