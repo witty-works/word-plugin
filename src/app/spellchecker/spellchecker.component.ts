@@ -75,11 +75,19 @@ export class SpellcheckerComponent implements OnInit {
         return;
       }
       if(response.code === 13013) { //edge case: throttled
+        const throttleWarning = document.getElementById('throttle-warning');
+        if(throttleWarning) {
+          throttleWarning.style.display = 'block';
+        }
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
         return;
       }
       console.log('ESCAPED', response)
+      const throttleWarning = document.getElementById('throttle-warning');
+      if(throttleWarning) {
+        throttleWarning.style.display = 'none';
+      }
       this.authResponse = response;
       this.isLoggedInWord = true;
       this.isLoggedin = true;
