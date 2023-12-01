@@ -29,6 +29,8 @@ export class SpellcheckerComponent implements OnInit {
   isLoggedInWord = true;
 
   isLoggedin = false;
+
+  showSpinner = false;
   
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
@@ -58,7 +60,12 @@ export class SpellcheckerComponent implements OnInit {
 
   async ngOnInit() { 
     this.register();
+  }
 
+  hideSpinner() {
+    setTimeout(() => {
+      this.showSpinner = false;
+    }, 1500);
   }
 
   register() {
@@ -75,12 +82,14 @@ export class SpellcheckerComponent implements OnInit {
         return;
       }
       if(response.code === 13013) { //edge case: throttled
+        this.showSpinner = true;
         const throttleWarning = document.getElementById('throttle-warning');
         if(throttleWarning) {
           throttleWarning.style.display = 'block';
         }
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
+        this.hideSpinner();
         return;
       }
       console.log('ESCAPED', response)
