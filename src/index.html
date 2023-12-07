@@ -1,65 +1,78 @@
 <!doctype html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Witty Word Add-in</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Witty Word Add-in</title>
 
-  <base href="/">
+    <base href="/">
 
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-  <!-- Office JavaScript API -->
-  <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
 
-  <!-- For more information on Office UI Fabric, visit https://developer.microsoft.com/fabric. -->
-  <link rel="stylesheet"
-    href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/9.6.1/css/fabric.min.css" />
-</head>
+    <!-- For more information on Office UI Fabric, visit https://developer.microsoft.com/fabric. -->
+    <link rel="stylesheet"
+      href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/9.6.1/css/fabric.min.css" />
+  </head>
 
-<body class="ms-font-m ms-welcome">
-  <div id="ie-warn"
-    style="display: none;margin: 20px;padding: 20px;background-color: #1ebbee;color: white;font-size: 16px;">
-    This add-in does not work with this version of Microsoft Office. Please update to a newer version.
-  </div>
-  <div id="warn-not-signed-in-word"
-    style="display: none;margin: 20px;padding: 20px;background-color: #1ebbee;color: white;font-size: 16px;">
-    <p>Could not authenticate, make sure you are signed into Word.</p>
-    <br />
-    <p>Once you are signed in, please close and re-open the Witty for Word add-in.</p>
-  </div>
-  <div id="throttle-warning"
-    style="display: none;margin: 20px;padding: 20px;background-color: #1ebbee;color: white;font-size: 16px;">
-    <p>Please retry in a moment.</p>
-    <br />
-    <p>Something about waiting 30 seconds.</p>
-  </div>
-  <app-root></app-root>
-  <script>
-    // Show update message for old Office versions that base on IE / Edge legacy
-    if (navigator.userAgent.indexOf("Trident") !== -1 || navigator.userAgent.indexOf("Edge") !== -1) {
-      const ieMessage = document.getElementById("ie-warn");
-      if (ieMessage) {
-        ieMessage.style.display = 'block';
+  <body class="ms-font-m ms-welcome">
+    <div id="ie-warn"
+      style="display: none;margin: 20px;padding: 20px;background-color: #1ebbee;color: white;font-size: 16px;">
+      This add-in does not work with this version of Microsoft Office. Please update to a newer version.
+    </div>
+    
+    <div id="warn-not-signed-in-word-en"
+      style="display: none;margin: 20px;padding: 20px;background-color: #1ebbee;color: white;font-size: 16px;">
+      <p>Could not authenticate, make sure you are signed into Word.</p>
+      <br />
+      <p>Once you are signed in, please close and re-open the Witty for Word add-in.</p>
+    </div>
+    <div id="warn-not-signed-in-word-de"
+      style="display: none;margin: 20px;padding: 20px;background-color: #1ebbee;color: white;font-size: 16px;">
+      <p>Could not authenticate, make sure you are signed into Word. GERMAN</p>
+      <br />
+      <p>Once you are signed in, please close and re-open the Witty for Word add-in. GERMAN</p>
+    </div>
+
+    <div id="throttle-warning-en"
+      style="display: none;margin: 20px;padding: 20px;background-color: #1ebbee;color: white;font-size: 16px;">
+      <p>Please retry in a moment.</p>
+      <br />
+      <p>Something about waiting 30 seconds.</p>
+    </div>
+    <div id="throttle-warning-de"
+      style="display: none;margin: 20px;padding: 20px;background-color: #1ebbee;color: white;font-size: 16px;">
+      <p>Please retry in a moment. GERMAN</p>
+      <br />
+      <p>Something about waiting 30 seconds. GERMAN</p>
+    </div>
+    <app-root></app-root>
+    <script>
+      // Show update message for old Office versions that base on IE / Edge legacy
+      if (navigator.userAgent.indexOf("Trident") !== -1 || navigator.userAgent.indexOf("Edge") !== -1) {
+        const ieMessage = document.getElementById("ie-warn");
+        if (ieMessage) {
+          ieMessage.style.display = 'block';
+        }
       }
-    }
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const dashboardUrl = window.location.href.includes('localhost') ? 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/' : 'https://dashboard.witty.works/';
-    const status = searchParams.get('status');
-    if (status) {
-      if (status === 'success') {
-        localStorage.setItem('authFailCounter', '0')
+      const searchParams = new URLSearchParams(window.location.search);
+      const dashboardUrl = window.location.href.includes('localhost') ? 'https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/' : 'https://dashboard.witty.works/';
+      const status = searchParams.get('status');
+      if (status) {
+        if (status === 'success') {
+          localStorage.setItem('authFailCounter', '0')
+        }
+        window.open(
+          `${dashboardUrl}word-addin?status=${status}`,
+          '_self',
+          'noopener'
+        );
       }
-      window.open(
-        `${dashboardUrl}word-addin?status=${status}`,
-        '_self',
-        'noopener'
-      );
-    }
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>
