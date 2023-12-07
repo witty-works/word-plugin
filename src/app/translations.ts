@@ -49,6 +49,10 @@ export const de = {
     logOut: 'Abmelden',
     wittyVersion: 'Witty Word Plugin Version: ',
     help: 'Hilfe',
+
+    //warnings
+    throttleWarning: 'GERMAN Please retry in a moment. Something about waiting 30 seconds.',
+    notSignedInWarning: 'GERMAN Could not authenticate, make sure you are signed into Word. Once you are signed in, please close and re-open the Witty for Word add-in.',
 };
 
 export const en = {
@@ -102,5 +106,9 @@ export const en = {
     logOut: 'Log out',
     wittyVersion: 'Witty Word Plugin Version: ',
     help: 'Help',
+
+    //warnings
+    throttleWarning: 'Please retry in a moment. Something about waiting 30 seconds.',
+    notSignedInWarning: 'Could not authenticate, make sure you are signed into Word. Once you are signed in, please close and re-open the Witty for Word add-in.',
 };
 

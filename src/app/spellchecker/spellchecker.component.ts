@@ -70,9 +70,7 @@ export class SpellcheckerComponent implements OnInit {
 
   register() {
     this.authService.makeAuthRequest().then((response) => {
-      const throttleWarning = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' 
-            ? document.getElementById("throttle-warning-de") 
-            : document.getElementById("throttle-warning-en");
+      const throttleWarning = document.getElementById("throttle-warning");
 
       if (response.code === 13001 || response.code === 13002 || response.code === 13000 || response.code === 5001) { //not logged in word, did not consent to add-in permissions
         this.isLoggedInWord = false;
@@ -89,6 +87,7 @@ export class SpellcheckerComponent implements OnInit {
         this.showSpinner = true;
         if(throttleWarning) {
           throttleWarning.style.display = 'block';
+          throttleWarning.innerHTML = this.lang.throttleWarning;
         }
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
