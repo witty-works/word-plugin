@@ -51,8 +51,8 @@ export const de = {
     help: 'Hilfe',
 
     //warnings
-    throttleWarning: 'GERMAN Please retry in a moment. Something about waiting 30 seconds.',
-    notSignedInWarning: 'GERMAN Could not authenticate, make sure you are signed into Word. Once you are signed in, please close and re-open the Witty for Word add-in.',
+    throttleWarning: 'Bitte versuche es in ca. 30 Sekunden erneut.',
+    notSignedInWarning: 'Witty konnte dich nicht authentifizieren. Stelle sicher, dass Du in Microsoft Word angemeldet bist. Sobald Du angemeldet bist, schließe bitte das Witty for Word Add-In und öffnen es erneut.',
 };
 
 export const en = {
@@ -108,7 +108,7 @@ export const en = {
     help: 'Help',
 
     //warnings
-    throttleWarning: 'Please retry in a moment. Something about waiting 30 seconds.',
-    notSignedInWarning: 'Could not authenticate, make sure you are signed into Word. Once you are signed in, please close and re-open the Witty for Word add-in.',
+    throttleWarning: 'Please try again in about 30 seconds.',
+    notSignedInWarning: 'Witty could not authenticate you, please make sure you are signed into Word. Once you are signed in, please close and re-open the Witty for Word add-in.',
 };
 
