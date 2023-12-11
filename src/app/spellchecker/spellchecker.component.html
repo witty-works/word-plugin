@@ -14,9 +14,12 @@
         <p>{{lang.pleaseRegister}}</p>
 
         <br />
-
-        <button class="witty-works-ext-button witty-works-ext-primary-button-red"
-            (click)="register()">{{lang.register}}</button>
+        <div class="button-spinner-row">
+            <button class="witty-works-ext-button witty-works-ext-primary-button-red"
+                (click)="register()">{{lang.register}}</button>
+      
+            <div *ngIf="showSpinner" class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+        </div>
     </div>
 
     <div *ngIf="isLoggedInWord && spellingErrors.length > 0" class="number-spelling-errors">
@@ -36,6 +39,7 @@
 
     <ngx-spinner bdColor="#f1f2f2" size="medium" color="#f06464" type="line-scale" [fullScreen]="true"
         [showSpinner]="isSpellchecking"></ngx-spinner>
+
 
     <ng-template #errorDialog>
         <header>

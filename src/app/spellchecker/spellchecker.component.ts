@@ -29,6 +29,8 @@ export class SpellcheckerComponent implements OnInit {
   isLoggedInWord = true;
 
   isLoggedin = false;
+
+  showSpinner = false;
   
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
@@ -58,11 +60,18 @@ export class SpellcheckerComponent implements OnInit {
 
   async ngOnInit() { 
     this.register();
+  }
 
+  hideSpinner() {
+    setTimeout(() => {
+      this.showSpinner = false;
+    }, 1500);
   }
 
   register() {
     this.authService.makeAuthRequest().then((response) => {
+      const throttleWarning = document.getElementById("throttle-warning");
+
       if (response.code === 13001 || response.code === 13002 || response.code === 13000 || response.code === 5001) { //not logged in word, did not consent to add-in permissions
         this.isLoggedInWord = false;
         this.isLoggedin = false;
@@ -75,11 +84,20 @@ export class SpellcheckerComponent implements OnInit {
         return;
       }
       if(response.code === 13013) { //edge case: throttled
+        this.showSpinner = true;
+        if(throttleWarning) {
+          throttleWarning.style.display = 'block';
+          throttleWarning.innerHTML = this.lang.throttleWarning;
+        }
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
+        this.hideSpinner();
         return;
       }
       console.log('ESCAPED', response)
+      if(throttleWarning) {
+        throttleWarning.style.display = 'none';
+      }
       this.authResponse = response;
       this.isLoggedInWord = true;
       this.isLoggedin = true;

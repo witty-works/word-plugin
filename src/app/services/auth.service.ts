@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { environment } from '../../environments/environment';
+import { de, en } from '../translations';
 
 @Injectable({
   providedIn: 'root'
@@ -52,9 +53,12 @@ export class AuthService {
         });
       } catch (error: any) {
         if (error.code === 13001 || error.code === 13002 || error.code === 13000 || error.code === 5001) {
-          const message = document.getElementById("warn-not-signed-in-word");
-          if (message) {
+          const message = document.getElementById("warn-not-signed-in-word")
+          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+
+          if (message && lang) {
               message.style.display = 'block';
+              message.innerHTML = lang.notSignedInWarning;
           }
         }
         return error;
