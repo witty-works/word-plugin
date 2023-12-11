@@ -49,6 +49,10 @@ export const de = {
     logOut: 'Abmelden',
     wittyVersion: 'Witty Word Plugin Version: ',
     help: 'Hilfe',
+
+    //warnings
+    throttleWarning: 'Bitte versuche es in ca. 30 Sekunden erneut.',
+    notSignedInWarning: 'Witty konnte dich nicht authentifizieren. Stelle sicher, dass Du in Microsoft Word angemeldet bist. Sobald Du angemeldet bist, schließe bitte das Witty for Word Add-In und öffnen es erneut.',
 };
 
 export const en = {
@@ -102,5 +106,9 @@ export const en = {
     logOut: 'Log out',
     wittyVersion: 'Witty Word Plugin Version: ',
     help: 'Help',
+
+    //warnings
+    throttleWarning: 'Please try again in about 30 seconds.',
+    notSignedInWarning: 'Witty could not authenticate you, please make sure you are signed into Word. Once you are signed in, please close and re-open the Witty for Word add-in.',
 };
 
