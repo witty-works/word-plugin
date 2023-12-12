@@ -32,8 +32,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   async openDashboard() {
     try {
       analytics.openLinkLog('dashboard_open');
-      const accessToken = await Office.auth.getAccessToken();
-      console.log('accessToken', accessToken);
+      const accessToken = await Office.auth.getAccessToken(); //can always fetch new here as you will never manage to reach throttle limit
       const url = `${environment.dashboard}office-login?token=${accessToken}`;
       Office.context.ui.displayDialogAsync(url, {height: 80, width: 80}, function (result) {
         if (result.status === Office.AsyncResultStatus.Failed) {
