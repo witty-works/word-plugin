@@ -4,6 +4,7 @@ import { HttpClient } from "@angular/common/http";
 import { IAlternatives, ICheckResponse } from "../data/types";
 import { ISpellingError } from "../data/data-structures";
 import { environment } from '../../environments/environment';
+import { de, en } from '../translations';
 
 @Injectable({
   providedIn: 'root'
@@ -15,11 +16,16 @@ export class CheckingService {
 
   async checkText(sentence: string): Promise<ICheckResponse> {
     try {
-      const accessToken = await Office.auth.getAccessToken({
-        allowSignInPrompt: true,
-        allowConsentPrompt: true,
-        forMSGraphAccess: true
-      });
+      let accessToken = localStorage.getItem('word_access_token');
+
+      if (!accessToken) {
+        accessToken = await Office.auth.getAccessToken({
+          allowSignInPrompt: true,
+          allowConsentPrompt: true,
+          forMSGraphAccess: true
+        });
+        localStorage.setItem('word_access_token', accessToken);
+      }
 
       const url = environment.api + 'v2.3/check';
 
@@ -50,6 +56,14 @@ export class CheckingService {
         });
     } catch (error: any) {
       console.log(error);
+      if(error.code === 13013) { //edge case: throttled
+        const throttleWarning = document.getElementById("throttle-warning");
+        if(throttleWarning) {
+          throttleWarning.style.display = 'block';
+          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+          throttleWarning.innerHTML = lang.throttleWarning;
+        }
+      }
       if (error.code === 13001 || error.code === 13002 || error.code === 13000 || error.code === 5001) {
         const message = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' 
           ? document.getElementById("warn-not-signed-in-word-de") 
