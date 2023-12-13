@@ -15,11 +15,16 @@ export class AuthService {
 
   async makeAuthRequest(): Promise<any> {
     try {
-      const accessToken = await Office.auth.getAccessToken({
-        allowSignInPrompt: true,
-        allowConsentPrompt: true,
-        forMSGraphAccess: true
-      });
+      let accessToken = localStorage.getItem('word_access_token');
+
+      if (!accessToken) {
+        accessToken = await Office.auth.getAccessToken({
+          allowSignInPrompt: true,
+          allowConsentPrompt: true,
+          forMSGraphAccess: true
+        });
+        localStorage.setItem('word_access_token', accessToken);
+      }
 
       const url = environment.api + 'v2.0/auth';
       const httpOptions = {
@@ -33,6 +38,7 @@ export class AuthService {
         .toPromise()
         .catch(error => {
           if (error.status === 403) {
+            localStorage.removeItem('word_access_token'); //ensures that we get new token
             const authFailCounter = localStorage.getItem('authFailCounter') ?? '0';
             if (parseInt(authFailCounter) <= 2) { //has to be 2 to avoid reaching api limit 
               const newCounter = parseInt(authFailCounter) + 1;

@@ -135,6 +135,16 @@ export class SpellcheckerComponent implements OnInit {
     this.isSpellchecking = true;
 
     return Word.run(async (context) => {
+      let accessToken = localStorage.getItem('word_access_token');
+
+      if (!accessToken) {
+        accessToken = await Office.auth.getAccessToken({
+          allowSignInPrompt: true,
+          allowConsentPrompt: true,
+          forMSGraphAccess: true
+        });
+        localStorage.setItem('word_access_token', accessToken);
+      }
       const body = context.document.body;
       try {
         context.load(body.paragraphs);
@@ -157,7 +167,6 @@ export class SpellcheckerComponent implements OnInit {
             }
             this.checkEndpointResponse = errs;
             if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {
-              const accessToken = await Office.auth.getAccessToken();
               //prompt user to register on dashboard
               const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
       
