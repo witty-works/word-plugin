@@ -71,8 +71,8 @@ export class SpellcheckerComponent implements OnInit {
   register() {
     this.authService.makeAuthRequest().then((response) => {
       const throttleWarning = document.getElementById("throttle-warning");
-
-      if (response.code === 13001 || response.code === 13002 || response.code === 13000 || response.code === 5001) { //not logged in word, did not consent to add-in permissions
+      const errorCodes = [13001, 13002, 13000, 5001];//not logged in word, did not consent to add-in permissions
+      if (errorCodes.includes(response?.code)) {
         this.isLoggedInWord = false;
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
@@ -83,7 +83,7 @@ export class SpellcheckerComponent implements OnInit {
         localStorage.setItem('is_logged_in', 'false');
         return;
       }
-      if(response.code === 13013) { //edge case: throttled
+      if(response?.code === 13013) { //edge case: throttled
         this.showSpinner = true;
         if(throttleWarning) {
           throttleWarning.style.display = 'block';
@@ -233,19 +233,19 @@ export class SpellcheckerComponent implements OnInit {
                 details: e
               });
             });
-          } catch (e: any) {
-            if (e.name === 'HttpErrorResponse' && e.status === 422) {
+          } catch (error: any) {
+            if (error.name === 'HttpErrorResponse' && error.status === 422) {
               continue;
-            } else if (e.code === 13001) {
+            } else if (error?.code === 13001) {
               this.isLoggedInWord = false;
               this.isLoggedin = false;
             }
-            console.error(e);
+            console.error(error);
           }
 
         }
-      } catch (e) {
-        this.handleError(e);
+      } catch (error) {
+        this.handleError(error);
       } finally {
         this.isSpellchecking = false;
       }

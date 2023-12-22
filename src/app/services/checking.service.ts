@@ -56,7 +56,7 @@ export class CheckingService {
         });
     } catch (error: any) {
       console.log(error);
-      if(error.code === 13013) { //edge case: throttled
+      if(error?.code === 13013) { //edge case: throttled
         const throttleWarning = document.getElementById("throttle-warning");
         if(throttleWarning) {
           throttleWarning.style.display = 'block';
@@ -64,7 +64,8 @@ export class CheckingService {
           throttleWarning.innerHTML = lang.throttleWarning;
         }
       }
-      if (error.code === 13001 || error.code === 13002 || error.code === 13000 || error.code === 5001) {
+      const errorCodes = [13001, 13002, 13000, 5001];
+      if (errorCodes.includes(error?.code)) {
         const message = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' 
           ? document.getElementById("warn-not-signed-in-word-de") 
           : document.getElementById("warn-not-signed-in-word-en");
