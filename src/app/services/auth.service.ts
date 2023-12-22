@@ -58,7 +58,8 @@ export class AuthService {
           }
         });
       } catch (error: any) {
-        if (error.code === 13001 || error.code === 13002 || error.code === 13000 || error.code === 5001) {
+        const errorCodes = [13001, 13002, 13000, 5001];
+        if (errorCodes.includes(error?.code)) {
           const message = document.getElementById("warn-not-signed-in-word")
           const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
