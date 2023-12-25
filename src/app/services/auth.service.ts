@@ -55,6 +55,14 @@ export class AuthService {
               });
             }
             throw error;
+          } else {
+            const message = document.getElementById("warn-server-error")
+            const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+  
+            if (message && lang) {
+                message.style.display = 'block';
+                message.innerHTML = lang.serverError;
+            }
           }
         });
       } catch (error: any) {
