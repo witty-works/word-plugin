@@ -55,22 +55,22 @@ export class CheckingService {
           throw error;
         });
     } catch (error: any) {
-      console.log(error);
-      if(error?.code === 13013) { //edge case: throttled
+      const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+      if (error?.code === 13013) { //edge case: throttled
         const throttleWarning = document.getElementById("throttle-warning");
-        if(throttleWarning) {
+        if (throttleWarning) {
           throttleWarning.style.display = 'block';
-          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
           throttleWarning.innerHTML = lang.throttleWarning;
         }
       }
+
       const errorCodes = [13001, 13002, 13000, 5001];
       if (errorCodes.includes(error?.code)) {
-        const message = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' 
-          ? document.getElementById("warn-not-signed-in-word-de") 
-          : document.getElementById("warn-not-signed-in-word-en");
+        const message = document.getElementById("warn-not-signed-in-word")
+
         if (message) {
-            message.style.display = 'block';
+          message.style.display = 'block';
+          message.innerHTML = lang.notSignedInWarning;
         }
       }
       throw error;

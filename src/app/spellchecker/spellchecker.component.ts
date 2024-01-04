@@ -94,10 +94,11 @@ export class SpellcheckerComponent implements OnInit {
         this.hideSpinner();
         return;
       }
-      console.log('ESCAPED', response)
+
       if(throttleWarning) {
         throttleWarning.style.display = 'none';
       }
+
       this.authResponse = response;
       this.isLoggedInWord = true;
       this.isLoggedin = true;
