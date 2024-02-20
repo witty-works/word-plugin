@@ -15,6 +15,8 @@ hooks:
             ./node_modules/.bin/sentry-cli sourcemaps upload --org witty-works --project word-plugin dist/word-plugin --release $CURRENT_VERSION
         fi
 
+        rm src/manifest.xml
+
 web:
     commands:
         # Run a no-op process that uses no CPU resources, since this is a static site.
