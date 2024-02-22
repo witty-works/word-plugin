@@ -86,7 +86,7 @@ export class ErrorComponent {
       return alert.data.text === this.error?.word;
     });
     alertRelevantToSuggestion && analytics.popoverLogs(alertRelevantToSuggestion, 'learning_bites');
-    url && Office.context.ui.openBrowserWindow(url);
+    url && Office.context.ui?.openBrowserWindow(url);
   }
 
   ignore() {
