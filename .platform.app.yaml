@@ -16,6 +16,8 @@ hooks:
         fi
 
         rm src/manifest.xml
+        rm src/environments/environment.test.ts
+        rm src/environments/environment.ts
 
 web:
     commands:
