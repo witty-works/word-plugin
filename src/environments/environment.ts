@@ -3,7 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  package_version: "1.3.7-dev",
+  package_version: "1.3.9-dev",
   production: false,
   environment: "development",
   sentry_dsn: "",
@@ -11,7 +11,7 @@ export const environment = {
   sentry_sample_rate: 0.0,
   sentry_traces_sample_rate: 0.0,
   sentry_package_name: "word-plugin",
-  api: "https://dev-54ta5gq-2ycn7tlsdvd2o.fr-4.platformsh.site/",
+  api: "https://dev-54ta5gq-jyeciedibdzvq.fr-4.platformsh.site/",
   dashboard: "https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/",
   plugin: "https://localhost:4200/word-plugin/",
 };

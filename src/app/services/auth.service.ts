@@ -55,15 +55,21 @@ export class AuthService {
               });
             }
             throw error;
+          } else {
+            const message = document.getElementById("warn-server-error")
+            if (message) {
+                const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+                message.style.display = 'block';
+                message.innerHTML = lang.serverError;
+            }
           }
         });
       } catch (error: any) {
         const errorCodes = [13001, 13002, 13000, 5001];
         if (errorCodes.includes(error?.code)) {
           const message = document.getElementById("warn-not-signed-in-word")
-          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-
-          if (message && lang) {
+          if (message) {
+              const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
               message.style.display = 'block';
               message.innerHTML = lang.notSignedInWarning;
           }
