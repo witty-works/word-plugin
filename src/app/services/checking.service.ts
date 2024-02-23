@@ -22,7 +22,6 @@ export class CheckingService {
         accessToken = await Office.auth.getAccessToken({
           allowSignInPrompt: true,
           allowConsentPrompt: true,
-          forMSGraphAccess: true
         });
         localStorage.setItem('word_access_token', accessToken);
       }
