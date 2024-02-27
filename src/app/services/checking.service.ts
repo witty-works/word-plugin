@@ -32,7 +32,7 @@ export class CheckingService {
         text: sentence,
         lang: 'auto',
         client: 'word-plugin:' + environment.package_version,
-        config: { //TODO: check that this is correct!
+        config: {
           disabled_categories: [
             'orthography',
           ]
