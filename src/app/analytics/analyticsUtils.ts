@@ -4,21 +4,25 @@ import { environment } from 'src/environments/environment';
 
 export const DEV_ENV = window.location.hostname === 'localhost';
 
-export const POSTHOG_API_KEY_EU = DEV_ENV
-  ? 'phc_DUofw8HC9GUENhXmZ8Wan7DGAvmWFrFnNCxoViLmuhx'
+export const POSTHOG_API_KEY = DEV_ENV
+  ? 'phc_QiISRw0yFAsndXqYD0HmfGvHaOBMxb57ZRIxlimvR64'
   : 'phc_i1tlvuh1iecIOSEr0QmTEIklrsSJGhULpUwUlf8fkkl';
+
+export const POSTHOG_API_URL = DEV_ENV
+  ? 'https://app.posthog.com'
+  : 'https://eu.posthog.com';
 
 export const captureEvent = (eventName: string, eventData: object) => {
     const userId = localStorage.getItem('user_id');
     const organizationId = localStorage.getItem('organization_id');
     const appId = 'test-app-id'
 
-    const ph = new PostHog(POSTHOG_API_KEY_EU, {
-      host: 'https://eu.posthog.com',
-      bootstrap : {
-        distinctId: userId || 'unknown',
-      },
-    })
+  const ph = new PostHog(POSTHOG_API_KEY, {
+    host: POSTHOG_API_URL,
+    bootstrap: {
+      distinctId: userId || 'unknown',
+    },
+  })
 
     if (organizationId) {
       ph.capture(eventName, {
