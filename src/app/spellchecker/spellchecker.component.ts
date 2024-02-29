@@ -78,7 +78,7 @@ export class SpellcheckerComponent implements OnInit {
         localStorage.setItem('is_logged_in', 'false');
         return;
       } 
-      if (response.status === 403) { //could not authenticate dashboard
+      if (response === undefined || response?.status === 403) { //could not authenticate dashboard
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
         return;
