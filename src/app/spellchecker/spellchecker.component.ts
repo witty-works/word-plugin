@@ -18,8 +18,6 @@ const analytics = useAnalytics();
   styleUrls: ['./spellchecker.component.scss']
 })
 export class SpellcheckerComponent implements OnInit {
-  // accessToken: string = '';
-  // refreshToken: string = '';
   environment = window.location.hostname === 'localhost'
 
   isSpellchecking = false;
@@ -137,7 +135,6 @@ export class SpellcheckerComponent implements OnInit {
 
     return Word.run(async (context) => {
       let accessToken = localStorage.getItem('word_access_token');
-
       if (!accessToken) {
         accessToken = await Office.auth.getAccessToken({
           allowSignInPrompt: true,
@@ -161,7 +158,7 @@ export class SpellcheckerComponent implements OnInit {
             continue;
           }
           try {
-            const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'));
+            const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'), accessToken);
             if (!errs) {
               continue;
             }

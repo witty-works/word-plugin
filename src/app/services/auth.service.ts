@@ -7,8 +7,6 @@ import { de, en } from '../translations';
   providedIn: 'root'
 })
 export class AuthService {
-  // accessToken = localStorage.getItem('access_token');
-
   isDevEnv = window.location.hostname === 'localhost'
 
   constructor(private http: HttpClient) { }
