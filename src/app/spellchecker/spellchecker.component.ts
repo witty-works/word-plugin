@@ -189,7 +189,6 @@ export class SpellcheckerComponent implements OnInit {
                   return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
                 }),
               };
-                    
               errsWithoutOrthography.results.forEach((result: any) => {
                 analytics.checkResultLog(
                   result,
@@ -202,8 +201,7 @@ export class SpellcheckerComponent implements OnInit {
               });
             }
 
-            const newAlerts = errs.results
-            .map((result) => ({
+            const newAlerts = errs.results.map((result) => ({
               id: `${result.text}-${result.category}-${result.start}${result.end}`,
               startOffset: result.start,
               endOffset: result.end,
