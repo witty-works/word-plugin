@@ -136,6 +136,7 @@ export class SpellcheckerComponent implements OnInit {
     return Word.run(async (context) => {
       let accessToken = localStorage.getItem('word_access_token');
       if (!accessToken) {
+        console.log('fetching new token 1');
         accessToken = await Office.auth.getAccessToken({
           allowSignInPrompt: true,
           allowConsentPrompt: true,
@@ -158,7 +159,7 @@ export class SpellcheckerComponent implements OnInit {
             continue;
           }
           try {
-            const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'), accessToken);
+            const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'));
             if (!errs) {
               continue;
             }
@@ -231,6 +232,10 @@ export class SpellcheckerComponent implements OnInit {
               });
             });
           } catch (error: any) {
+            if (error?.status === 403) {
+              console.log('removing tokeen')
+                localStorage.removeItem('word_access_token'); 
+            }
             if (error.name === 'HttpErrorResponse' && error.status === 422) {
               continue;
             } else if (error?.code === 13001) {

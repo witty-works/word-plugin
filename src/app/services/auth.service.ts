@@ -12,6 +12,7 @@ export class AuthService {
   constructor(private http: HttpClient) { }
 
   async makeAuthRequest(): Promise<any> {
+    console.log('makeAuthRequest');
     try {
       let accessToken = localStorage.getItem('word_access_token');
 
