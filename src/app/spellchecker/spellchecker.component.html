@@ -25,7 +25,7 @@
     <div *ngIf="isLoggedInWord && spellingErrors.length > 0" class="number-spelling-errors">
         {{ spellingErrors.length }} {{lang.suggstions}}:
     </div>
-    <app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphs" (highlightEvent)="highlight($event)"
+    <app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphsWithIds" (highlightEvent)="highlight($event)"
         (acceptSuggestionEvent)="acceptSuggestion($event)" *ngIf="isLoggedInWord && !isFirstRun && spellingErrors.length > 0">
     </app-errors-list>
 

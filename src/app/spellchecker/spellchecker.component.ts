@@ -34,7 +34,7 @@ export class SpellcheckerComponent implements OnInit {
   
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
-  paragraphs: string[] = [];
+  paragraphsWithIds: { text: string, id: string }[] = [];
 
   spellingErrors: ISpellingError[] = [];
 
@@ -60,6 +60,14 @@ export class SpellcheckerComponent implements OnInit {
 
   async ngOnInit() { 
     this.register();
+    await Word.run(async (context) => {
+      context.document.onParagraphChanged.add(this.paragraphChanged.bind(this));
+      await context.sync();
+    });
+  }
+
+  async paragraphChanged(event: Word.ParagraphChangedEventArgs) {
+    this.spellingErrors = this.spellingErrors.filter(error => error.paragraphUniqueId !== event.uniqueLocalIds[0]);
   }
 
   hideSpinner() {
@@ -152,16 +160,16 @@ export class SpellcheckerComponent implements OnInit {
         const paragraphCollection = body.paragraphs.load({
           text: true,
         });
-        this.paragraphs = paragraphCollection.items.map((p) => p.text);
 
+        this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
         this.spellingErrors = [];
-        for (let paragraphIndex = 0; paragraphIndex < this.paragraphs.length; paragraphIndex++) {
-          const paragraph = this.paragraphs[paragraphIndex];
-          if (!paragraph) {
+        for (let paragraphIndex = 0; paragraphIndex < this.paragraphsWithIds.length; paragraphIndex++) {
+          const paragraph = this.paragraphsWithIds[paragraphIndex];
+          if (!paragraph.text) {
             continue;
           }
           try {
-            const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'));
+            const errs = await this.spellcheckerService.checkText(paragraph.text.replace(/\u000b/g, '\n'));
             if (!errs) {
               continue;
             }
@@ -178,7 +186,7 @@ export class SpellcheckerComponent implements OnInit {
             }
             const checkLogEventId = Math.random().toString(36).substring(2, 15);
 
-            analytics.checkLog(errs, null, paragraph.length, 'check', false, checkLogEventId);
+            analytics.checkLog(errs, null, paragraph.text.length, 'check', false, checkLogEventId);
 
             if(this.authResponse?.plan !== 'witty_free') {
               const errsWithoutOrthography = {
@@ -192,7 +200,7 @@ export class SpellcheckerComponent implements OnInit {
                 analytics.checkResultLog(
                   result,
                   this.authResponse,
-                  paragraph.length,
+                  paragraph.text.length,
                   'check_result',
                   false,
                   checkLogEventId,
@@ -226,6 +234,7 @@ export class SpellcheckerComponent implements OnInit {
             errs.results.forEach(e => {
               if(e.text === ' \v') return; //TODO: handle white space typography error in the future
               this.spellingErrors.push({
+                paragraphUniqueId: paragraph.id,
                 paragraph: paragraphIndex,
                 offset: e.start,
                 length: e.end - e.start,
@@ -316,11 +325,11 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   private getLineText(lineIndex: number): string {
-    return this.paragraphs[lineIndex];
+    return this.paragraphsWithIds[lineIndex].text;
   }
 
   private updateLineText(lineIndex: number, newText: string): void {
-    this.paragraphs[lineIndex] = newText;
+    this.paragraphsWithIds[lineIndex].text = newText;
   }
 
   private getGrammarErrorText(errorIndex: number): string {
