@@ -14,14 +14,19 @@ export class AuthService {
   async makeAuthRequest(): Promise<any> {
     console.log('makeAuthRequest');
     try {
-      let accessToken = localStorage.getItem('word_access_token');
+      let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
 
-      if (!accessToken) {
-        accessToken = await Office.auth.getAccessToken({
+      if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) { //check if token is older than 5 min
+        const newAccessToken = await Office.auth.getAccessToken({
           allowSignInPrompt: true,
           allowConsentPrompt: true,
         });
-        localStorage.setItem('word_access_token', accessToken);
+
+        accessTokenWithTimestamp = {
+          token: newAccessToken,
+          timestamp: new Date().getTime()
+        }
+        localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
       }
 
       const url = environment.api + 'v2.0/auth';
@@ -29,14 +34,14 @@ export class AuthService {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessTokenWithTimestamp.token}`,
         }
       };
       return await this.http.post<any>(url, {}, httpOptions)
         .toPromise()
         .catch(error => {
           if (error.status === 403) {
-            localStorage.removeItem('word_access_token'); //ensures that we get new token
+            localStorage.removeItem('word_access_token_with_timestamp'); //ensures that we get new token
             const authFailCounter = localStorage.getItem('authFailCounter') ?? '0';
             if (parseInt(authFailCounter) <= 2) { //has to be 2 to avoid reaching api limit 
               const newCounter = parseInt(authFailCounter) + 1;
@@ -45,7 +50,7 @@ export class AuthService {
                 this.makeAuthRequest();
               }, 1000);
             } else {
-              const url = `${environment.dashboard}office-register?token=${accessToken}`;
+              const url = `${environment.dashboard}office-register?token=${accessTokenWithTimestamp.token}`;
               Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
                 if (result.status === Office.AsyncResultStatus.Failed) {
                   console.log('result.error', result.error);

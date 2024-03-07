@@ -134,14 +134,18 @@ export class SpellcheckerComponent implements OnInit {
     this.isSpellchecking = true;
 
     return Word.run(async (context) => {
-      let accessToken = localStorage.getItem('word_access_token');
-      if (!accessToken) {
-        console.log('fetching new token 1');
-        accessToken = await Office.auth.getAccessToken({
+      let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+      if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) { //check if token is older than 5 min
+        const newAccessToken = await Office.auth.getAccessToken({
           allowSignInPrompt: true,
           allowConsentPrompt: true,
         });
-        localStorage.setItem('word_access_token', accessToken);
+
+        accessTokenWithTimestamp = {
+          token: newAccessToken,
+          timestamp: new Date().getTime()
+        }
+        localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
       }
       const body = context.document.body;
       try {
@@ -159,14 +163,14 @@ export class SpellcheckerComponent implements OnInit {
             continue;
           }
           try {
-            const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'));
+            const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
             if (!errs) {
               continue;
             }
             this.checkEndpointResponse = errs;
             if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {
               //prompt user to register on dashboard
-              const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
+              const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
       
               Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
                 if (result.status === Office.AsyncResultStatus.Failed) {
@@ -232,10 +236,6 @@ export class SpellcheckerComponent implements OnInit {
               });
             });
           } catch (error: any) {
-            if (error?.status === 403) {
-              console.log('removing tokeen')
-                localStorage.removeItem('word_access_token'); 
-            }
             if (error.name === 'HttpErrorResponse' && error.status === 422) {
               continue;
             } else if (error?.code === 13001) {
