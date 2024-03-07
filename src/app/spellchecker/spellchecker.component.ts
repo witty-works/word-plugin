@@ -18,8 +18,6 @@ const analytics = useAnalytics();
   styleUrls: ['./spellchecker.component.scss']
 })
 export class SpellcheckerComponent implements OnInit {
-  // accessToken: string = '';
-  // refreshToken: string = '';
   environment = window.location.hostname === 'localhost'
 
   isSpellchecking = false;
@@ -136,14 +134,18 @@ export class SpellcheckerComponent implements OnInit {
     this.isSpellchecking = true;
 
     return Word.run(async (context) => {
-      let accessToken = localStorage.getItem('word_access_token');
-
-      if (!accessToken) {
-        accessToken = await Office.auth.getAccessToken({
+      let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+      if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) { //check if token is older than 5 min
+        const newAccessToken = await Office.auth.getAccessToken({
           allowSignInPrompt: true,
           allowConsentPrompt: true,
         });
-        localStorage.setItem('word_access_token', accessToken);
+
+        accessTokenWithTimestamp = {
+          token: newAccessToken,
+          timestamp: new Date().getTime()
+        }
+        localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
       }
       const body = context.document.body;
       try {
@@ -161,14 +163,14 @@ export class SpellcheckerComponent implements OnInit {
             continue;
           }
           try {
-            const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'));
+            const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
             if (!errs) {
               continue;
             }
             this.checkEndpointResponse = errs;
             if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {
               //prompt user to register on dashboard
-              const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
+              const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
       
               Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
                 if (result.status === Office.AsyncResultStatus.Failed) {
