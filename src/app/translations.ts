@@ -28,6 +28,8 @@ export const de = {
     register: 'Registrieren',
     wittyInfos: 'Willkommen bei Witty for Word, der inklusiven Schreibhilfe für Microsoft Word.',
     pleaseRegister: 'Bitte registriere, um Texte auf inklusive Sprache prüfen zu können.',
+    hitMaxTextLength: 'You have reached the maximum text length for Witty. Please select text by marking it with your cursor. Currently checked utill DE',
+    hitMaxTextLengthHere: 'here DE',
 
     //error
     tryInstead: 'Versuche es nochmal',
@@ -86,6 +88,8 @@ export const en = {
     register: 'Register',
     wittyInfos: 'Welcome to Witty for Word, the inclusive language writing assistance for Microsoft Word.',
     pleaseRegister: 'Please register to be able check your writing for inclusive language.',
+    hitMaxTextLength: 'You have reached the maximum text length for Witty. Please select text by dragging your cursor over it or by clicking a specific paragaph. Currently checked utill',
+    hitMaxTextLengthHere: 'here',
 
     //error
     tryInstead: 'Try instead ...',

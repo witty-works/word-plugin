@@ -25,6 +25,12 @@
     <div *ngIf="isLoggedInWord && spellingErrors.length > 0" class="number-spelling-errors">
         {{ spellingErrors.length }} {{lang.suggstions}}:
     </div>
+
+    <div *ngIf="hitMaxTextLength" class="max-length-reached-banner">
+        <span>{{lang.hitMaxTextLength}}</span>
+        <span class="max-length-reached-banner-link" (click)="markLastSpellingError()">{{lang.hitMaxTextLengthHere}}</span>
+    </div>
+
     <app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphs" (highlightEvent)="highlight($event)"
         (acceptSuggestionEvent)="acceptSuggestion($event)" *ngIf="isLoggedInWord && !isFirstRun && spellingErrors.length > 0">
     </app-errors-list>

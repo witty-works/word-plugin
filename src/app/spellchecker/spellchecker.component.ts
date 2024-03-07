@@ -40,6 +40,10 @@ export class SpellcheckerComponent implements OnInit {
 
   lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string};
 
+  maxTextLength = 1000; //adjust as needed
+
+  hitMaxTextLength = false;
+
   alerts: IAlert[] = [];
   authResponse: IAuthResponse | null = null;
   checkEndpointResponse: ICheckResponse | null = null;
@@ -132,9 +136,10 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   async checkGrammar(): Promise<void> {
+    this.hitMaxTextLength = false;
     this.isFirstRun = false;
     this.isSpellchecking = true;
-
+    let textLengthUsed = 0;
     return Word.run(async (context) => {
       let accessToken = localStorage.getItem('word_access_token');
 
@@ -145,13 +150,22 @@ export class SpellcheckerComponent implements OnInit {
         });
         localStorage.setItem('word_access_token', accessToken);
       }
-      const body = context.document.body;
+      const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
+      currentlySelectedPageparagraphs.load();
+      await context.sync();
+      const paragraphs = 
+        currentlySelectedPageparagraphs && 
+        currentlySelectedPageparagraphs.items.length > 0 && 
+        currentlySelectedPageparagraphs.items[0].text.length > 0 ? 
+        currentlySelectedPageparagraphs : 
+        context.document.body.paragraphs;
       try {
-        context.load(body.paragraphs);
+        context.load(paragraphs);
         await context.sync();
-        const paragraphCollection = body.paragraphs.load({
+        const paragraphCollection = paragraphs.load({
           text: true,
         });
+        console.log('paragraphCollection', paragraphCollection);
         this.paragraphs = paragraphCollection.items.map((p) => p.text);
 
         this.spellingErrors = [];
@@ -160,7 +174,12 @@ export class SpellcheckerComponent implements OnInit {
           if (!paragraph) {
             continue;
           }
+          if (textLengthUsed + paragraph.length > this.maxTextLength) {
+            this.hitMaxTextLength = true;
+            break;
+          }
           try {
+            textLengthUsed += paragraph.length;
             const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'));
             if (!errs) {
               continue;
@@ -359,5 +378,9 @@ export class SpellcheckerComponent implements OnInit {
     } else {
       console.error(e);
     }
+  }
+  markLastSpellingError() {
+    const lastSpellingError = this.spellingErrors[this.spellingErrors.length - 1];
+    this.highlight({paragraphIndex: lastSpellingError.paragraph, errorIndex: this.spellingErrors.length - 1});
   }
 }
