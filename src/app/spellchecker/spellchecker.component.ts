@@ -137,6 +137,7 @@ export class SpellcheckerComponent implements OnInit {
 
   async checkGrammar(): Promise<void> {
     this.hitMaxTextLength = false;
+    this.noParagraphsSelected = false;
     this.isFirstRun = false;
     this.isSpellchecking = true;
     let textLengthUsed = 0;
@@ -160,6 +161,7 @@ export class SpellcheckerComponent implements OnInit {
   
       if (currentlySelectedPageparagraphs.items.length === 0 || currentlySelectedPageparagraphs.items[0].text.length === 0) {
         this.noParagraphsSelected = true;
+        this.spellingErrors = [];
         this.isSpellchecking = false;
         return;
       }
