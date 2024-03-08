@@ -209,12 +209,12 @@ export class SpellcheckerComponent implements OnInit {
           if (!paragraph.text) {
             continue;
           }
-          if (textLengthUsed + paragraph.length > this.maxTextLength) {
+          if (textLengthUsed + paragraph.text.length > this.maxTextLength) {
             this.hitMaxTextLength = true;
             break;
           }
           try {
-            textLengthUsed += paragraph.length;
+            textLengthUsed += paragraph.text.length;
             const errs = await this.spellcheckerService.checkText(paragraph.text.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
             if (!errs) {
               continue;
@@ -415,11 +415,11 @@ export class SpellcheckerComponent implements OnInit {
   }
   async markLastSpellingError() {
     const lastParagraph = this.spellingErrors[this.spellingErrors.length - 1].paragraph;
-    const lastParagraphLastWord = this.paragraphs[lastParagraph].split(' ').pop();
+    const lastParagraphLastWord = this.paragraphsWithIds[lastParagraph].text.split(' ').pop()?.replace(/\u000b/g, '');
     if(!lastParagraphLastWord) return;
     await Word.run(async (context) => {
       try {
-        const paragraphRange = await DocumentUtils.fetchParagraph(context, this.paragraphs[lastParagraph]);
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, this.paragraphsWithIds[lastParagraph].text);
         const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, lastParagraphLastWord);
 
         errorRange.select('Select');
