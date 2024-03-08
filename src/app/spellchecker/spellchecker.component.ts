@@ -29,14 +29,14 @@ export class SpellcheckerComponent implements OnInit {
   isLoggedin = false;
 
   showSpinner = false;
-  
+
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   paragraphs: string[] = [];
 
   spellingErrors: ISpellingError[] = [];
 
-  lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string};
+  lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string };
 
   alerts: IAlert[] = [];
   authResponse: IAuthResponse | null = null;
@@ -50,13 +50,13 @@ export class SpellcheckerComponent implements OnInit {
   dialogRef?: DialogRef;
 
   constructor(
-    private spellcheckerService: CheckingService, 
+    private spellcheckerService: CheckingService,
     private authService: AuthService,
     private dialogService: DialogService
-    ) {
-    }
+  ) {
+  }
 
-  async ngOnInit() { 
+  async ngOnInit() {
     this.register();
   }
 
@@ -75,15 +75,15 @@ export class SpellcheckerComponent implements OnInit {
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
         return;
-      } 
+      }
       if (response === undefined || response?.status === 403) { //could not authenticate dashboard
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
         return;
       }
-      if(response?.code === 13013) { //edge case: throttled
+      if (response?.code === 13013) { //edge case: throttled
         this.showSpinner = true;
-        if(throttleWarning) {
+        if (throttleWarning) {
           throttleWarning.style.display = 'block';
           throttleWarning.innerHTML = this.lang.throttleWarning;
         }
@@ -93,7 +93,7 @@ export class SpellcheckerComponent implements OnInit {
         return;
       }
 
-      if(throttleWarning) {
+      if (throttleWarning) {
         throttleWarning.style.display = 'none';
       }
 
@@ -108,11 +108,11 @@ export class SpellcheckerComponent implements OnInit {
       localStorage.setItem('organization_id', response?.organization_id);
     });
   }
-  
+
   login() {
     const url = `${environment.dashboard}browser-login?redirect_uri=${environment.plugin + `app/login/login.component.html`}?target=${environment.dashboard}word-addin`;
 
-    Office.context.ui.displayDialogAsync(url, {height: 80, width: 80}, function (result) {
+    Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
       if (result.status === Office.AsyncResultStatus.Failed) {
         console.log('result.error', result.error);
       }
@@ -171,7 +171,7 @@ export class SpellcheckerComponent implements OnInit {
             if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {
               //prompt user to register on dashboard
               const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
-      
+
               Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
                 if (result.status === Office.AsyncResultStatus.Failed) {
                   console.log('result.error', result.error);
@@ -182,7 +182,7 @@ export class SpellcheckerComponent implements OnInit {
 
             analytics.checkLog(errs, null, paragraph.length, 'check', false, checkLogEventId);
 
-            if(this.authResponse?.plan !== 'witty_free') {
+            if (this.authResponse?.plan !== 'witty_free') {
               const errsWithoutOrthography = {
                 ...errs,
                 results: errs.results.filter((result: any) => {
@@ -224,7 +224,7 @@ export class SpellcheckerComponent implements OnInit {
             this.alerts = this.alerts.concat(newAlerts);
 
             errs.results.forEach(e => {
-              if(e.text === ' \v') return; //TODO: handle white space typography error in the future
+              if (e.text === ' \v') return; //TODO: handle white space typography error in the future
               this.spellingErrors.push({
                 paragraph: paragraphIndex,
                 offset: e.start,
@@ -260,8 +260,8 @@ export class SpellcheckerComponent implements OnInit {
       }
     });
   }
-  
-  async highlight(obj: {paragraphIndex: number, errorIndex: number }) {
+
+  async highlight(obj: { paragraphIndex: number, errorIndex: number }) {
     await Word.run(async (context) => {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
@@ -277,7 +277,7 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
 
-  acceptSuggestion(obj: {paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
+  acceptSuggestion(obj: { paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
     Word.run(async (context) => {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
@@ -289,8 +289,8 @@ export class SpellcheckerComponent implements OnInit {
         const alertRelevantToSuggestion = this.alerts.find(a => a.data.text === errorText);
         alertRelevantToSuggestion && analytics.alternativeLog(alertRelevantToSuggestion, obj.suggestion.text);
 
-        errorRange.insertText(obj.suggestion.text, 'Replace');        
-    
+        errorRange.insertText(obj.suggestion.text, 'Replace');
+
         errorRange.select('End');
 
         const newParagraph = paragraphRange.paragraphs.getFirst();
@@ -339,13 +339,13 @@ export class SpellcheckerComponent implements OnInit {
 
     if (e instanceof Error) {
       if (e.message.startsWith("Could not find range for chunk: ")) {
-        this.errorIntro = "Betg chattà il paragraf";
+        this.errorIntro = "Paragraph not found";
         this.errorMessage = e.message.replace("Could not find range for chunk: ", "");
-      } else if(e.message.startsWith("The range for the error was not found: ")) {
-        this.errorIntro = "Betg chattà il pled";
+      } else if (e.message.startsWith("The range for the error was not found: ")) {
+        this.errorIntro = "Word not found";
         this.errorMessage = e.message.replace("The range for the error was not found: ", "");
       } else {
-        this.errorIntro = "Errur nunenconuschenta"
+        this.errorIntro = "Unknown error"
         this.errorMessage = e.message;
       }
 
