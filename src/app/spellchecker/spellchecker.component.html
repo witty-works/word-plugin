@@ -31,7 +31,7 @@
         <span class="max-length-reached-banner-link" (click)="markLastSpellingError()">{{lang.hitMaxTextLengthHere}}</span>
     </div>
 
-    <app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphs" (highlightEvent)="highlight($event)"
+    <app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphsWithIds" (highlightEvent)="highlight($event)"
         (acceptSuggestionEvent)="acceptSuggestion($event)" *ngIf="isLoggedInWord && !isFirstRun && spellingErrors.length > 0">
     </app-errors-list>
 
