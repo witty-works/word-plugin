@@ -15,7 +15,7 @@ export class ErrorsListComponent implements OnInit, OnDestroy {
   spellingErrors: ISpellingError[] = [];
 
   @Input()
-  paragraphs: string[] = [];
+  paragraphs: { text: string, id: string }[] = [];
 
   @Output()
   highlightEvent = new EventEmitter<{ paragraphIndex: number, errorIndex: number }>();
