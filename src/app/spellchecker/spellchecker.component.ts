@@ -66,22 +66,30 @@ export class SpellcheckerComponent implements OnInit {
 
   async paragraphChanged(event: Word.ParagraphChangedEventArgs) {
     return Word.run(async (context) => {
-      const paragraph = context.document.body.paragraphs.getFirst();
-      paragraph.load('text');
-      await context.sync();
+      const body = context.document.body;
+      try {
+        context.load(body.paragraphs);
+        await context.sync();
+        const updatedParagraphs = body.paragraphs.load({
+          text: true,
+        });
+        this.paragraphsWithIds = updatedParagraphs.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
+        const changedParagraph = this.paragraphsWithIds.find(paragraph => paragraph.id === event.uniqueLocalIds[0]);
+        if(!changedParagraph) return; 
+        await context.sync();
 
-      const paragraphText = paragraph.text;
-      const spellingErrorsInChangedParagraph = this.spellingErrors.filter(error => error.paragraphUniqueId === event.uniqueLocalIds[0]);
-      const spellingErrorsInChangedParagraphText = spellingErrorsInChangedParagraph.map(error => error.word);
-      const paragraphTextSpellingErrors = spellingErrorsInChangedParagraphText.filter(word => paragraphText.includes(word));
-      const spellingErrorsNotInChangedParagraph = spellingErrorsInChangedParagraph.filter(error => !paragraphTextSpellingErrors.includes(error.word));
-
-      spellingErrorsNotInChangedParagraph.forEach(error => {
-        this.spellingErrors = this.spellingErrors.filter(e => e !== error);
-      });
+        const errorsInChangedParagraph = this.spellingErrors.filter(error => error.paragraphUniqueId === event.uniqueLocalIds[0]);
+        errorsInChangedParagraph.forEach((error) => {
+          if(!changedParagraph.text.includes(error.word)) {
+            this.spellingErrors = this.spellingErrors.filter(e => e.word !== error.word);
+          }
+      }); 
+      }
+      catch (e) {
+        this.handleError(e);
+      }     
     });
   }
-
   hideSpinner() {
     setTimeout(() => {
       this.showSpinner = false;
