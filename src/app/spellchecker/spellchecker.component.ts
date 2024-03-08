@@ -44,6 +44,8 @@ export class SpellcheckerComponent implements OnInit {
 
   hitMaxTextLength = false;
 
+  noParagraphsSelected = false;
+
   alerts: IAlert[] = [];
   authResponse: IAuthResponse | null = null;
   checkEndpointResponse: ICheckResponse | null = null;
@@ -153,19 +155,18 @@ export class SpellcheckerComponent implements OnInit {
       const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
       currentlySelectedPageparagraphs.load();
       await context.sync();
-      const paragraphs = 
-        currentlySelectedPageparagraphs && 
-        currentlySelectedPageparagraphs.items.length > 0 && 
-        currentlySelectedPageparagraphs.items[0].text.length > 0 ? 
-        currentlySelectedPageparagraphs : 
-        context.document.body.paragraphs;
+  
+      if (currentlySelectedPageparagraphs.items.length === 0 || currentlySelectedPageparagraphs.items[0].text.length === 0) {
+        this.noParagraphsSelected = true;
+        this.isSpellchecking = false;
+        return;
+      }
       try {
-        context.load(paragraphs);
+        context.load(currentlySelectedPageparagraphs);
         await context.sync();
-        const paragraphCollection = paragraphs.load({
+        const paragraphCollection = currentlySelectedPageparagraphs.load({
           text: true,
         });
-        console.log('paragraphCollection', paragraphCollection);
         this.paragraphs = paragraphCollection.items.map((p) => p.text);
 
         this.spellingErrors = [];
@@ -379,8 +380,20 @@ export class SpellcheckerComponent implements OnInit {
       console.error(e);
     }
   }
-  markLastSpellingError() {
-    const lastSpellingError = this.spellingErrors[this.spellingErrors.length - 1];
-    this.highlight({paragraphIndex: lastSpellingError.paragraph, errorIndex: this.spellingErrors.length - 1});
+  async markLastSpellingError() {
+    const lastParagraph = this.spellingErrors[this.spellingErrors.length - 1].paragraph;
+    const lastParagraphLastWord = this.paragraphs[lastParagraph].split(' ').pop();
+    if(!lastParagraphLastWord) return;
+    await Word.run(async (context) => {
+      try {
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, this.paragraphs[lastParagraph]);
+        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, lastParagraphLastWord);
+
+        errorRange.select('Select');
+        await context.sync();
+      } catch (e) {
+        this.handleError(e);
+      }
+    });
   }
 }

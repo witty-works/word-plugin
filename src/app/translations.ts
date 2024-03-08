@@ -30,6 +30,7 @@ export const de = {
     pleaseRegister: 'Bitte registriere, um Texte auf inklusive Sprache prüfen zu können.',
     hitMaxTextLength: 'You have reached the maximum text length for Witty. Please select text by marking it with your cursor. Currently checked utill DE',
     hitMaxTextLengthHere: 'here DE',
+    noParagraphsSelected: 'No paragraphs selected DE',
 
     //error
     tryInstead: 'Versuche es nochmal',
@@ -90,6 +91,7 @@ export const en = {
     pleaseRegister: 'Please register to be able check your writing for inclusive language.',
     hitMaxTextLength: 'You have reached the maximum text length for Witty. Please select text by dragging your cursor over it or by clicking a specific paragaph. Currently checked utill',
     hitMaxTextLengthHere: 'here',
+    noParagraphsSelected: 'No paragraphs selected',
 
     //error
     tryInstead: 'Try instead ...',

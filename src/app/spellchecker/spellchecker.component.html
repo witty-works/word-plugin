@@ -39,8 +39,12 @@
         <span>{{lang.clickWittyCheck}}</span>
     </div>
 
-    <div class="full-size-notification" *ngIf="isLoggedInWord && !isFirstRun && spellingErrors.length === 0">
+    <div class="full-size-notification" *ngIf="isLoggedInWord && !isFirstRun && spellingErrors.length === 0 && !noParagraphsSelected">
         <span>{{lang.noFurtherSuggestions}}</span>
+    </div>
+
+    <div class="full-size-notification" *ngIf="isLoggedInWord && !isFirstRun && noParagraphsSelected">
+        <span>{{lang.noParagraphsSelected}}</span>
     </div>
 
     <ngx-spinner bdColor="#f1f2f2" size="medium" color="#f06464" type="line-scale" [fullScreen]="true"
