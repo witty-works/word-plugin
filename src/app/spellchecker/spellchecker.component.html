@@ -25,6 +25,12 @@
     <div *ngIf="isLoggedInWord && spellingErrors.length > 0" class="number-spelling-errors">
         {{ spellingErrors.length }} {{lang.suggstions}}:
     </div>
+
+    <div *ngIf="hitMaxTextLength && isLoggedInWord && !isFirstRun && spellingErrors.length > 0" class="max-length-reached-banner">
+        <span>{{lang.hitMaxTextLength}}</span>
+        <span class="max-length-reached-banner-link" (click)="markLastSpellingError()">{{lang.hitMaxTextLengthHere}}</span>
+    </div>
+
     <app-errors-list [spellingErrors]="spellingErrors" [paragraphs]="paragraphsWithIds" (highlightEvent)="highlight($event)"
         (acceptSuggestionEvent)="acceptSuggestion($event)" *ngIf="isLoggedInWord && !isFirstRun && spellingErrors.length > 0">
     </app-errors-list>
@@ -33,8 +39,12 @@
         <span>{{lang.clickWittyCheck}}</span>
     </div>
 
-    <div class="full-size-notification" *ngIf="isLoggedInWord && !isFirstRun && spellingErrors.length === 0">
+    <div class="full-size-notification" *ngIf="isLoggedInWord && !isFirstRun && spellingErrors.length === 0 && !noParagraphsSelected">
         <span>{{lang.noFurtherSuggestions}}</span>
+    </div>
+
+    <div class="full-size-notification" *ngIf="isLoggedInWord && !isFirstRun && noParagraphsSelected">
+        <span>{{lang.noParagraphsSelected}}</span>
     </div>
 
     <ngx-spinner bdColor="#f1f2f2" size="medium" color="#f06464" type="line-scale" [fullScreen]="true"

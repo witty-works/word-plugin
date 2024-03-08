@@ -38,6 +38,14 @@ export class SpellcheckerComponent implements OnInit {
 
   lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string };
 
+  maxTextLength = 1000; //adjust as needed
+
+  hitMaxTextLength = false;
+
+  noParagraphsSelected = false;
+
+  lastParagraphChecked = 0;
+
   alerts: IAlert[] = [];
   authResponse: IAuthResponse | null = null;
   checkEndpointResponse: ICheckResponse | null = null;
@@ -160,9 +168,11 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   async checkGrammar(): Promise<void> {
+    this.hitMaxTextLength = false;
+    this.noParagraphsSelected = false;
     this.isFirstRun = false;
     this.isSpellchecking = true;
-
+    let textLengthUsed = 0;
     return Word.run(async (context) => {
       let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
       if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) { //check if token is older than 5 min
@@ -177,11 +187,20 @@ export class SpellcheckerComponent implements OnInit {
         }
         localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
       }
-      const body = context.document.body;
+      const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
+      currentlySelectedPageparagraphs.load();
+      await context.sync();
+  
+      if (currentlySelectedPageparagraphs.items.length === 0 || currentlySelectedPageparagraphs.items[0].text.length === 0) {
+        this.noParagraphsSelected = true;
+        this.spellingErrors = [];
+        this.isSpellchecking = false;
+        return;
+      }
       try {
-        context.load(body.paragraphs);
+        context.load(currentlySelectedPageparagraphs);
         await context.sync();
-        const paragraphCollection = body.paragraphs.load({
+        const paragraphCollection = currentlySelectedPageparagraphs.load({
           text: true,
         });
 
@@ -192,7 +211,13 @@ export class SpellcheckerComponent implements OnInit {
           if (!paragraph.text) {
             continue;
           }
+          if (textLengthUsed + paragraph.text.length > this.maxTextLength) {
+            this.hitMaxTextLength = true;
+            this.lastParagraphChecked = paragraphIndex;
+            break;
+          }
           try {
+            textLengthUsed += paragraph.text.length;
             const errs = await this.spellcheckerService.checkText(paragraph.text.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
             if (!errs) {
               continue;
@@ -390,5 +415,21 @@ export class SpellcheckerComponent implements OnInit {
     } else {
       console.error(e);
     }
+  }
+  async markLastSpellingError() {
+    const lastParagraph = this.paragraphsWithIds[this.lastParagraphChecked];
+    const lastParagraphLastWord = lastParagraph.text.split(' ').pop()?.replace(/\u000b/g, '');
+    if(!lastParagraphLastWord) return;
+    await Word.run(async (context) => {
+      try {
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, lastParagraph.text);
+        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, lastParagraphLastWord);
+
+        errorRange.select('Select');
+        await context.sync();
+      } catch (e) {
+        this.handleError(e);
+      }
+    });
   }
 }
