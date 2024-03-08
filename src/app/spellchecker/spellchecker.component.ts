@@ -65,7 +65,21 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   async paragraphChanged(event: Word.ParagraphChangedEventArgs) {
-    this.spellingErrors = this.spellingErrors.filter(error => error.paragraphUniqueId !== event.uniqueLocalIds[0]);
+    return Word.run(async (context) => {
+      const paragraph = context.document.body.paragraphs.getFirst();
+      paragraph.load('text');
+      await context.sync();
+
+      const paragraphText = paragraph.text;
+      const spellingErrorsInChangedParagraph = this.spellingErrors.filter(error => error.paragraphUniqueId === event.uniqueLocalIds[0]);
+      const spellingErrorsInChangedParagraphText = spellingErrorsInChangedParagraph.map(error => error.word);
+      const paragraphTextSpellingErrors = spellingErrorsInChangedParagraphText.filter(word => paragraphText.includes(word));
+      const spellingErrorsNotInChangedParagraph = spellingErrorsInChangedParagraph.filter(error => !paragraphTextSpellingErrors.includes(error.word));
+
+      spellingErrorsNotInChangedParagraph.forEach(error => {
+        this.spellingErrors = this.spellingErrors.filter(e => e !== error);
+      });
+    });
   }
 
   hideSpinner() {
@@ -171,7 +185,7 @@ export class SpellcheckerComponent implements OnInit {
             continue;
           }
           try {
-            const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
+            const errs = await this.spellcheckerService.checkText(paragraph.text.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
             if (!errs) {
               continue;
             }
