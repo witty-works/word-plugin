@@ -1,13 +1,12 @@
-<ng-container *ngIf="error && context && getContext(error.word)">
+<ng-container *ngIf="error && getContextErrorComponent(error.word) as contextValue">
     <div class="error-box">
         <header class="header" (click)="toggle()">
-            <div class="preview" *ngIf="showContext" [innerHTML]="getContext(error.word) | highlight:error"></div>
+            <div class="preview" *ngIf="showContext" [innerHTML]="contextValue | highlight:error"></div>
             <div class="preview" *ngIf="!showContext">{{ error.word }}</div>
             <div class="toggle" [class.active]="isOpen" tabindex="0" (keydown.enter)="toggle()" role="button">
                 <img src="assets/icons/chevron-down.svg" alt="{lang.arrowDownIconAlt}">
             </div>
         </header>
-        
 
         <section class="suggestions" *ngIf="isOpen">
         <div

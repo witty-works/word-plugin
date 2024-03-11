@@ -43,7 +43,7 @@ export class ErrorComponent {
   }
   
   
-  getContext(word: string) {
+  getContextErrorComponent(word: string) {
     if (!this.context) return;
     let ctxt = TextUtils.getContext(word, this.context);
     if (ctxt) {

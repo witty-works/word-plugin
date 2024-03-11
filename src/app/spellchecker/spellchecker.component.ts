@@ -18,8 +18,6 @@ const analytics = useAnalytics();
   styleUrls: ['./spellchecker.component.scss']
 })
 export class SpellcheckerComponent implements OnInit {
-  // accessToken: string = '';
-  // refreshToken: string = '';
   environment = window.location.hostname === 'localhost'
 
   isSpellchecking = false;
@@ -31,14 +29,22 @@ export class SpellcheckerComponent implements OnInit {
   isLoggedin = false;
 
   showSpinner = false;
-  
+
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
-  paragraphs: string[] = [];
+  paragraphsWithIds: { text: string, id: string }[] = [];
 
   spellingErrors: ISpellingError[] = [];
 
-  lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string};
+  lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string };
+
+  maxTextLength = 1000; //adjust as needed
+
+  hitMaxTextLength = false;
+
+  noParagraphsSelected = false;
+
+  lastParagraphChecked = 0;
 
   alerts: IAlert[] = [];
   authResponse: IAuthResponse | null = null;
@@ -52,16 +58,46 @@ export class SpellcheckerComponent implements OnInit {
   dialogRef?: DialogRef;
 
   constructor(
-    private spellcheckerService: CheckingService, 
+    private spellcheckerService: CheckingService,
     private authService: AuthService,
     private dialogService: DialogService
-    ) {
-    }
-
-  async ngOnInit() { 
-    this.register();
+  ) {
   }
 
+  async ngOnInit() {
+    this.register();
+    await Word.run(async (context) => {
+      context.document.onParagraphChanged.add(this.paragraphChanged.bind(this));
+      await context.sync();
+    });
+  }
+
+  async paragraphChanged(event: Word.ParagraphChangedEventArgs) {
+    return Word.run(async (context) => {
+      const body = context.document.body;
+      try {
+        context.load(body.paragraphs);
+        await context.sync();
+        const updatedParagraphs = body.paragraphs.load({
+          text: true,
+        });
+        this.paragraphsWithIds = updatedParagraphs.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
+        const changedParagraph = this.paragraphsWithIds.find(paragraph => paragraph.id === event.uniqueLocalIds[0]);
+        if(!changedParagraph) return; 
+        await context.sync();
+
+        const errorsInChangedParagraph = this.spellingErrors.filter(error => error.paragraphUniqueId === event.uniqueLocalIds[0]);
+        errorsInChangedParagraph.forEach((error) => {
+          if(!changedParagraph.text.includes(error.word)) {
+            this.spellingErrors = this.spellingErrors.filter(e => e.word !== error.word);
+          }
+      }); 
+      }
+      catch (e) {
+        this.handleError(e);
+      }     
+    });
+  }
   hideSpinner() {
     setTimeout(() => {
       this.showSpinner = false;
@@ -77,15 +113,15 @@ export class SpellcheckerComponent implements OnInit {
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
         return;
-      } 
-      if (response.status === 403) { //could not authenticate dashboard
+      }
+      if (response === undefined || response?.status === 403) { //could not authenticate dashboard
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
         return;
       }
-      if(response?.code === 13013) { //edge case: throttled
+      if (response?.code === 13013) { //edge case: throttled
         this.showSpinner = true;
-        if(throttleWarning) {
+        if (throttleWarning) {
           throttleWarning.style.display = 'block';
           throttleWarning.innerHTML = this.lang.throttleWarning;
         }
@@ -95,7 +131,7 @@ export class SpellcheckerComponent implements OnInit {
         return;
       }
 
-      if(throttleWarning) {
+      if (throttleWarning) {
         throttleWarning.style.display = 'none';
       }
 
@@ -110,11 +146,11 @@ export class SpellcheckerComponent implements OnInit {
       localStorage.setItem('organization_id', response?.organization_id);
     });
   }
-  
+
   login() {
     const url = `${environment.dashboard}browser-login?redirect_uri=${environment.plugin + `app/login/login.component.html`}?target=${environment.dashboard}word-addin`;
 
-    Office.context.ui.displayDialogAsync(url, {height: 80, width: 80}, function (result) {
+    Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
       if (result.status === Office.AsyncResultStatus.Failed) {
         console.log('result.error', result.error);
       }
@@ -132,44 +168,65 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   async checkGrammar(): Promise<void> {
+    this.hitMaxTextLength = false;
+    this.noParagraphsSelected = false;
     this.isFirstRun = false;
     this.isSpellchecking = true;
-
+    let textLengthUsed = 0;
     return Word.run(async (context) => {
-      let accessToken = localStorage.getItem('word_access_token');
-
-      if (!accessToken) {
-        accessToken = await Office.auth.getAccessToken({
+      let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+      if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) { //check if token is older than 5 min
+        const newAccessToken = await Office.auth.getAccessToken({
           allowSignInPrompt: true,
           allowConsentPrompt: true,
         });
-        localStorage.setItem('word_access_token', accessToken);
+
+        accessTokenWithTimestamp = {
+          token: newAccessToken,
+          timestamp: new Date().getTime()
+        }
+        localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
       }
-      const body = context.document.body;
+      const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
+      currentlySelectedPageparagraphs.load();
+      await context.sync();
+  
+      if (currentlySelectedPageparagraphs.items.length === 0 || currentlySelectedPageparagraphs.items[0].text.length === 0) {
+        this.noParagraphsSelected = true;
+        this.spellingErrors = [];
+        this.isSpellchecking = false;
+        return;
+      }
       try {
-        context.load(body.paragraphs);
+        context.load(currentlySelectedPageparagraphs);
         await context.sync();
-        const paragraphCollection = body.paragraphs.load({
+        const paragraphCollection = currentlySelectedPageparagraphs.load({
           text: true,
         });
-        this.paragraphs = paragraphCollection.items.map((p) => p.text);
 
+        this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
         this.spellingErrors = [];
-        for (let paragraphIndex = 0; paragraphIndex < this.paragraphs.length; paragraphIndex++) {
-          const paragraph = this.paragraphs[paragraphIndex];
-          if (!paragraph) {
+        for (let paragraphIndex = 0; paragraphIndex < this.paragraphsWithIds.length; paragraphIndex++) {
+          const paragraph = this.paragraphsWithIds[paragraphIndex];
+          if (!paragraph.text) {
             continue;
           }
+          if (textLengthUsed + paragraph.text.length > this.maxTextLength) {
+            this.hitMaxTextLength = true;
+            this.lastParagraphChecked = paragraphIndex;
+            break;
+          }
           try {
-            const errs = await this.spellcheckerService.checkText(paragraph.replace(/\u000b/g, '\n'));
+            textLengthUsed += paragraph.text.length;
+            const errs = await this.spellcheckerService.checkText(paragraph.text.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
             if (!errs) {
               continue;
             }
             this.checkEndpointResponse = errs;
             if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {
               //prompt user to register on dashboard
-              const url = environment.dashboard + 'office-register?token=' + accessToken; //TODO
-      
+              const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
+
               Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
                 if (result.status === Office.AsyncResultStatus.Failed) {
                   console.log('result.error', result.error);
@@ -178,21 +235,20 @@ export class SpellcheckerComponent implements OnInit {
             }
             const checkLogEventId = Math.random().toString(36).substring(2, 15);
 
-            analytics.checkLog(errs, null, paragraph.length, 'check', false, checkLogEventId);
+            analytics.checkLog(errs, null, paragraph.text.length, 'check', false, checkLogEventId);
 
-            if(this.authResponse?.plan !== 'witty_free') {
+            if (this.authResponse?.plan !== 'witty_free') {
               const errsWithoutOrthography = {
                 ...errs,
                 results: errs.results.filter((result: any) => {
                   return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
                 }),
               };
-                    
               errsWithoutOrthography.results.forEach((result: any) => {
                 analytics.checkResultLog(
                   result,
                   this.authResponse,
-                  paragraph.length,
+                  paragraph.text.length,
                   'check_result',
                   false,
                   checkLogEventId,
@@ -200,8 +256,7 @@ export class SpellcheckerComponent implements OnInit {
               });
             }
 
-            const newAlerts = errs.results
-            .map((result) => ({
+            const newAlerts = errs.results.map((result) => ({
               id: `${result.text}-${result.category}-${result.start}${result.end}`,
               startOffset: result.start,
               endOffset: result.end,
@@ -224,8 +279,9 @@ export class SpellcheckerComponent implements OnInit {
             this.alerts = this.alerts.concat(newAlerts);
 
             errs.results.forEach(e => {
-              if(e.text === ' \v') return; //TODO: handle white space typography error in the future
+              if (e.text === ' \v') return; //TODO: handle white space typography error in the future
               this.spellingErrors.push({
+                paragraphUniqueId: paragraph.id,
                 paragraph: paragraphIndex,
                 offset: e.start,
                 length: e.end - e.start,
@@ -260,8 +316,8 @@ export class SpellcheckerComponent implements OnInit {
       }
     });
   }
-  
-  async highlight(obj: {paragraphIndex: number, errorIndex: number }) {
+
+  async highlight(obj: { paragraphIndex: number, errorIndex: number }) {
     await Word.run(async (context) => {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
@@ -277,7 +333,7 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
 
-  acceptSuggestion(obj: {paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
+  acceptSuggestion(obj: { paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
     Word.run(async (context) => {
       try {
         const paragraphText = this.getLineText(obj.paragraphIndex);
@@ -289,8 +345,8 @@ export class SpellcheckerComponent implements OnInit {
         const alertRelevantToSuggestion = this.alerts.find(a => a.data.text === errorText);
         alertRelevantToSuggestion && analytics.alternativeLog(alertRelevantToSuggestion, obj.suggestion.text);
 
-        errorRange.insertText(obj.suggestion.text, 'Replace');        
-    
+        errorRange.insertText(obj.suggestion.text, 'Replace');
+
         errorRange.select('End');
 
         const newParagraph = paragraphRange.paragraphs.getFirst();
@@ -316,11 +372,11 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   private getLineText(lineIndex: number): string {
-    return this.paragraphs[lineIndex];
+    return this.paragraphsWithIds[lineIndex].text;
   }
 
   private updateLineText(lineIndex: number, newText: string): void {
-    this.paragraphs[lineIndex] = newText;
+    this.paragraphsWithIds[lineIndex].text = newText;
   }
 
   private getGrammarErrorText(errorIndex: number): string {
@@ -339,13 +395,13 @@ export class SpellcheckerComponent implements OnInit {
 
     if (e instanceof Error) {
       if (e.message.startsWith("Could not find range for chunk: ")) {
-        this.errorIntro = "Betg chattà il paragraf";
+        this.errorIntro = "Paragraph not found";
         this.errorMessage = e.message.replace("Could not find range for chunk: ", "");
-      } else if(e.message.startsWith("The range for the error was not found: ")) {
-        this.errorIntro = "Betg chattà il pled";
+      } else if (e.message.startsWith("The range for the error was not found: ")) {
+        this.errorIntro = "Word not found";
         this.errorMessage = e.message.replace("The range for the error was not found: ", "");
       } else {
-        this.errorIntro = "Errur nunenconuschenta"
+        this.errorIntro = "Unknown error"
         this.errorMessage = e.message;
       }
 
@@ -359,5 +415,21 @@ export class SpellcheckerComponent implements OnInit {
     } else {
       console.error(e);
     }
+  }
+  async markLastSpellingError() {
+    const lastParagraph = this.paragraphsWithIds[this.lastParagraphChecked];
+    const lastParagraphLastWord = lastParagraph.text.split(' ').pop()?.replace(/\u000b/g, '');
+    if(!lastParagraphLastWord) return;
+    await Word.run(async (context) => {
+      try {
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, lastParagraph.text);
+        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, lastParagraphLastWord);
+
+        errorRange.select('Select');
+        await context.sync();
+      } catch (e) {
+        this.handleError(e);
+      }
+    });
   }
 }

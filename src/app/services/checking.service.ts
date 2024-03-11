@@ -14,25 +14,15 @@ export class CheckingService {
 
   constructor(private settingsService: SettingsService, private http: HttpClient) { }
 
-  async checkText(sentence: string): Promise<ICheckResponse> {
+  async checkText(sentence: string, accessToken: string): Promise<ICheckResponse> {
     try {
-      let accessToken = localStorage.getItem('word_access_token');
-
-      if (!accessToken) {
-        accessToken = await Office.auth.getAccessToken({
-          allowSignInPrompt: true,
-          allowConsentPrompt: true,
-        });
-        localStorage.setItem('word_access_token', accessToken);
-      }
-
       const url = environment.api + 'v2.3/check';
 
       const body = {
         text: sentence,
         lang: 'auto',
         client: 'word-plugin:' + environment.package_version,
-        config: { //TODO: check that this is correct!
+        config: {
           disabled_categories: [
             'orthography',
           ]
