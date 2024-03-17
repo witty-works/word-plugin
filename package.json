@@ -70,7 +70,7 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jsdoc": "^46.9.1",
     "eslint-plugin-prefer-arrow": "1.2.3",
-    "office-addin-debugging": "^4.3.9",
+    "office-addin-debugging": "^4.6.7",
     "office-addin-dev-certs": "^1.11.2",
     "office-addin-manifest": "^1.12.7",
     "ts-node": "~10.9.1",
