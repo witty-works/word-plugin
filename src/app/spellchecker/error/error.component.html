@@ -16,8 +16,11 @@
             <div class="witty-works-ext-lato-popover-text witty-works-ext-justify-space-between witty-works-ext-wittyworks-container">
               <div class="witty-works-ext-container-row witty-works-ext-justify-start">
                 <div class="witty-works-ext-explanation-icon">{{error.details.explanation.icon}}</div>
-                {{error.details.explanation.text}}
-                {{error.details.explanation.context ? ' (' + error.details.explanation.context + ')' : ''}}
+                <div>
+                  <b>{{error.details.label.split(':').pop()}}</b>
+                  {{error.details.explanation.text}}
+                  {{error.details.explanation.context ? ' (' + error.details.explanation.context + ')' : ''}}
+                </div>
               </div>
 
               <ng-container *ngIf="error.details.explanation?.url">
