@@ -34,17 +34,19 @@ export class SpellcheckerComponent implements OnInit {
 
   paragraphsWithIds: { text: string, id: string }[] = [];
 
-  spellingErrors: ISpellingError[] = [];
+  highlights: ISpellingError[] = [];
 
   lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string };
 
-  maxTextLength = 1000; //adjust as needed
+  maxTextLength = 2000; //adjust as needed
 
   hitMaxTextLength = false;
 
   noParagraphsSelected = false;
 
   lastParagraphChecked = 0;
+
+  selectedText = '';
 
   alerts: IAlert[] = [];
   authResponse: IAuthResponse | null = null;
@@ -88,10 +90,10 @@ export class SpellcheckerComponent implements OnInit {
         if(!changedParagraph) return; 
         await context.sync();
 
-        const errorsInChangedParagraph = this.spellingErrors.filter(error => error.paragraphUniqueId === event.uniqueLocalIds[0]);
+        const errorsInChangedParagraph = this.highlights.filter(error => error.paragraphUniqueId === event.uniqueLocalIds[0]);
         errorsInChangedParagraph.forEach((error) => {
           if(!changedParagraph.text.includes(error.word)) {
-            this.spellingErrors = this.spellingErrors.filter(e => e.word !== error.word);
+            this.highlights = this.highlights.filter(e => e.word !== error.word);
           }
       }); 
       }
@@ -169,37 +171,54 @@ export class SpellcheckerComponent implements OnInit {
     Office.context.ui.openBrowserWindow('https://witty.works');
   }
 
-  async checkGrammar(): Promise<void> {
+  async getAccessTokenWithTimestamp(): Promise<{ token: string, timestamp: number }> {
+    let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+    if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) { //check if token is older than 5 min
+      const newAccessToken = await Office.auth.getAccessToken({
+        allowSignInPrompt: true,
+        allowConsentPrompt: true,
+      });
+
+      accessTokenWithTimestamp = {
+        token: newAccessToken,
+        timestamp: new Date().getTime()
+      }
+      localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
+    }
+    return accessTokenWithTimestamp;
+  }
+
+  async checkText(): Promise<void> {
     this.hitMaxTextLength = false;
     this.noParagraphsSelected = false;
     this.isFirstRun = false;
     this.isSpellchecking = true;
-    let textLengthUsed = 0;
+    this.selectedText = ''
     return Word.run(async (context) => {
-      let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
-      if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) { //check if token is older than 5 min
-        const newAccessToken = await Office.auth.getAccessToken({
-          allowSignInPrompt: true,
-          allowConsentPrompt: true,
-        });
-
-        accessTokenWithTimestamp = {
-          token: newAccessToken,
-          timestamp: new Date().getTime()
+      Office.context.document.getSelectedDataAsync(Office.CoercionType.Text,  (asyncResult) => {
+        if (asyncResult.status == Office.AsyncResultStatus.Failed) {
+            console.log('Action failed. Error: ' + asyncResult.error.message);
         }
-        localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
-      }
-      const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
-      currentlySelectedPageparagraphs.load();
-      await context.sync();
-  
-      if (currentlySelectedPageparagraphs.items.length === 0 || currentlySelectedPageparagraphs.items[0].text.length === 0) {
-        this.noParagraphsSelected = true;
-        this.spellingErrors = [];
-        this.isSpellchecking = false;
-        return;
-      }
+        else {
+          this.selectedText = asyncResult.value as string;
+          
+          if (this.selectedText.length === 0) {
+            this.noParagraphsSelected = true;
+            this.highlights = [];
+            this.isSpellchecking = false;
+            return;
+          } else if (this.selectedText.length > this.maxTextLength) {
+            this.hitMaxTextLength = true;
+            this.selectedText = this.selectedText.substring(0, this.maxTextLength);
+          }
+        }
+      }); 
       try {
+
+        const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
+        currentlySelectedPageparagraphs.load();
+        await context.sync();
+    
         context.load(currentlySelectedPageparagraphs);
         await context.sync();
         const paragraphCollection = currentlySelectedPageparagraphs.load({
@@ -207,58 +226,35 @@ export class SpellcheckerComponent implements OnInit {
         });
 
         this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
-        this.spellingErrors = [];
-        for (let paragraphIndex = 0; paragraphIndex < this.paragraphsWithIds.length; paragraphIndex++) {
-          const paragraph = this.paragraphsWithIds[paragraphIndex];
-          if (!paragraph.text) {
-            continue;
-          }
-          if (textLengthUsed + paragraph.text.length > this.maxTextLength) {
-            this.hitMaxTextLength = true;
-            this.lastParagraphChecked = paragraphIndex;
-            break;
-          }
-          try {
-            textLengthUsed += paragraph.text.length;
-            const errs = await this.spellcheckerService.checkText(paragraph.text.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
-            if (!errs) {
-              continue;
+        this.highlights = [];
+        let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
+        const errs = await this.spellcheckerService.checkText(this.selectedText.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
+        if (!errs) return;
+        this.checkEndpointResponse = errs;
+        if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {  //prompt user to register on dashboard   
+          const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
+          Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
+            if (result.status === Office.AsyncResultStatus.Failed) {
+              console.log('result.error', result.error);
             }
-            this.checkEndpointResponse = errs;
-            if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {
-              //prompt user to register on dashboard
-              const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
+          });
+        }
+        const checkLogEventId = Math.random().toString(36).substring(2, 15);
+        analytics.checkLog(errs, null, this.selectedText.length, 'check', false, checkLogEventId);
 
-              Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
-                if (result.status === Office.AsyncResultStatus.Failed) {
-                  console.log('result.error', result.error);
-                }
-              });
-            }
-            const checkLogEventId = Math.random().toString(36).substring(2, 15);
-
-            analytics.checkLog(errs, null, paragraph.text.length, 'check', false, checkLogEventId);
-
-            if (this.authResponse?.plan !== 'witty_free') {
-              const errsWithoutOrthography = {
-                ...errs,
-                results: errs.results.filter((result: any) => {
-                  return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
-                }),
-              };
-              errsWithoutOrthography.results.forEach((result: any) => {
-                analytics.checkResultLog(
-                  result,
-                  this.authResponse,
-                  paragraph.text.length,
-                  'check_result',
-                  false,
-                  checkLogEventId,
-                )
-              });
-            }
-
-            const newAlerts = errs.results.map((result) => ({
+        if (this.authResponse?.plan !== 'witty_free') {
+          const errsWithoutOrthography = {
+            ...errs,
+            results: errs.results.filter((result: any) => {
+              return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
+            })
+          };
+          errsWithoutOrthography.results.forEach((result: any) => {
+            analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false,checkLogEventId)
+          });
+        }
+        //mostrly for analytics purposes
+        const newAlerts = errs.results.map((result) => ({
               id: `${result.text}-${result.category}-${result.start}${result.end}`,
               startOffset: result.start,
               endOffset: result.end,
@@ -280,38 +276,38 @@ export class SpellcheckerComponent implements OnInit {
             }))
             this.alerts = this.alerts.concat(newAlerts);
 
-            errs.results.forEach(e => {
-              if (e.text === ' \v') return; //TODO: handle white space typography error in the future
-              this.spellingErrors.push({
-                paragraphUniqueId: paragraph.id,
-                paragraph: paragraphIndex,
-                offset: e.start,
-                length: e.end - e.start,
-                word: e.text,
-                details: e
-              });
-            });
-          } catch (error: any) {
-            if (error.name === 'HttpErrorResponse' && error.status === 422) {
-              continue;
-            } else if (error?.code === 13001) {
-              this.isLoggedInWord = false;
-              this.isLoggedin = false;
-            }
-            console.error(error);
-          }
+        errs.results.forEach(error => {
+          const paragraphIndex = this.paragraphsWithIds.findIndex(paragraph => paragraph.text.includes(error.text));
+          if (paragraphIndex === -1) return;
+          const paragraph = this.paragraphsWithIds[paragraphIndex];
+          if (error.text === ' \v') return; //TODO: handle white space typography error in the future
+          this.highlights.push({
+            paragraphUniqueId: paragraph.id,
+            paragraph: paragraphIndex,
+            offset: error.start,
+            length: error.end - error.start,
+            word: error.text,
+            details: error
+          });
+        });
 
+      } catch (error: any) {
+        if (error.name === 'HttpErrorResponse' && error.status === 422) {
+          this.highlights = [];
+        } else if (error?.code === 13001) {
+          this.isLoggedInWord = false;
+          this.isLoggedin = false;
         }
-      } catch (error) {
-        this.handleError(error);
-      } finally {
+        console.error(error);
+      }
+      finally {
         this.isSpellchecking = false;
       }
-    });
+    })
   }
 
-  updateSpellingErrors() {
-    this.spellingErrors = this.spellingErrors.map((error, index) => {
+  updatehighlights() {
+    this.highlights = this.highlights.map((error, index) => {
       return {
         ...error,
         index: index
@@ -382,15 +378,15 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   private getGrammarErrorText(errorIndex: number): string {
-    return this.spellingErrors[errorIndex].word;
+    return this.highlights[errorIndex].word;
   }
 
   private removeGrammarError(errorIndex: number) {
-    this.spellingErrors.splice(errorIndex, 1);
+    this.highlights.splice(errorIndex, 1);
   }
 
   insertGrammarError(errorIndex: number, error: ISpellingError) {
-    this.spellingErrors.splice(errorIndex, 0, error);
+    this.highlights.splice(errorIndex, 0, error);
   }
 
   private handleError(e: any) {
@@ -410,7 +406,7 @@ export class SpellcheckerComponent implements OnInit {
       this.dialogRef = this.dialogService.open(this.errorDialog!);
       this.dialogRef.afterClosed$.subscribe((result) => {
         if (!!result) {
-          this.checkGrammar();
+          this.checkText();
         }
       });
       console.error(e.message);
@@ -418,16 +414,72 @@ export class SpellcheckerComponent implements OnInit {
       console.error(e);
     }
   }
-  async markLastSpellingError() {
-    const lastParagraph = this.paragraphsWithIds[this.lastParagraphChecked];
-    const lastParagraphLastWord = lastParagraph.text.split(' ').pop()?.replace(/\u000b/g, '');
-    if(!lastParagraphLastWord) return;
+
+  //overly complicated function to highlight the text that was checked (mostly because search is limited to 255 characters), look into simplifying
+  async highlightCheckedText() {
     await Word.run(async (context) => {
       try {
-        const paragraphRange = await DocumentUtils.fetchParagraph(context, lastParagraph.text);
-        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, lastParagraphLastWord);
+        if (!this.selectedText || this.selectedText.length <= 255) {
+          // console.log('Text is too short or not specified.');
+          return;
+        }
 
-        errorRange.select('Select');
+        const chunkSize = 255; // Maximum size for each search
+        const overlap = 50; // Overlap size to ensure continuity
+        let startPosition = 0;
+        let endPosition = chunkSize;
+        let firstRangeFound = null;
+        let lastRangeFound = null;
+
+        while (startPosition < this.selectedText.length && !firstRangeFound) {
+          const searchChunk = this.selectedText.substring(startPosition, Math.min(endPosition, this.selectedText.length));
+          const searchResults = context.document.body.search(searchChunk, { matchCase: true, matchWholeWord: false });
+          context.load(searchResults, 'items');
+          await context.sync();
+
+          if (searchResults.items.length > 0) {
+            firstRangeFound = searchResults.items[0];
+            lastRangeFound = searchResults.items[0];
+            break; // Found the first chunk, break the loop to proceed with the next step
+          }
+
+          // Adjust positions for the next chunk, considering overlap
+          startPosition += (chunkSize - overlap);
+          endPosition = startPosition + chunkSize;
+        }
+
+        if (!firstRangeFound) {
+          // console.log('Text not found in the document.');
+          return;
+        }
+
+        // Now find the rest of the text, ensuring each chunk is in sequence
+        while (endPosition < this.selectedText.length && firstRangeFound && lastRangeFound) {
+          const nextChunkStart = endPosition - overlap;
+          const nextChunkEnd = nextChunkStart + chunkSize;
+          const nextSearchChunk = this.selectedText.substring(nextChunkStart, Math.min(nextChunkEnd, this.selectedText.length));
+
+          const nextSearchResults = context.document.body.search(nextSearchChunk, { matchCase: true, matchWholeWord: false });
+          context.load(nextSearchResults, 'items');
+          await context.sync();
+
+          if (nextSearchResults.items.length > 0) {
+            // Assume the first match is the correct continuation
+            lastRangeFound = nextSearchResults.items[0];
+            endPosition = nextChunkEnd;
+          } else {
+            // console.log('Could not find the next part of the text.');
+            return;
+          }
+        }
+
+        if (!lastRangeFound) {
+          // console.log('Text not found in the document.');
+          return;
+        }
+        // Highlight the entire text from the first to the last found range
+        const completeRange = firstRangeFound.expandTo(lastRangeFound);
+        completeRange.select('Select');
         await context.sync();
       } catch (e) {
         this.handleError(e);

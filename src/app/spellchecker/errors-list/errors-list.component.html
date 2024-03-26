@@ -1,4 +1,4 @@
-<virtual-scroller #scroll [items]="spellingErrors" [enableUnequalChildrenSizes]="true">
+<virtual-scroller #scroll [items]="highlights" [enableUnequalChildrenSizes]="true">
         <app-error *ngFor="let errorItem of scroll.viewPortItems; let i = index" 
            [error]="errorItem" 
            [context]="paragraphs[errorItem.paragraph].text" 
