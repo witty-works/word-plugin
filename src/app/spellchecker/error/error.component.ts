@@ -90,10 +90,10 @@ export class ErrorComponent {
   }
 
   ignore() {
-    this.spellcheckerComponent.spellingErrors = this.spellcheckerComponent.spellingErrors.filter((error) => {
+    this.spellcheckerComponent.highlights = this.spellcheckerComponent.highlights.filter((error) => {
       return error.word !== this.error?.word;
     });
-    this.spellcheckerComponent.updateSpellingErrors();
+    this.spellcheckerComponent.updatehighlights();
   }
 
   get containerStyle() {

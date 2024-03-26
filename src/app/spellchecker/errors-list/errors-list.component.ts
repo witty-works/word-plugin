@@ -12,7 +12,7 @@ import { IAlternatives } from "../../data/types";
 export class ErrorsListComponent implements OnInit, OnDestroy {
 
   @Input()
-  spellingErrors: ISpellingError[] = [];
+  highlights: ISpellingError[] = [];
 
   @Input()
   paragraphs: { text: string, id: string }[] = [];
