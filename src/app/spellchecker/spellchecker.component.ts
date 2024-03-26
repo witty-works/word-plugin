@@ -420,7 +420,7 @@ export class SpellcheckerComponent implements OnInit {
     await Word.run(async (context) => {
       try {
         if (!this.selectedText || this.selectedText.length <= 255) {
-          console.log('Text is too short or not specified.');
+          // console.log('Text is too short or not specified.');
           return;
         }
 
@@ -449,7 +449,7 @@ export class SpellcheckerComponent implements OnInit {
         }
 
         if (!firstRangeFound) {
-          console.log('Text not found in the document.');
+          // console.log('Text not found in the document.');
           return;
         }
 
@@ -468,20 +468,19 @@ export class SpellcheckerComponent implements OnInit {
             lastRangeFound = nextSearchResults.items[0];
             endPosition = nextChunkEnd;
           } else {
-            console.log('Could not find the next part of the text.');
+            // console.log('Could not find the next part of the text.');
             return;
           }
         }
 
         if (!lastRangeFound) {
-          console.log('Text not found in the document.');
+          // console.log('Text not found in the document.');
           return;
         }
         // Highlight the entire text from the first to the last found range
         const completeRange = firstRangeFound.expandTo(lastRangeFound);
         completeRange.select('Select');
         await context.sync();
-        console.log('Entire text highlighted successfully.');
       } catch (e) {
         this.handleError(e);
       }
