@@ -36,6 +36,8 @@ export class ErrorComponent {
   showLearningBite: boolean = false;
   
   alerts: IAlert[] = this.spellcheckerComponent.alerts;
+
+  paragraphsWithIds: { text: string, id: string }[] = this.spellcheckerComponent.paragraphsWithIds;
   
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
@@ -43,9 +45,8 @@ export class ErrorComponent {
   }
   
   
-  getContextErrorComponent(word: string) {
-    if (!this.context) return;
-    let ctxt = TextUtils.getContext(word, this.context);
+  getContextErrorComponent(error: ISpellingError) {
+    let ctxt = TextUtils.getContext(error, this.paragraphsWithIds);
     if (ctxt) {
       ctxt = ctxt.replace(/()/g, '<img src="assets/icons/soft-return.svg" class="soft-return-icon" alt="Soft return icon"><br>');
     }
