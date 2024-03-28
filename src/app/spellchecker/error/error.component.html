@@ -1,4 +1,4 @@
-<ng-container *ngIf="error && getContextErrorComponent(error.word) as contextValue">
+<ng-container *ngIf="error && getContextErrorComponent(error) as contextValue">
     <div class="error-box">
         <header class="header" (click)="toggle()">
             <div class="preview" *ngIf="showContext" [innerHTML]="contextValue | highlight:error"></div>
