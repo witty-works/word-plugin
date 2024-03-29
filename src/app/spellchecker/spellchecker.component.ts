@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
 import { ISpellingError } from "../data/data-structures";
-import { IAlternatives, IAlert, IAuthResponse, ICheckResponse } from "../data/types";
+import { IAlternatives, IAlert, IAuthResponse, ICheckResponse, ICheckResponseResult } from "../data/types";
 import { AuthService } from '../services/auth.service';
 import { en, de } from '../translations';
 import { environment } from '../../environments/environment';
@@ -253,7 +253,7 @@ export class SpellcheckerComponent implements OnInit {
             analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false,checkLogEventId)
           });
         }
-        //mostrly for analytics purposes
+        //mostly for analytics purposes
         const newAlerts = errs.results.map((result) => ({
               id: `${result.text}-${result.category}-${result.start}${result.end}`,
               startOffset: result.start,
@@ -275,21 +275,36 @@ export class SpellcheckerComponent implements OnInit {
               },
             }))
             this.alerts = this.alerts.concat(newAlerts);
+            const paragraphsWithErrors: { text: string, id: string, errors: ICheckResponseResult[] }[] = [];
 
-        errs.results.forEach(error => {
-          const paragraphIndex = this.paragraphsWithIds.findIndex(paragraph => paragraph.text.includes(error.text));
-          if (paragraphIndex === -1) return;
-          const paragraph = this.paragraphsWithIds[paragraphIndex];
-          if (error.text === ' \v') return; //TODO: handle white space typography error in the future
-          this.highlights.push({
-            paragraphUniqueId: paragraph.id,
-            paragraph: paragraphIndex,
-            offset: error.start,
-            length: error.end - error.start,
-            word: error.text,
-            details: error
-          });
-        });
+            errs.results.forEach(error => {
+              const paragraphIndex = this.paragraphsWithIds.findIndex(paragraph => 
+                paragraph.text.includes(error.text) && 
+                !paragraphsWithErrors.some(p => p.id === paragraph.id && p.errors.some(e => e.text === error.text))
+              );
+            
+              if (paragraphIndex === -1) return;
+            
+              const paragraph = this.paragraphsWithIds[paragraphIndex];
+              if (!paragraphsWithErrors.some(p => p.id === paragraph.id)) {
+                paragraphsWithErrors.push({
+                  text: paragraph.text,
+                  id: paragraph.id,
+                  errors: [error]
+                });
+              }
+            
+              if (error.text === ' \v') return; // Handle whitespace or typography error in the future
+            
+              this.highlights.push({
+                paragraphUniqueId: paragraph.id,
+                paragraph: paragraphIndex,
+                offset: error.start,
+                length: error.end - error.start,
+                word: error.text,
+                details: error
+              });
+            });
 
       } catch (error: any) {
         if (error.name === 'HttpErrorResponse' && error.status === 422) {
