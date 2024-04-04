@@ -209,7 +209,9 @@ export class SpellcheckerComponent implements OnInit {
             return;
           } else if (this.selectedText.length > this.maxTextLength) {
             this.hitMaxTextLength = true;
-            this.selectedText = this.selectedText.substring(0, this.maxTextLength);
+            const selectedTextWithinRange = this.selectedText.substring(0, this.maxTextLength);
+            const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
+            this.selectedText = this.selectedText.substring(0, lastSpace);
           }
         }
       }); 
