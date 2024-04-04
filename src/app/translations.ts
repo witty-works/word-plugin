@@ -28,12 +28,13 @@ export const de = {
     register: 'Registrieren',
     wittyInfos: 'Willkommen bei Witty for Word, der inklusiven Schreibhilfe für Microsoft Word.',
     pleaseRegister: 'Bitte registriere, um Texte auf inklusive Sprache prüfen zu können.',
-    hitMaxTextLength: 'Du hast die maximale Textlänge für Witty erreicht. Bitte markiere den Text, indem Du den Cursor darüber ziehen. Mit diesem Link wird der tatsächlich',
-    hitMaxTextLengthHere: 'geprüfte Text-Ausschnitt angezeigt.',
+    hitMaxTextLength1: 'Du hast die maximale Textlänge erreicht.',
+    hitMaxTextLengthHere: 'Hier',
+    hitMaxTextLength2: ' siehst du, wie weit dein Text geprüft wurde. Markiere den Text danach, um den Text weiter zu überprüfen.',
     noParagraphsSelected: 'Bitte markiere den zu prüfenden Text.',
 
     //error
-    tryInstead: 'Versuche es nochmal',
+    tryInstead: 'Wie wär\'s mit ...',
     learnMore: 'Warum das so ist',
     arrowDownIconAlt: 'Erklärung öffnen',
     videoIconAlt: 'Ein Erklärungsvideo ist verfügbar',
@@ -89,8 +90,9 @@ export const en = {
     register: 'Register',
     wittyInfos: 'Welcome to Witty for Word, the inclusive language writing assistance for Microsoft Word.',
     pleaseRegister: 'Please register to be able check your writing for inclusive language.',
-    hitMaxTextLength: 'You have reached the maximum text length for Witty. Please select text by dragging your cursor over it. With this link the actually',
-    hitMaxTextLengthHere: 'checked text portion is shown.',
+    hitMaxTextLength1: 'You have reached the maximum text length.',
+    hitMaxTextLengthHere: 'Here',
+    hitMaxTextLength2: ' you can see what portion of the text was checked. Mark the text following to check the rest of the text.',
     noParagraphsSelected: 'Please select the text portion that should be checked.',
 
     //error

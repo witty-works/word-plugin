@@ -27,8 +27,9 @@
     </div>
 
     <div *ngIf="hitMaxTextLength && isLoggedInWord && !isFirstRun && highlights.length > 0" class="max-length-reached-banner">
-        <span>{{lang.hitMaxTextLength}}</span>
+        <span>{{lang.hitMaxTextLength1}}</span>
         <span class="max-length-reached-banner-link" (click)="highlightCheckedText()">{{lang.hitMaxTextLengthHere}}</span>
+        <span>{{lang.hitMaxTextLength2}}</span>
     </div>
 
     <app-errors-list [highlights]="highlights" [paragraphs]="paragraphsWithIds" (highlightEvent)="highlight($event)"
