@@ -38,7 +38,7 @@ export class SpellcheckerComponent implements OnInit {
 
   lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string };
 
-  maxTextLength = 2000; //adjust as needed
+  maxTextLength = 3000; //adjust as needed
 
   hitMaxTextLength = false;
 
