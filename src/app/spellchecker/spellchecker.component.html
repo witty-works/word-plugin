@@ -23,7 +23,7 @@
     </div>
 
     <div *ngIf="isLoggedInWord && highlights.length > 0" class="number-spelling-errors">
-        {{ highlights.length }} {{lang.suggstions}}:
+        {{ highlights.length }} {{highlights.length == 1 ? lang.suggstion : lang.suggstions}}:
     </div>
 
     <div *ngIf="hitMaxTextLength && isLoggedInWord && !isFirstRun && highlights.length > 0" class="max-length-reached-banner">
