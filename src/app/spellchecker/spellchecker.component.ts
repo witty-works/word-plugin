@@ -38,7 +38,7 @@ export class SpellcheckerComponent implements OnInit {
 
   lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string };
 
-  maxTextLength = 2000; //adjust as needed
+  maxTextLength = 3000; //adjust as needed
 
   hitMaxTextLength = false;
 
@@ -209,7 +209,9 @@ export class SpellcheckerComponent implements OnInit {
             return;
           } else if (this.selectedText.length > this.maxTextLength) {
             this.hitMaxTextLength = true;
-            this.selectedText = this.selectedText.substring(0, this.maxTextLength);
+            const selectedTextWithinRange = this.selectedText.substring(0, this.maxTextLength);
+            const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
+            this.selectedText = this.selectedText.substring(0, lastSpace);
           }
         }
       }); 
@@ -304,6 +306,10 @@ export class SpellcheckerComponent implements OnInit {
                 word: error.text,
                 details: error
               });
+            });
+            // sort highlights by paragraph -> make sure highlights come in the right order
+            this.highlights.sort((a, b) => {
+              return a.paragraph - b.paragraph;
             });
 
       } catch (error: any) {

@@ -6,6 +6,7 @@ import { SpellcheckerComponent } from "../spellchecker.component";
 import {IAlert, IAlternatives} from "../../data/types";
 import { en, de } from '../../translations';
 import { useAnalytics } from 'src/app/analytics/analytics';
+import * as Sentry from '@sentry/browser';
 
 const analytics = useAnalytics();
 
@@ -43,12 +44,13 @@ export class ErrorComponent {
 
   constructor(private spellcheckerService: CheckingService, private spellcheckerComponent: SpellcheckerComponent) {
   }
-  
-  
+
   getContextErrorComponent(error: ISpellingError) {
     let ctxt = TextUtils.getContext(error, this.paragraphsWithIds);
     if (ctxt) {
       ctxt = ctxt.replace(/()/g, '<img src="assets/icons/soft-return.svg" class="soft-return-icon" alt="Soft return icon"><br>');
+    } else {
+      this.sendErrorToSentry();
     }
     return ctxt;
   }
@@ -110,5 +112,9 @@ export class ErrorComponent {
     else if (gravity < 1.5) return '#F7D4D4';
     else if (gravity > 2.5) return '#FFFFD3';
     else return '#F8E7CB';
+  }
+
+  sendErrorToSentry() {
+    Sentry.captureException(new Error(`Error: ${this.error} not found in paragraph`));
   }
 }

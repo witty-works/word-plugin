@@ -1,6 +1,7 @@
 import OfficePlatformType = Office.PlatformType;
 
 import PlatformType = Office.PlatformType;
+import * as Sentry from '@sentry/browser';
 
 export default class DocumentUtils {
     static async fetchParagraph(context: Word.RequestContext, paragraph: string): Promise<Word.Range> {
@@ -29,6 +30,7 @@ export default class DocumentUtils {
             await context.sync();
 
             if (!paragraphRange || paragraphRange.isNullObject) {
+                Sentry.captureException(new Error(`Paragraph not found: ${chunk}`));
                 return Promise.reject(new Error('Could not find range for chunk: ' + chunk));
 
             }
@@ -42,6 +44,7 @@ export default class DocumentUtils {
         }
 
         if (!fullRange) {
+            Sentry.captureException(new Error(`Context paragraph not found`));
             return Promise.reject(new Error('Context paragraph not found'));
         }
 
@@ -74,7 +77,8 @@ export default class DocumentUtils {
         await context.sync();
 
         if (!locatedTextRange || locatedTextRange.isNullObject) {
-            throw new Error(`Cannot find the range for text: ${lookupText}`);
+            Sentry.captureException(new Error(`lookupText: ${lookupText} not found in paragraph`));
+            return Promise.reject(new Error('Could not find range for lookupText: ' + lookupText));
         }
 
         return locatedTextRange;
