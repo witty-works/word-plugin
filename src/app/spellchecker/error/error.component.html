@@ -1,4 +1,5 @@
-<ng-container *ngIf="error && getContextErrorComponent(error) as contextValue">
+<ng-container>
+  <div *ngIf="error && getContextErrorComponent(error) as contextValue">
     <div class="error-box">
         <header class="header" (click)="toggle()">
             <div class="preview" *ngIf="showContext" [innerHTML]="contextValue | highlight:error"></div>
@@ -72,4 +73,6 @@
           </div>
         </section>
     </div>
+  </div>
+  <div *ngIf="!error && sendErrorToSentry()" ></div>
 </ng-container>

@@ -305,6 +305,10 @@ export class SpellcheckerComponent implements OnInit {
                 details: error
               });
             });
+            // sort highlights by paragraph -> make sure highlights come in the right order
+            this.highlights.sort((a, b) => {
+              return a.paragraph - b.paragraph;
+            });
 
       } catch (error: any) {
         if (error.name === 'HttpErrorResponse' && error.status === 422) {
