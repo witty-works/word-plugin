@@ -115,6 +115,6 @@ export class ErrorComponent {
   }
 
   sendErrorToSentry() {
-    Sentry.captureException(new Error(`Error: ${this.error} not found in paragraph`));
+    Sentry.captureException(new Error(`Error word: ${this.error?.word} not found in paragraph: ${this.error?.details?.context}`));
   }
 }
