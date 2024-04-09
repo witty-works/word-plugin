@@ -48,22 +48,29 @@ button {
 
 .highlighted-text {
   font-weight: bold;
+  text-decoration-thickness: 2px; 
+  padding: 0 3px;
+  border-radius: 4px;
 }
 
 .highlighted-text--green {
   text-decoration: #BCD485 underline solid;
+  background-color: #D3E4AC;
 }
 
 .highlighted-text--red {
   text-decoration: #E6635A underline dotted;
+  background-color: #F7D4D4;
 }
 
 .highlighted-text--yellow {
   text-decoration: #F6EC6B underline solid;
+  background-color: #FFFFD3;
 }
 
 .highlighted-text--orange {
   text-decoration: #EB9F46 underline solid;
+  background-color: #F8E7CB;
 }
 
 // modal
