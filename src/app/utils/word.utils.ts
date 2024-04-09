@@ -77,7 +77,7 @@ export default class DocumentUtils {
         await context.sync();
 
         if (!locatedTextRange || locatedTextRange.isNullObject) {
-            Sentry.captureException(new Error(`lookupText: ${lookupText} not found in paragraph`));
+            Sentry.captureException(new Error(`lookupText: ${lookupText} not found in paragraph ${withinRange.text}`));
             return Promise.reject(new Error('Could not find range for lookupText: ' + lookupText));
         }
 
