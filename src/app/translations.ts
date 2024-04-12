@@ -58,7 +58,8 @@ export const de = {
     //warnings
     throttleWarning: 'Bitte versuche es in ca. 30 Sekunden erneut.',
     notSignedInWarning: 'Witty konnte dich nicht authentifizieren. Stelle sicher, dass Du in Microsoft Word angemeldet bist. Sobald Du angemeldet bist, schließe bitte das Witty for Word Add-In und öffnen es erneut.',
-    serverError: 'Witty ist aktuell leider nicht verfügbar. Bitte versuche es in ein paar Minuten noch einmal.'
+    serverError: 'Witty ist aktuell leider nicht verfügbar. Bitte versuche es in ein paar Minuten noch einmal.',
+    issueCheckingText: 'There was an issue checking the text. Please try again later. DE'
 };
 
 export const en = {
@@ -121,6 +122,7 @@ export const en = {
     //warnings
     throttleWarning: 'Please try again in about 30 seconds.',
     notSignedInWarning: 'Witty could not authenticate you, please make sure you are signed into Word. Once you are signed in, please close and re-open the Witty for Word add-in.',
-    serverError: 'Witty is currently not available. Please try again in a few minutes.'
+    serverError: 'Witty is currently not available. Please try again in a few minutes.',
+    issueCheckingText: 'There was an issue checking the text. Please try again later.'
 };
 
