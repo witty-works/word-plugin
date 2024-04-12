@@ -318,6 +318,13 @@ export class SpellcheckerComponent implements OnInit {
         } else if (error?.code === 13001) {
           this.isLoggedInWord = false;
           this.isLoggedin = false;
+        } else {
+          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+          const message = document.getElementById("issue-checking-text")
+          if (message) {
+            message.style.display = 'block';
+            message.innerHTML = lang.issueCheckingText;
+          }
         }
         console.error(error);
       }
