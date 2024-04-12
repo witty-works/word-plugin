@@ -48,6 +48,8 @@ export class SpellcheckerComponent implements OnInit {
 
   selectedText = '';
 
+  maxChunkSize = 255;
+
   alerts: IAlert[] = [];
   authResponse: IAuthResponse | null = null;
   checkEndpointResponse: ICheckResponse | null = null;
@@ -194,6 +196,7 @@ export class SpellcheckerComponent implements OnInit {
     this.isFirstRun = false;
     this.isSpellchecking = true;
     this.selectedText = ''
+    this.highlights = [];
     return Word.run(async (context) => {
       Office.context.document.getSelectedDataAsync(Office.CoercionType.Text,  (asyncResult) => {
         if (asyncResult.status == Office.AsyncResultStatus.Failed) {
@@ -216,7 +219,21 @@ export class SpellcheckerComponent implements OnInit {
         }
       }); 
       try {
+        await context.sync();
 
+        console.log('this.selectedText', this.selectedText)
+        let chunks = [];
+        while (this.selectedText.length > 0) {
+            let endOfChunk = Math.min(this.maxChunkSize, this.selectedText.length);
+            let lastSpace = this.selectedText.lastIndexOf(' ', endOfChunk);
+            let chunk = this.selectedText.substring(0, lastSpace > 0 ? lastSpace : endOfChunk);
+            chunks.push(chunk);
+            this.selectedText = this.selectedText.substring(chunk.length).trim();
+        }
+
+        console.log('chunks', chunks);
+        for (let textChunk of chunks) {
+        console.log('textChunk', textChunk);
         const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
         currentlySelectedPageparagraphs.load();
         await context.sync();
@@ -228,9 +245,10 @@ export class SpellcheckerComponent implements OnInit {
         });
 
         this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
-        this.highlights = [];
         let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
-        const newHighlights = await this.spellcheckerService.checkText(this.selectedText.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
+        console.log('his.selectedText', this.selectedText)
+        const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
+        console.log('newHighlights', newHighlights);
         if (!newHighlights) return;
         const newHighlightsExcludingOrthography = {
           ...newHighlights,
@@ -311,7 +329,8 @@ export class SpellcheckerComponent implements OnInit {
             this.highlights.sort((a, b) => {
               return a.paragraph - b.paragraph;
             });
-
+            console.log('this.highlights', this.highlights);
+          }
       } catch (error: any) {
         if (error.name === 'HttpErrorResponse' && error.status === 422) {
           this.highlights = [];
