@@ -230,9 +230,15 @@ export class SpellcheckerComponent implements OnInit {
         this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
         this.highlights = [];
         let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
-        const errs = await this.spellcheckerService.checkText(this.selectedText.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
-        if (!errs) return;
-        this.checkEndpointResponse = errs;
+        const newHighlights = await this.spellcheckerService.checkText(this.selectedText.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
+        if (!newHighlights) return;
+        const newHighlightsExcludingOrthography = {
+          ...newHighlights,
+          results: newHighlights.results.filter((result: any) => {
+            return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
+          })
+        };
+        this.checkEndpointResponse = newHighlightsExcludingOrthography;
         if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {  //prompt user to register on dashboard   
           const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
           Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
@@ -242,21 +248,15 @@ export class SpellcheckerComponent implements OnInit {
           });
         }
         const checkLogEventId = Math.random().toString(36).substring(2, 15);
-        analytics.checkLog(errs, null, this.selectedText.length, 'check', false, checkLogEventId);
+        analytics.checkLog(newHighlightsExcludingOrthography, null, this.selectedText.length, 'check', false, checkLogEventId);
 
         if (this.authResponse?.plan !== 'witty_free') {
-          const errsWithoutOrthography = {
-            ...errs,
-            results: errs.results.filter((result: any) => {
-              return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
-            })
-          };
-          errsWithoutOrthography.results.forEach((result: any) => {
+          newHighlightsExcludingOrthography.results.forEach((result: any) => {
             analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false,checkLogEventId)
           });
         }
         //mostly for analytics purposes
-        const newAlerts = errs.results.map((result) => ({
+        const newAlerts = newHighlightsExcludingOrthography.results.map((result) => ({
               id: `${result.text}-${result.category}-${result.start}${result.end}`,
               startOffset: result.start,
               endOffset: result.end,
@@ -279,10 +279,10 @@ export class SpellcheckerComponent implements OnInit {
             this.alerts = this.alerts.concat(newAlerts);
             const paragraphsWithErrors: { text: string, id: string, errors: ICheckResponseResult[] }[] = [];
 
-            errs.results.forEach(error => {
+            newHighlightsExcludingOrthography.results.forEach(highlight => {
               const paragraphIndex = this.paragraphsWithIds.findIndex(paragraph => 
-                paragraph.text.includes(error.text) && 
-                !paragraphsWithErrors.some(p => p.id === paragraph.id && p.errors.some(e => e.text === error.text))
+                paragraph.text.includes(highlight.text) && 
+                !paragraphsWithErrors.some(p => p.id === paragraph.id && p.errors.some(e => e.text === highlight.text))
               );
             
               if (paragraphIndex === -1) return;
@@ -292,19 +292,19 @@ export class SpellcheckerComponent implements OnInit {
                 paragraphsWithErrors.push({
                   text: paragraph.text,
                   id: paragraph.id,
-                  errors: [error]
+                  errors: [highlight]
                 });
               }
             
-              if (error.text === ' \v') return; // Handle whitespace or typography error in the future
+              if (highlight.text === ' \v') return; // Handle whitespace or typography error in the future
             
               this.highlights.push({
                 paragraphUniqueId: paragraph.id,
                 paragraph: paragraphIndex,
-                offset: error.start,
-                length: error.end - error.start,
-                word: error.text,
-                details: error
+                offset: highlight.start,
+                length: highlight.end - highlight.start,
+                word: highlight.text,
+                details: highlight
               });
             });
             // sort highlights by paragraph -> make sure highlights come in the right order
@@ -318,6 +318,13 @@ export class SpellcheckerComponent implements OnInit {
         } else if (error?.code === 13001) {
           this.isLoggedInWord = false;
           this.isLoggedin = false;
+        } else {
+          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+          const message = document.getElementById("issue-checking-text")
+          if (message) {
+            message.style.display = 'block';
+            message.innerHTML = lang.issueCheckingText;
+          }
         }
         console.error(error);
       }
