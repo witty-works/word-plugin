@@ -48,7 +48,7 @@ export class SpellcheckerComponent implements OnInit {
 
   selectedText = '';
 
-  maxChunkSize = 255;
+  maxChunkSize = 300;
 
   alerts: IAlert[] = [];
   authResponse: IAuthResponse | null = null;
@@ -221,7 +221,6 @@ export class SpellcheckerComponent implements OnInit {
       try {
         await context.sync();
 
-        console.log('this.selectedText', this.selectedText)
         let chunks = [];
         while (this.selectedText.length > 0) {
             let endOfChunk = Math.min(this.maxChunkSize, this.selectedText.length);
@@ -231,9 +230,7 @@ export class SpellcheckerComponent implements OnInit {
             this.selectedText = this.selectedText.substring(chunk.length).trim();
         }
 
-        console.log('chunks', chunks);
         for (let textChunk of chunks) {
-        console.log('textChunk', textChunk);
         const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
         currentlySelectedPageparagraphs.load();
         await context.sync();
@@ -246,9 +243,7 @@ export class SpellcheckerComponent implements OnInit {
 
         this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
         let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
-        console.log('his.selectedText', this.selectedText)
         const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
-        console.log('newHighlights', newHighlights);
         if (!newHighlights) return;
         const newHighlightsExcludingOrthography = {
           ...newHighlights,
@@ -329,11 +324,10 @@ export class SpellcheckerComponent implements OnInit {
             this.highlights.sort((a, b) => {
               return a.paragraph - b.paragraph;
             });
-            console.log('this.highlights', this.highlights);
           }
       } catch (error: any) {
         if (error.name === 'HttpErrorResponse' && error.status === 422) {
-          this.highlights = [];
+          //TODO: handle this
         } else if (error?.code === 13001) {
           this.isLoggedInWord = false;
           this.isLoggedin = false;

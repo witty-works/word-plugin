@@ -1,10 +1,9 @@
 <div>
-    <div style="display: flex; align-items: center;"> <!-- Container with flex layout -->
+    <div style="display: flex; align-items: center;">
         <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
             (click)="checkText()">{{lang.wittyCheck}}</button>
-        <!-- Removed fullScreen attribute and added custom styles as needed -->
-        <!-- <ngx-spinner bdColor="#f1f2f2" size="small" color="#f06464" type="line-scale"
-            [showSpinner]="isSpellchecking" style="margin-left: 10px;"></ngx-spinner> -->
+        <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale"
+            [showSpinner]="isSpellchecking" style="opacity: 70%; z-index: 99999999;"></ngx-spinner>
     </div>
 
     <div *ngIf="!isLoggedin && !isLoggedInWord" tabindex="0" class="number-spelling-errors">
