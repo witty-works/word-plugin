@@ -10,4 +10,6 @@ export const environment = {
   api: "https://default.api.witty.works/",
   dashboard: "https://dashboard.witty.works/",
   plugin: "https://word.witty.works/",
+  maxChunkSize: 500,
+  maxTextLength: 2000,
 };

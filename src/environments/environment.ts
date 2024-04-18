@@ -14,6 +14,8 @@ export const environment = {
   api: "https://dev-54ta5gq-jyeciedibdzvq.fr-4.platformsh.site/",
   dashboard: "https://dev-54ta5gq-56xlfiudba6c2.fr-4.platformsh.site/",
   plugin: "https://localhost:4200/word-plugin/",
+  maxChunkSize: 500,
+  maxTextLength: 2000,
 };
 
 /*

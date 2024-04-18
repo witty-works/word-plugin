@@ -38,8 +38,6 @@ export class SpellcheckerComponent implements OnInit {
 
   lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string };
 
-  maxTextLength = 3000; //adjust as needed
-
   hitMaxTextLength = false;
 
   noParagraphsSelected = false;
@@ -47,8 +45,6 @@ export class SpellcheckerComponent implements OnInit {
   lastParagraphChecked = 0;
 
   selectedText = '';
-
-  maxChunkSize = 300;
 
   alerts: IAlert[] = [];
   authResponse: IAuthResponse | null = null;
@@ -204,15 +200,15 @@ export class SpellcheckerComponent implements OnInit {
         }
         else {
           this.selectedText = asyncResult.value as string;
-          
+          const maxTextLength = environment.maxTextLength;
           if (this.selectedText.length === 0) {
             this.noParagraphsSelected = true;
             this.highlights = [];
             this.isSpellchecking = false;
             return;
-          } else if (this.selectedText.length > this.maxTextLength) {
+          } else if (this.selectedText.length > maxTextLength) {
             this.hitMaxTextLength = true;
-            const selectedTextWithinRange = this.selectedText.substring(0, this.maxTextLength);
+            const selectedTextWithinRange = this.selectedText.substring(0, maxTextLength);
             const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
             this.selectedText = this.selectedText.substring(0, lastSpace);
           }
@@ -223,7 +219,8 @@ export class SpellcheckerComponent implements OnInit {
 
         let chunks = [];
         while (this.selectedText.length > 0) {
-            let endOfChunk = Math.min(this.maxChunkSize, this.selectedText.length);
+            const maxChunkSize = environment.maxChunkSize;
+            let endOfChunk = Math.min(maxChunkSize, this.selectedText.length);
             let lastSpace = this.selectedText.lastIndexOf(' ', endOfChunk);
             let chunk = this.selectedText.substring(0, lastSpace > 0 ? lastSpace : endOfChunk);
             chunks.push(chunk);
