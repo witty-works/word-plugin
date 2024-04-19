@@ -38,8 +38,6 @@ export class SpellcheckerComponent implements OnInit {
 
   lastCorrectedError?: { errorIndex: number, paragraphIndex: number, paragraphText: string, errorText: string };
 
-  maxTextLength = 3000; //adjust as needed
-
   hitMaxTextLength = false;
 
   noParagraphsSelected = false;
@@ -194,6 +192,7 @@ export class SpellcheckerComponent implements OnInit {
     this.isFirstRun = false;
     this.isSpellchecking = true;
     this.selectedText = ''
+    this.highlights = [];
     return Word.run(async (context) => {
       Office.context.document.getSelectedDataAsync(Office.CoercionType.Text,  (asyncResult) => {
         if (asyncResult.status == Office.AsyncResultStatus.Failed) {
@@ -201,22 +200,34 @@ export class SpellcheckerComponent implements OnInit {
         }
         else {
           this.selectedText = asyncResult.value as string;
-          
+          const maxTextLength = environment.maxTextLength;
           if (this.selectedText.length === 0) {
             this.noParagraphsSelected = true;
             this.highlights = [];
             this.isSpellchecking = false;
             return;
-          } else if (this.selectedText.length > this.maxTextLength) {
+          } else if (this.selectedText.length > maxTextLength) {
             this.hitMaxTextLength = true;
-            const selectedTextWithinRange = this.selectedText.substring(0, this.maxTextLength);
+            const selectedTextWithinRange = this.selectedText.substring(0, maxTextLength);
             const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
             this.selectedText = this.selectedText.substring(0, lastSpace);
           }
         }
       }); 
       try {
+        await context.sync();
 
+        let chunks = [];
+        while (this.selectedText.length > 0) {
+            const maxChunkSize = environment.maxChunkSize;
+            let endOfChunk = Math.min(maxChunkSize, this.selectedText.length);
+            let lastSpace = this.selectedText.lastIndexOf(' ', endOfChunk);
+            let chunk = this.selectedText.substring(0, lastSpace > 0 ? lastSpace : endOfChunk);
+            chunks.push(chunk);
+            this.selectedText = this.selectedText.substring(chunk.length).trim();
+        }
+
+        for (let textChunk of chunks) {
         const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
         currentlySelectedPageparagraphs.load();
         await context.sync();
@@ -228,9 +239,8 @@ export class SpellcheckerComponent implements OnInit {
         });
 
         this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
-        this.highlights = [];
         let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
-        const newHighlights = await this.spellcheckerService.checkText(this.selectedText.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
+        const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
         if (!newHighlights) return;
         const newHighlightsExcludingOrthography = {
           ...newHighlights,
@@ -311,10 +321,10 @@ export class SpellcheckerComponent implements OnInit {
             this.highlights.sort((a, b) => {
               return a.paragraph - b.paragraph;
             });
-
+          }
       } catch (error: any) {
         if (error.name === 'HttpErrorResponse' && error.status === 422) {
-          this.highlights = [];
+          //TODO: handle this
         } else if (error?.code === 13001) {
           this.isLoggedInWord = false;
           this.isLoggedin = false;

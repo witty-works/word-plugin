@@ -1,6 +1,10 @@
 <div>
-    <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
-        (click)="checkText()">{{lang.wittyCheck}}</button>
+    <div style="display: flex; align-items: center;">
+        <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
+            (click)="checkText()">{{lang.wittyCheck}}</button>
+        <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale"
+            [showSpinner]="isSpellchecking" style="opacity: 70%; z-index: 99999999;"></ngx-spinner>
+    </div>
 
     <div *ngIf="!isLoggedin && !isLoggedInWord" tabindex="0" class="number-spelling-errors">
          <p>{{lang.wittyInfos}}</p>
@@ -40,17 +44,13 @@
         <span>{{lang.clickWittyCheck}}</span>
     </div>
 
-    <div class="full-size-notification" *ngIf="isLoggedInWord && !isFirstRun && highlights.length === 0 && !noParagraphsSelected">
+    <div class="full-size-notification" *ngIf="isLoggedInWord && !isFirstRun && highlights.length === 0 && !noParagraphsSelected && !isSpellchecking">
         <span>{{lang.noFurtherSuggestions}}</span>
     </div>
 
     <div class="full-size-notification" *ngIf="isLoggedInWord && !isFirstRun && noParagraphsSelected">
         <span>{{lang.noParagraphsSelected}}</span>
     </div>
-
-    <ngx-spinner bdColor="#f1f2f2" size="medium" color="#f06464" type="line-scale" [fullScreen]="true"
-        [showSpinner]="isSpellchecking"></ngx-spinner>
-
 
     <ng-template #errorDialog>
         <header>
