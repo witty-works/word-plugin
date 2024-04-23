@@ -221,8 +221,7 @@ export class SpellcheckerComponent implements OnInit {
         while (this.selectedText.length > 0) {
             const maxChunkSize = environment.maxChunkSize;
             let endOfChunk = Math.min(maxChunkSize, this.selectedText.length);
-            let lastSpace = this.selectedText.lastIndexOf(' ', endOfChunk);
-            let chunk = this.selectedText.substring(0, lastSpace > 0 ? lastSpace : endOfChunk);
+            let chunk = this.selectedText.substring(0, endOfChunk);
             chunks.push(chunk);
             this.selectedText = this.selectedText.substring(chunk.length).trim();
         }
@@ -239,8 +238,15 @@ export class SpellcheckerComponent implements OnInit {
         });
 
         this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
+        this.paragraphsWithIds = this.paragraphsWithIds.filter(paragraph => paragraph.text !== "");
         let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
-        const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
+        //if multiple \r in the text, replace the first one with a space, the rest with nothing
+        let textChunkFiltered = textChunk.replace(/\r/, ' ').replace(/\r/g, '');
+
+        //same with \u000b
+        textChunkFiltered = textChunkFiltered.replace(/\u000b/, ' ')
+
+        const newHighlights = await this.spellcheckerService.checkText(textChunkFiltered, accessTokenWithTimestamp.token);
         if (!newHighlights) return;
         const newHighlightsExcludingOrthography = {
           ...newHighlights,
@@ -289,11 +295,25 @@ export class SpellcheckerComponent implements OnInit {
             this.alerts = this.alerts.concat(newAlerts);
             const paragraphsWithErrors: { text: string, id: string, errors: ICheckResponseResult[] }[] = [];
 
+            //paragraph id wrong
+            console.log('newHighlightsExcludingOrthography', newHighlightsExcludingOrthography)
+            console.log('this.paragraphsWithIds', this.paragraphsWithIds)
+
             newHighlightsExcludingOrthography.results.forEach(highlight => {
-              const paragraphIndex = this.paragraphsWithIds.findIndex(paragraph => 
-                paragraph.text.includes(highlight.text) && 
-                !paragraphsWithErrors.some(p => p.id === paragraph.id && p.errors.some(e => e.text === highlight.text))
+              console.log('highlight', highlight)
+              let textLength = 0
+              const paragraphIndex = this.paragraphsWithIds.findIndex(paragraph => {
+                console.log('word found', paragraph.text.substring(highlight.start - textLength, highlight.end - textLength))
+                //get text between start and end of highlight to check if it is in the paragraph
+                const highlightFound = paragraph.text.substring(highlight.start - textLength - 1, highlight.end - textLength).includes(highlight.text) //-1 is for the \r
+                && !paragraphsWithErrors.some(p => p.id === paragraph.id && p.errors.some(e => e.text === highlight.text)) //figure out if this is correct
+                textLength += paragraph.text.length; 
+
+                return highlightFound
+                
+              }
               );
+              console.log('paragraphIndex', paragraphIndex)
             
               if (paragraphIndex === -1) return;
             
