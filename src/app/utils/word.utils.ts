@@ -23,7 +23,7 @@ export default class DocumentUtils {
                 matchCase: true,
             });
 
-            const paragraphRange = paragraphRangeCollection.getFirstOrNullObject(); //get paragraph at index here        
+            const paragraphRange = paragraphRangeCollection.getFirstOrNullObject(); //get paragraph at index here
 
             paragraphRange.load('isNullObject');
 

@@ -193,6 +193,7 @@ export class SpellcheckerComponent implements OnInit {
     this.isSpellchecking = true;
     this.selectedText = ''
     this.highlights = [];
+    const previouslyCheckedParagraphs: { text: string, id: string, errors: ICheckResponseResult[] }[] = [];
     return Word.run(async (context) => {
       Office.context.document.getSelectedDataAsync(Office.CoercionType.Text,  (asyncResult) => {
         if (asyncResult.status == Office.AsyncResultStatus.Failed) {
@@ -215,18 +216,7 @@ export class SpellcheckerComponent implements OnInit {
         }
       }); 
       try {
-        await context.sync();
-
-        let chunks = [];
-        while (this.selectedText.length > 0) {
-            const maxChunkSize = environment.maxChunkSize;
-            let endOfChunk = Math.min(maxChunkSize, this.selectedText.length);
-            let chunk = this.selectedText.substring(0, endOfChunk);
-            chunks.push(chunk);
-            this.selectedText = this.selectedText.substring(chunk.length).trim();
-        }
-
-        for (let textChunk of chunks) {
+        // if (this.selectedText.length === 0) return;
         const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
         currentlySelectedPageparagraphs.load();
         await context.sync();
@@ -240,13 +230,9 @@ export class SpellcheckerComponent implements OnInit {
         this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
         this.paragraphsWithIds = this.paragraphsWithIds.filter(paragraph => paragraph.text !== "");
         let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
-        //if multiple \r in the text, replace the first one with a space, the rest with nothing
-        let textChunkFiltered = textChunk.replace(/\r/, ' ').replace(/\r/g, '');
-
-        //same with \u000b
-        textChunkFiltered = textChunkFiltered.replace(/\u000b/, ' ')
-
-        const newHighlights = await this.spellcheckerService.checkText(textChunkFiltered, accessTokenWithTimestamp.token);
+        for (let textChunk of  paragraphCollection.items) {
+          if(textChunk.text === "") continue;
+        const newHighlights = await this.spellcheckerService.checkText(textChunk.text, accessTokenWithTimestamp.token);
         if (!newHighlights) return;
         const newHighlightsExcludingOrthography = {
           ...newHighlights,
@@ -293,41 +279,24 @@ export class SpellcheckerComponent implements OnInit {
               },
             }))
             this.alerts = this.alerts.concat(newAlerts);
-            const paragraphsWithErrors: { text: string, id: string, errors: ICheckResponseResult[] }[] = [];
 
-            //paragraph id wrong
-            console.log('newHighlightsExcludingOrthography', newHighlightsExcludingOrthography)
-            console.log('this.paragraphsWithIds', this.paragraphsWithIds)
 
             newHighlightsExcludingOrthography.results.forEach(highlight => {
-              console.log('highlight', highlight)
-              let textLength = 0
-              const paragraphIndex = this.paragraphsWithIds.findIndex(paragraph => {
-                console.log('word found', paragraph.text.substring(highlight.start - textLength, highlight.end - textLength))
-                //get text between start and end of highlight to check if it is in the paragraph
-                const highlightFound = paragraph.text.substring(highlight.start - textLength - 1, highlight.end - textLength).includes(highlight.text) //-1 is for the \r
-                && !paragraphsWithErrors.some(p => p.id === paragraph.id && p.errors.some(e => e.text === highlight.text)) //figure out if this is correct
-                textLength += paragraph.text.length; 
-
-                return highlightFound
-                
-              }
-              );
-              console.log('paragraphIndex', paragraphIndex)
-            
-              if (paragraphIndex === -1) return;
-            
+              const paragraphIndex = this.paragraphsWithIds.findIndex((paragraph) => {
+                //filter out highlights if previous paragraph had identical text -> because we can not differentiate and highlight always the first in this case
+                if(previouslyCheckedParagraphs.some((checkedParagraph) => checkedParagraph.text === paragraph.text && checkedParagraph.errors.some((error) => error.text === highlight.text))) {
+                    return false;
+                } 
+                return paragraph.text.substring(highlight.start, highlight.end).includes(highlight.text)
+              });
+              if (paragraphIndex === -1) return;          
               const paragraph = this.paragraphsWithIds[paragraphIndex];
-              if (!paragraphsWithErrors.some(p => p.id === paragraph.id)) {
-                paragraphsWithErrors.push({
+              previouslyCheckedParagraphs.push({
                   text: paragraph.text,
                   id: paragraph.id,
                   errors: [highlight]
                 });
-              }
-            
-              if (highlight.text === ' \v') return; // Handle whitespace or typography error in the future
-            
+                        
               this.highlights.push({
                 paragraphUniqueId: paragraph.id,
                 paragraph: paragraphIndex,
@@ -341,6 +310,8 @@ export class SpellcheckerComponent implements OnInit {
             this.highlights.sort((a, b) => {
               return a.paragraph - b.paragraph;
             });
+
+            //within the paragraph, order by start offset
           }
       } catch (error: any) {
         if (error.name === 'HttpErrorResponse' && error.status === 422) {
@@ -375,72 +346,64 @@ export class SpellcheckerComponent implements OnInit {
 
   async highlight(obj: { paragraphIndex: number, errorIndex: number }) {
     await Word.run(async (context) => {
-      try {
-        const paragraphText = this.getLineText(obj.paragraphIndex);
-        const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
-        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, errorText);
+        try {
+            // Get the paragraph text and the error object using their respective indices.
+            const paragraphText = this.paragraphsWithIds[obj.paragraphIndex].text;
+            //necessary because you get slightly different result when fetching a single paragraph vs all paragraphs
+            const leadingSpaces = paragraphText.match(/\u000b+/);
+            //count number of \u000b in the paragraphOffset match
+            const paragraphOffset = leadingSpaces ? leadingSpaces[0].length : 0;
+            const error = this.highlights[obj.errorIndex];
+            // Fetch the paragraph range using the paragraph text.
+            const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
 
-        errorRange.select('Select');
-        await context.sync();
-      } catch (e) {
-        this.handleError(e);
-      }
+            // Load the paragraph range text to obtain the full content, including any possible changes.
+            paragraphRange.load('text');
+            await context.sync();
+
+            // Search for all instances of the error word within the paragraph range.
+            const searchResults = paragraphRange.search(error.word, { matchCase: true});
+            context.load(searchResults, 'text');
+            await context.sync();
+
+            // Prepare to find the actual range to highlight by calculating offsets.
+            let previousStartOffset = 0;
+            let foundMatchingRange = false;
+            for (const item of searchResults.items) {
+                // Calculate the start offset of this instance of the error word.
+                const startOffset = paragraphRange.text.indexOf(item.text, previousStartOffset);
+                if (startOffset + paragraphOffset === error.offset) {
+                    const errorRange = item;
+                    errorRange.select('Select');
+                    await context.sync();
+
+                    foundMatchingRange = true;
+                    break;
+                }
+                previousStartOffset = startOffset + 1;
+            }
+
+            if (!foundMatchingRange) {
+                console.error('The error text was not found at the specified offset.');
+            }
+        } catch (e) {
+            this.handleError(e);
+        }
     });
   }
 
-  acceptSuggestion(obj: { paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
-    Word.run(async (context) => {
+  async acceptSuggestion(obj: { paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
+    await Word.run(async (context) => {
       try {
-        const paragraphText = this.getLineText(obj.paragraphIndex);
-        const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
-
-        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
-
-        const alertRelevantToSuggestion = this.alerts.find(a => a.data.text === errorText);
-        alertRelevantToSuggestion && analytics.alternativeLog(alertRelevantToSuggestion, obj.suggestion.text);
-
-        errorRange.insertText(obj.suggestion.text, 'Replace');
-
-        errorRange.select('End');
-
-        const newParagraph = paragraphRange.paragraphs.getFirst();
-        newParagraph.load('text');
+        const highlightedText = context.document.getSelection()
+        highlightedText.load();
         await context.sync();
-
-        this.updateLineText(obj.paragraphIndex, newParagraph.text);
-
-        this.lastCorrectedError = {
-          errorIndex: obj.errorIndex,
-          paragraphIndex: obj.paragraphIndex,
-          paragraphText: paragraphText,
-          errorText: errorText
-        };
-
-        this.removeGrammarError(obj.errorIndex);
-
+        highlightedText.insertText(obj.suggestion.text, "Replace");
         await context.sync();
       } catch (e) {
-        this.handleError(e);
+          this.handleError(e);
       }
     });
-  }
-
-  private getLineText(lineIndex: number): string {
-    return this.paragraphsWithIds[lineIndex].text;
-  }
-
-  private updateLineText(lineIndex: number, newText: string): void {
-    this.paragraphsWithIds[lineIndex].text = newText;
-  }
-
-  private getGrammarErrorText(errorIndex: number): string {
-    return this.highlights[errorIndex].word;
-  }
-
-  private removeGrammarError(errorIndex: number) {
-    this.highlights.splice(errorIndex, 1);
   }
 
   insertGrammarError(errorIndex: number, error: ISpellingError) {
