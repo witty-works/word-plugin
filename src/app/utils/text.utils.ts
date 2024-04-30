@@ -1,7 +1,7 @@
 import { ISpellingError } from "../data/data-structures";
 
 export default class TextUtils {
-    static getContext(error: ISpellingError, paragraphsWithIds: { text: string, id: string }[], allHighlights: ISpellingError[]): string | undefined {
+    static getContext(error: ISpellingError, paragraphsWithIds: { text: string, id: string }[]): string | undefined {
         const searchTerm = error.word;
         const paragraph = paragraphsWithIds.find((paragraph) => paragraph.id === error.paragraphUniqueId);
         if (!paragraph) {
@@ -16,10 +16,7 @@ export default class TextUtils {
 
         let match;
         while ((match = regExp.exec(text)) !== null) {
-            const matchOffset = match.index + match[1].length;
-            if (matchOffset === error.offset) {
-                return match[0];
-            }
+            return match[0];
         }
 
         return undefined;

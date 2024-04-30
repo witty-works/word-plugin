@@ -48,7 +48,7 @@ export class ErrorComponent {
   }
 
   getContextErrorComponent(error: ISpellingError) {
-    let ctxt = TextUtils.getContext(error, this.paragraphsWithIds, this.highlights);
+    let ctxt = TextUtils.getContext(error, this.paragraphsWithIds);
     if (ctxt) {
       ctxt = ctxt.replace(/()/g, '<img src="assets/icons/soft-return.svg" class="soft-return-icon" alt="Soft return icon"><br>');
     } else {
