@@ -85,17 +85,38 @@ export class SpellcheckerComponent implements OnInit {
         const updatedParagraphs = body.paragraphs.load({
           text: true,
         });
-        this.paragraphsWithIds = updatedParagraphs.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
+        const previousParagraphsWithIds = this.paragraphsWithIds;
+        this.paragraphsWithIds = updatedParagraphs.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId })).filter(paragraph => paragraph.text !== "");
         const changedParagraph = this.paragraphsWithIds.find(paragraph => paragraph.id === event.uniqueLocalIds[0]);
         if(!changedParagraph) return; 
         await context.sync();
 
-        const errorsInChangedParagraph = this.highlights.filter(error => error.paragraphUniqueId === event.uniqueLocalIds[0]);
-        errorsInChangedParagraph.forEach((error) => {
-          if(!changedParagraph.text.includes(error.word)) {
-            this.highlights = this.highlights.filter(e => e.word !== error.word);
+        let offsetChange = 0;
+        let indexOfFirstChange = 0
+        previousParagraphsWithIds.map((paragraph) => {
+          if(paragraph.id === event.uniqueLocalIds[0]) {
+            offsetChange = changedParagraph.text.replace(/^\u000b+/, '').length - paragraph.text.replace(/^\u000b+/, '').length;
+            //find the first change where previous paragraph and changed paragraph differ
+            indexOfFirstChange = paragraph.text.replace(/^\u000b+/, '').split('').findIndex((char, index) => char !== changedParagraph.text.replace(/^\u000b+/, '')[index]);
+            return { text: changedParagraph.text, id: paragraph.id };
           }
-      }); 
+          return paragraph;
+        });
+        
+        //move highlight according to changes
+        this.highlights = this.highlights.map((highlight) => {
+          if (highlight.paragraphUniqueId === event.uniqueLocalIds[0]) {
+            //make sure the highlight is after the change
+            if (highlight.offset < indexOfFirstChange) {
+              return highlight;
+            }
+            return {
+              ...highlight,
+              offset: highlight.offset + offsetChange
+            }
+          }
+          return highlight;
+        });
       }
       catch (e) {
         this.handleError(e);
@@ -391,7 +412,7 @@ export class SpellcheckerComponent implements OnInit {
             }
 
             if (!foundMatchingRange) {
-                console.error('The error text was not found at the specified offset.');
+              this.handleError(new Error('The range for the error was not found: ' + error.word));
             }
         } catch (e) {
             this.handleError(e);
