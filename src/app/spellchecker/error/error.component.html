@@ -19,6 +19,7 @@
                 <div class="witty-works-ext-explanation-icon">{{error.details.explanation.icon}}</div>
                 <div>
                   <b>{{error.details.label.split(':').pop()}}</b>
+                  <br>
                   {{error.details.explanation.text}}
                   {{error.details.explanation.context ? ' (' + error.details.explanation.context + ')' : ''}}
                 </div>
@@ -54,9 +55,9 @@
                 (mouseleave)="suggestion.hovered = false" 
                 [ngStyle]="{'text-decoration': suggestion.text ? 'none' : 'line-through'}">
                   {{ suggestion.text 
-                    ? (suggestion.hovered || !suggestion.context || suggestion.text.length <= 20)
-                      ? suggestion.text 
-                      : (suggestion.text.substring(0, 15) + '..')
+                    ? (suggestion.hovered || suggestion.text.length <= 25)
+                      ? suggestion.text
+                      : (suggestion.text.substring(0, 25) + '..')
                     : error.word
                   }}
               </button>
