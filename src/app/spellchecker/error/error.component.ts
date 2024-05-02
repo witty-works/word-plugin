@@ -61,6 +61,11 @@ export class ErrorComponent {
       return alert.data.text === this.error?.word;
     });
 
+    this.suggestions = this.suggestions.map((suggestion) => {
+      suggestion.text = suggestion.text.replace(/\(\(/g, '[').replace(/\)\)/g, ']');
+      return suggestion;
+    });
+
     if (!this.isOpen) {
       this.isOpen = true;
       alertRelevantToSuggestion && analytics.popoverLogs(alertRelevantToSuggestion, 'popover_open');
