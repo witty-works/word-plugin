@@ -14,8 +14,8 @@ export default class TextUtils {
 
         regExp.lastIndex = Math.max(0, error.offset - 100);  // start 100 characters back, adjust as necessary
 
-        let match;
-        while ((match = regExp.exec(text)) !== null) {
+        const match = regExp.exec(text);
+        if (match) {
             return match[0];
         }
 
