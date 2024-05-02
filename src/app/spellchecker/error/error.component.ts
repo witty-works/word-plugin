@@ -39,6 +39,8 @@ export class ErrorComponent {
   alerts: IAlert[] = this.spellcheckerComponent.alerts;
 
   paragraphsWithIds: { text: string, id: string }[] = this.spellcheckerComponent.paragraphsWithIds;
+
+  highlights: ISpellingError[] = this.spellcheckerComponent.highlights;
   
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 

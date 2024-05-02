@@ -46,6 +46,8 @@ export class SpellcheckerComponent implements OnInit {
 
   selectedText = '';
 
+  previouslyCheckedParagraphs: { text: string, id: string, errors: ICheckResponseResult[] }[] = [];
+
   alerts: IAlert[] = [];
   authResponse: IAuthResponse | null = null;
   checkEndpointResponse: ICheckResponse | null = null;
@@ -83,17 +85,38 @@ export class SpellcheckerComponent implements OnInit {
         const updatedParagraphs = body.paragraphs.load({
           text: true,
         });
-        this.paragraphsWithIds = updatedParagraphs.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
+        const previousParagraphsWithIds = this.paragraphsWithIds;
+        this.paragraphsWithIds = updatedParagraphs.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId })).filter(paragraph => paragraph.text !== "");
         const changedParagraph = this.paragraphsWithIds.find(paragraph => paragraph.id === event.uniqueLocalIds[0]);
         if(!changedParagraph) return; 
         await context.sync();
 
-        const errorsInChangedParagraph = this.highlights.filter(error => error.paragraphUniqueId === event.uniqueLocalIds[0]);
-        errorsInChangedParagraph.forEach((error) => {
-          if(!changedParagraph.text.includes(error.word)) {
-            this.highlights = this.highlights.filter(e => e.word !== error.word);
+        let offsetChange = 0;
+        let indexOfFirstChange = 0
+        previousParagraphsWithIds.map((paragraph) => {
+          if(paragraph.id === event.uniqueLocalIds[0]) {
+            offsetChange = changedParagraph.text.replace(/^\u000b+/, '').length - paragraph.text.replace(/^\u000b+/, '').length;
+            //find the first change where previous paragraph and changed paragraph differ
+            indexOfFirstChange = paragraph.text.replace(/^\u000b+/, '').split('').findIndex((char, index) => char !== changedParagraph.text.replace(/^\u000b+/, '')[index]);
+            return { text: changedParagraph.text, id: paragraph.id };
           }
-      }); 
+          return paragraph;
+        });
+        
+        //move highlight according to changes
+        this.highlights = this.highlights.map((highlight) => {
+          if (highlight.paragraphUniqueId === event.uniqueLocalIds[0]) {
+            //make sure the highlight is after the change
+            if (highlight.offset < indexOfFirstChange) {
+              return highlight;
+            }
+            return {
+              ...highlight,
+              offset: highlight.offset + offsetChange
+            }
+          }
+          return highlight;
+        });
       }
       catch (e) {
         this.handleError(e);
@@ -193,13 +216,14 @@ export class SpellcheckerComponent implements OnInit {
     this.isSpellchecking = true;
     this.selectedText = ''
     this.highlights = [];
+    this.previouslyCheckedParagraphs = [];
+    
     return Word.run(async (context) => {
-      Office.context.document.getSelectedDataAsync(Office.CoercionType.Text,  (asyncResult) => {
+      Office.context.document.getSelectedDataAsync(Office.CoercionType.Text, async (asyncResult) => {
         if (asyncResult.status == Office.AsyncResultStatus.Failed) {
-            console.log('Action failed. Error: ' + asyncResult.error.message);
-        }
-        else {
-          this.selectedText = asyncResult.value as string;
+          console.log('Action failed. Error: ' + asyncResult.error.message);
+        } else {
+          this.selectedText = asyncResult.value as string;  
           const maxTextLength = environment.maxTextLength;
           if (this.selectedText.length === 0) {
             this.noParagraphsSelected = true;
@@ -212,136 +236,135 @@ export class SpellcheckerComponent implements OnInit {
             const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
             this.selectedText = this.selectedText.substring(0, lastSpace);
           }
+          
+          // Continue with further operations inside this callback or call a separate async function
+          await this.processSelectedText(context);
         }
-      }); 
-      try {
-        await context.sync();
+      });
+    });
+  }
+  
+  async processSelectedText(context: Word.RequestContext ): Promise<void> {
+    try {
+      if (this.selectedText.length === 0) return;
+      let chunks = this.selectedText.split(/\r/);
+      chunks = chunks.filter((paragraph) => paragraph !== "");
 
-        let chunks = [];
-        while (this.selectedText.length > 0) {
-            const maxChunkSize = environment.maxChunkSize;
-            let endOfChunk = Math.min(maxChunkSize, this.selectedText.length);
-            let lastSpace = this.selectedText.lastIndexOf(' ', endOfChunk);
-            let chunk = this.selectedText.substring(0, lastSpace > 0 ? lastSpace : endOfChunk);
-            chunks.push(chunk);
-            this.selectedText = this.selectedText.substring(chunk.length).trim();
-        }
+      const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
+      currentlySelectedPageparagraphs.load();
+      await context.sync();
+  
+      context.load(currentlySelectedPageparagraphs);
+      await context.sync();
+      const paragraphCollection = currentlySelectedPageparagraphs.load({
+        text: true,
+      });
 
-        for (let textChunk of chunks) {
-        const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
-        currentlySelectedPageparagraphs.load();
-        await context.sync();
-    
-        context.load(currentlySelectedPageparagraphs);
-        await context.sync();
-        const paragraphCollection = currentlySelectedPageparagraphs.load({
-          text: true,
+      this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => ({ text: paragraph.text.replace(/^\u000b+/, ''), id: paragraph.uniqueLocalId }));
+      this.paragraphsWithIds = this.paragraphsWithIds.filter(paragraph => paragraph.text !== "");
+      let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
+      for (let textChunk of chunks) {
+      if(textChunk === "") continue;
+      const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/^\u000b+/, ''), accessTokenWithTimestamp.token);
+      if (!newHighlights) return;
+      const newHighlightsExcludingOrthography = {
+        ...newHighlights,
+        results: newHighlights.results.filter((result: any) => {
+          return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
+        })
+      };
+      this.checkEndpointResponse = newHighlightsExcludingOrthography;
+      if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {  //prompt user to register on dashboard   
+        const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
+        Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
+          if (result.status === Office.AsyncResultStatus.Failed) {
+            console.log('result.error', result.error);
+          }
         });
+      }
+      const checkLogEventId = Math.random().toString(36).substring(2, 15);
+      analytics.checkLog(newHighlightsExcludingOrthography, null, this.selectedText.length, 'check', false, checkLogEventId);
 
-        this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId }));
-        let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
-        const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/\u000b/g, '\n'), accessTokenWithTimestamp.token);
-        if (!newHighlights) return;
-        const newHighlightsExcludingOrthography = {
-          ...newHighlights,
-          results: newHighlights.results.filter((result: any) => {
-            return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
-          })
-        };
-        this.checkEndpointResponse = newHighlightsExcludingOrthography;
-        if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {  //prompt user to register on dashboard   
-          const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
-          Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
-            if (result.status === Office.AsyncResultStatus.Failed) {
-              console.log('result.error', result.error);
-            }
-          });
-        }
-        const checkLogEventId = Math.random().toString(36).substring(2, 15);
-        analytics.checkLog(newHighlightsExcludingOrthography, null, this.selectedText.length, 'check', false, checkLogEventId);
+      if (this.authResponse?.plan !== 'witty_free') {
+        newHighlightsExcludingOrthography.results.forEach((result: any) => {
+          analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false,checkLogEventId)
+        });
+      }
+      //mostly for analytics purposes
+      const newAlerts = newHighlightsExcludingOrthography.results.map((result) => ({
+            id: `${result.text}-${result.category}-${result.start}${result.end}`,
+            startOffset: result.start,
+            endOffset: result.end,
+            popOverIsOpen: false,
+            organizationId: this.authResponse?.organization_id,
+            userId: this.authResponse?.id,
+            plan: this.authResponse?.plan,
+            data: {
+              language: this.checkEndpointResponse?.language || 'en',
+              category: result.category,
+              subcategory: result.subcategory,
+              context: result.context,
+              text: result.text,
+              label: result.label,
+              explanation: result.explanation,
+              alternatives: result.alternatives,
+              gravity: result.gravity,
+            },
+          }))
+          this.alerts = this.alerts.concat(newAlerts);
 
-        if (this.authResponse?.plan !== 'witty_free') {
-          newHighlightsExcludingOrthography.results.forEach((result: any) => {
-            analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false,checkLogEventId)
-          });
-        }
-        //mostly for analytics purposes
-        const newAlerts = newHighlightsExcludingOrthography.results.map((result) => ({
-              id: `${result.text}-${result.category}-${result.start}${result.end}`,
-              startOffset: result.start,
-              endOffset: result.end,
-              popOverIsOpen: false,
-              organizationId: this.authResponse?.organization_id,
-              userId: this.authResponse?.id,
-              plan: this.authResponse?.plan,
-              data: {
-                language: this.checkEndpointResponse?.language || 'en',
-                category: result.category,
-                subcategory: result.subcategory,
-                context: result.context,
-                text: result.text,
-                label: result.label,
-                explanation: result.explanation,
-                alternatives: result.alternatives,
-                gravity: result.gravity,
-              },
-            }))
-            this.alerts = this.alerts.concat(newAlerts);
-            const paragraphsWithErrors: { text: string, id: string, errors: ICheckResponseResult[] }[] = [];
 
-            newHighlightsExcludingOrthography.results.forEach(highlight => {
-              const paragraphIndex = this.paragraphsWithIds.findIndex(paragraph => 
-                paragraph.text.includes(highlight.text) && 
-                !paragraphsWithErrors.some(p => p.id === paragraph.id && p.errors.some(e => e.text === highlight.text))
-              );
-            
-              if (paragraphIndex === -1) return;
-            
-              const paragraph = this.paragraphsWithIds[paragraphIndex];
-              if (!paragraphsWithErrors.some(p => p.id === paragraph.id)) {
-                paragraphsWithErrors.push({
-                  text: paragraph.text,
-                  id: paragraph.id,
-                  errors: [highlight]
-                });
-              }
-            
-              if (highlight.text === ' \v') return; // Handle whitespace or typography error in the future
-            
-              this.highlights.push({
-                paragraphUniqueId: paragraph.id,
-                paragraph: paragraphIndex,
-                offset: highlight.start,
-                length: highlight.end - highlight.start,
-                word: highlight.text,
-                details: highlight
+          newHighlightsExcludingOrthography.results.forEach(highlight => {
+            const paragraphIndex = this.paragraphsWithIds.findIndex((paragraph) => {
+              //filter out highlights if previous paragraph had identical text -> because we can not differentiate and highlight always the first in this case
+              if(this.previouslyCheckedParagraphs.some((checkedParagraph) => checkedParagraph.text === paragraph.text && checkedParagraph.errors.some((error) => error.text === highlight.text))) {
+                return false;
+              } 
+              const errorMargin = 0;
+              return paragraph.text.substring(highlight.start - errorMargin, highlight.end + errorMargin).includes(highlight.text)
+            });
+            if (paragraphIndex === -1) return;          
+            const paragraph = this.paragraphsWithIds[paragraphIndex];
+            this.previouslyCheckedParagraphs.push({
+                text: paragraph.text,
+                id: paragraph.id,
+                errors: [highlight]
               });
+                      
+            this.highlights.push({
+              paragraphUniqueId: paragraph.id,
+              paragraph: paragraphIndex,
+              offset: highlight.start,
+              length: highlight.end - highlight.start,
+              word: highlight.text,
+              details: highlight
             });
-            // sort highlights by paragraph -> make sure highlights come in the right order
-            this.highlights.sort((a, b) => {
-              return a.paragraph - b.paragraph;
-            });
-          }
-      } catch (error: any) {
-        if (error.name === 'HttpErrorResponse' && error.status === 422) {
-          //TODO: handle this
-        } else if (error?.code === 13001) {
-          this.isLoggedInWord = false;
-          this.isLoggedin = false;
-        } else {
-          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-          const message = document.getElementById("issue-checking-text")
-          if (message) {
-            message.style.display = 'block';
-            message.innerHTML = lang.issueCheckingText;
-          }
+          });
+          // sort highlights by paragraph -> make sure highlights come in the right order
+          this.highlights.sort((a, b) => {
+            return a.paragraph - b.paragraph;
+          });
+          //within the paragraph, order by start offset
         }
-        console.error(error);
+    } catch (error: any) {
+      if (error.name === 'HttpErrorResponse' && error.status === 422) {
+        //TODO: handle this
+      } else if (error?.code === 13001) {
+        this.isLoggedInWord = false;
+        this.isLoggedin = false;
+      } else {
+        const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+        const message = document.getElementById("issue-checking-text")
+        if (message) {
+          message.style.display = 'block';
+          message.innerHTML = lang.issueCheckingText;
+        }
       }
-      finally {
-        this.isSpellchecking = false;
-      }
-    })
+      console.error(error);
+    }
+    finally {
+      this.isSpellchecking = false;
+    }
   }
 
   updatehighlights() {
@@ -355,72 +378,60 @@ export class SpellcheckerComponent implements OnInit {
 
   async highlight(obj: { paragraphIndex: number, errorIndex: number }) {
     await Word.run(async (context) => {
-      try {
-        const paragraphText = this.getLineText(obj.paragraphIndex);
-        const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
-        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, errorText);
+        try {
+            // Get the paragraph text and the error object using their respective indices.
+            const paragraphText = this.paragraphsWithIds[obj.paragraphIndex].text;
+            const error = this.highlights[obj.errorIndex];
+            // Fetch the paragraph range using the paragraph text.
+            const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
 
-        errorRange.select('Select');
-        await context.sync();
-      } catch (e) {
-        this.handleError(e);
-      }
+            // Load the paragraph range text to obtain the full content, including any possible changes.
+            paragraphRange.load('text');
+            await context.sync();
+
+            // Search for all instances of the error word within the paragraph range.
+            const searchResults = paragraphRange.search(error.word, { matchCase: true});
+            context.load(searchResults, 'text');
+            await context.sync();
+
+            // Prepare to find the actual range to highlight by calculating offsets.
+            let previousStartOffset = 0;
+            let foundMatchingRange = false;
+            for (const item of searchResults.items) {
+                // Calculate the start offset of this instance of the error word.
+                const startOffset = paragraphRange.text.indexOf(item.text, previousStartOffset);
+                if (startOffset === error.offset) {
+                    const errorRange = item;
+                    errorRange.select('Select');
+                    await context.sync();
+
+                    foundMatchingRange = true;
+                    break;
+                }
+                previousStartOffset = startOffset + 1;
+            }
+
+            if (!foundMatchingRange) {
+              this.handleError(new Error('The range for the error was not found: ' + error.word));
+            }
+        } catch (e) {
+            this.handleError(e);
+        }
     });
   }
 
-  acceptSuggestion(obj: { paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
-    Word.run(async (context) => {
+  async acceptSuggestion(obj: { paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
+    await Word.run(async (context) => {
       try {
-        const paragraphText = this.getLineText(obj.paragraphIndex);
-        const errorText = this.getGrammarErrorText(obj.errorIndex);
-        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
-
-        const errorRange = await DocumentUtils.fetchTextBounds(context, paragraphRange, obj.suggestion.text.length == 0 ? errorText + " " : errorText);
-
-        const alertRelevantToSuggestion = this.alerts.find(a => a.data.text === errorText);
-        alertRelevantToSuggestion && analytics.alternativeLog(alertRelevantToSuggestion, obj.suggestion.text);
-
-        errorRange.insertText(obj.suggestion.text, 'Replace');
-
-        errorRange.select('End');
-
-        const newParagraph = paragraphRange.paragraphs.getFirst();
-        newParagraph.load('text');
+        const highlightedText = context.document.getSelection()
+        highlightedText.load();
         await context.sync();
-
-        this.updateLineText(obj.paragraphIndex, newParagraph.text);
-
-        this.lastCorrectedError = {
-          errorIndex: obj.errorIndex,
-          paragraphIndex: obj.paragraphIndex,
-          paragraphText: paragraphText,
-          errorText: errorText
-        };
-
-        this.removeGrammarError(obj.errorIndex);
-
+        highlightedText.insertText(obj.suggestion.text, "Replace");
         await context.sync();
       } catch (e) {
-        this.handleError(e);
+          this.handleError(e);
       }
     });
-  }
-
-  private getLineText(lineIndex: number): string {
-    return this.paragraphsWithIds[lineIndex].text;
-  }
-
-  private updateLineText(lineIndex: number, newText: string): void {
-    this.paragraphsWithIds[lineIndex].text = newText;
-  }
-
-  private getGrammarErrorText(errorIndex: number): string {
-    return this.highlights[errorIndex].word;
-  }
-
-  private removeGrammarError(errorIndex: number) {
-    this.highlights.splice(errorIndex, 1);
   }
 
   insertGrammarError(errorIndex: number, error: ISpellingError) {
