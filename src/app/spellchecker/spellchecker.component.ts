@@ -104,7 +104,9 @@ export class SpellcheckerComponent implements OnInit {
           }
           return paragraph;
         });
-        
+
+        this.highlights = this.highlights.filter((highlight) => highlight.offset !== indexOfFirstChange);
+
         //move highlight according to changes
         this.highlights = this.highlights.map((highlight) => {
           if (highlight.paragraphUniqueId === event.uniqueLocalIds[0]) {
