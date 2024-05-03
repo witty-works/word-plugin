@@ -68,11 +68,15 @@ export class SpellcheckerComponent implements OnInit {
 
   async ngOnInit() {
     this.register();
-    Office.onReady(() => {
-      Word.run(async (context) => {
-        context.document.onParagraphChanged.add(this.paragraphChanged.bind(this));
-        await context.sync();
-      });
+    Office.onReady((info) => {
+      try {
+        Word.run(async (context) => {
+          context.document.onParagraphChanged.add(this.paragraphChanged.bind(this));
+          await context.sync();
+        });
+      } catch (error) {
+        console.error("Failed to run Word context:", error);
+      }
     });
   }
 
