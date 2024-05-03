@@ -64,7 +64,9 @@ export class ErrorComponent {
     });
 
     this.suggestions = this.suggestions.map((suggestion) => {
-      suggestion.text = suggestion.text.replace(/\(\(/g, '[').replace(/\)\)/g, ']');
+      if (suggestion && suggestion.text) {
+        suggestion.text = suggestion.text.replace(/\(\(/g, '[').replace(/\)\)/g, ']');
+        }
       return suggestion;
     });
 

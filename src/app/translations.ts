@@ -32,7 +32,7 @@ export const de = {
     hitMaxTextLength1: 'Du hast die maximale Textlänge erreicht.',
     hitMaxTextLengthHere: 'Hier',
     hitMaxTextLength2: ' siehst du, wie weit dein Text geprüft wurde. Markiere den Text danach, um den Text weiter zu überprüfen.',
-    noParagraphsSelected: 'Bitte markiere den zu prüfenden Text.',
+    howToSelectText: 'Wähle einen Textabschnitt zum Prüfen aus. Alternativ werden die ersten 2000 Zeichen geprüft.',
 
     //error
     tryInstead: 'Wie wär\'s mit ...',
@@ -96,7 +96,7 @@ export const en = {
     hitMaxTextLength1: 'You have reached the maximum text length.',
     hitMaxTextLengthHere: 'Here',
     hitMaxTextLength2: ' you can see what portion of the text was checked. Mark the text following to check the rest of the text.',
-    noParagraphsSelected: 'Please select the text portion that should be checked.',
+    howToSelectText: 'Select text to choose a text portion to check. Alternatively the first 2000 characters will be checked.',
 
     //error
     tryInstead: 'Try instead ...',

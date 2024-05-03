@@ -40,8 +40,6 @@ export class SpellcheckerComponent implements OnInit {
 
   hitMaxTextLength = false;
 
-  noParagraphsSelected = false;
-
   lastParagraphChecked = 0;
 
   selectedText = '';
@@ -211,7 +209,6 @@ export class SpellcheckerComponent implements OnInit {
 
   async checkText(): Promise<void> {
     this.hitMaxTextLength = false;
-    this.noParagraphsSelected = false;
     this.isFirstRun = false;
     this.isSpellchecking = true;
     this.selectedText = ''
@@ -226,10 +223,10 @@ export class SpellcheckerComponent implements OnInit {
           this.selectedText = asyncResult.value as string;  
           const maxTextLength = environment.maxTextLength;
           if (this.selectedText.length === 0) {
-            this.noParagraphsSelected = true;
-            this.highlights = [];
-            this.isSpellchecking = false;
-            return;
+            const body = context.document.body;
+            body.load('text');
+            await context.sync();
+            this.selectedText = body.text.substring(0, maxTextLength);
           } else if (this.selectedText.length > maxTextLength) {
             this.hitMaxTextLength = true;
             const selectedTextWithinRange = this.selectedText.substring(0, maxTextLength);
@@ -246,22 +243,22 @@ export class SpellcheckerComponent implements OnInit {
   
   async processSelectedText(context: Word.RequestContext ): Promise<void> {
     try {
-      if (this.selectedText.length === 0) return;
       let chunks = this.selectedText.split(/\r/);
       chunks = chunks.filter((paragraph) => paragraph !== "");
 
-      const currentlySelectedPageparagraphs = context.document.getSelection().paragraphs
-      currentlySelectedPageparagraphs.load();
+      const allPageparagraphs = context.document.body.paragraphs
+      allPageparagraphs.load();
       await context.sync();
   
-      context.load(currentlySelectedPageparagraphs);
+      context.load(allPageparagraphs);
       await context.sync();
-      const paragraphCollection = currentlySelectedPageparagraphs.load({
+      const paragraphCollection = allPageparagraphs.load({
         text: true,
       });
 
-      this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => ({ text: paragraph.text.replace(/^\u000b+/, ''), id: paragraph.uniqueLocalId }));
-      this.paragraphsWithIds = this.paragraphsWithIds.filter(paragraph => paragraph.text !== "");
+      this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => (
+        { text: paragraph.text.replace(/^\u000b+/, ''), id: paragraph.uniqueLocalId }))
+        .filter(paragraph => paragraph.text !== "");
       let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
       for (let textChunk of chunks) {
       if(textChunk === "") continue;

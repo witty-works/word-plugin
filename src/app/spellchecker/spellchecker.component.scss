@@ -23,6 +23,8 @@
   line-height: 14px;
   margin-right: 1em;
   cursor: pointer;
+  white-space: nowrap;
+  min-width: 110px;
 }
 
 .witty-works-ext-primary-button-red {
@@ -326,4 +328,8 @@
   text-decoration: underline;
   margin-left: 0.25em;
   cursor: pointer;
+}
+
+.witty-works-ext-selection-info {
+  font-size: 12px;
 }
