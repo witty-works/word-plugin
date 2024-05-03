@@ -6,13 +6,15 @@ import TextUtils from "../utils/text.utils";
 })
 export class HighlightPipe implements PipeTransform {
 
-  transform(value: any, error: any): unknown {
-    if(!value || !error.word) return value;
-    const re = new RegExp(`(?<![äöüÄÖÜàéèòìÀÉÈÒÌ\w])(${TextUtils.escapeRegExp(error.word)})(?![äöüÄÖÜàéèòìÀÉÈÒÌ\w])`, 'g');
-    const color = this.getExplanationColor(error.details.gravity);
-    value = value.replace(re, `<span class="highlighted-text highlighted-text--${color}">$1</span>`);
-    return value;
-  }
+  transform(context: any, highlight: any): unknown {
+    if (!context || !highlight.word) return context;
+    const escapedWord = TextUtils.escapeRegExp(highlight.word);
+    const re = new RegExp(`(${escapedWord})(?!.*${escapedWord})(?![äöüÄÖÜàéèòìÀÉÈÒÌ\\w])`, 'gu');
+    const color = this.getExplanationColor(highlight.details.gravity);
+    context = context.replace(re, `<span class="highlighted-text highlighted-text--${color}">$1</span>`);
+    return context;
+}
+
 
   getExplanationColor(gravity: number): string {
     if (!gravity) return 'green';

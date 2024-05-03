@@ -39,6 +39,8 @@ export class ErrorComponent {
   alerts: IAlert[] = this.spellcheckerComponent.alerts;
 
   paragraphsWithIds: { text: string, id: string }[] = this.spellcheckerComponent.paragraphsWithIds;
+
+  highlights: ISpellingError[] = this.spellcheckerComponent.highlights;
   
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
@@ -59,6 +61,13 @@ export class ErrorComponent {
     this.suggestions = await this.spellcheckerService.getSuggestions(this.error!);
     const alertRelevantToSuggestion = this.alerts.find((alert) => {
       return alert.data.text === this.error?.word;
+    });
+
+    this.suggestions = this.suggestions.map((suggestion) => {
+      if (suggestion && suggestion.text) {
+        suggestion.text = suggestion.text.replace(/\(\(/g, '[').replace(/\)\)/g, ']');
+        }
+      return suggestion;
     });
 
     if (!this.isOpen) {
