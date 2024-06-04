@@ -8,6 +8,7 @@ import { environment } from '../../environments/environment';
 import DocumentUtils from '../utils/word.utils';
 import { useAnalytics } from '../analytics/analytics';
 import { DialogRef, DialogService } from "@ngneat/dialog";
+import * as Sentry from '@sentry/browser';
 
 const analytics = useAnalytics();
 
@@ -350,6 +351,7 @@ export class SpellcheckerComponent implements OnInit {
           //within the paragraph, order by start offset
         }
     } catch (error: any) {
+      Sentry.captureException(new Error(`Error in processSelectedText: ${error}`));
       if (error.name === 'HttpErrorResponse' && error.status === 422) {
         //TODO: handle this
       } else if (error?.code === 13001) {

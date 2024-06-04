@@ -5,7 +5,7 @@ import { IAlternatives, ICheckResponse } from "../data/types";
 import { ISpellingError } from "../data/data-structures";
 import { environment } from '../../environments/environment';
 import { de, en } from '../translations';
-
+import * as Sentry from '@sentry/browser';
 @Injectable({
   providedIn: 'root'
 })
@@ -44,6 +44,7 @@ export class CheckingService {
           throw error;
         });
     } catch (error: any) {
+      Sentry.captureException(new Error(`Error in checkText: ${error}`));
       const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
       if (error?.code === 13013) { //edge case: throttled
         const throttleWarning = document.getElementById("throttle-warning");
