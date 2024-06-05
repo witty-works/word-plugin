@@ -1,7 +1,6 @@
-@import '../../styles/variables';
+@import "../../styles/variables";
 
 :host {
-
 }
 
 .error-box {
@@ -24,7 +23,7 @@
     }
 
     .toggle {
-     margin-left: 0.5em;
+      margin-left: 0.5em;
 
       &.active {
         img {
@@ -41,7 +40,7 @@
 
     .suggestion-title {
       font-size: 16px;
-      color: $black;;
+      color: $black;
       margin-bottom: 8px;
     }
 
@@ -61,6 +60,16 @@
       }
     }
   }
+}
+
+.witty-works-ext-button-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.witty-works-ext-button-group > div {
+  margin-right: 10px;
 }
 
 .witty-works-ext-wittyworks-container {
@@ -100,7 +109,7 @@
 }
 
 .witty-works-ext-explanation-icon {
-  font-size: 2em; 
+  font-size: 2em;
   margin-right: 0.5em;
 }
 

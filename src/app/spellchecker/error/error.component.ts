@@ -1,22 +1,22 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { ISpellingError } from "../../data/data-structures";
 import TextUtils from "../../utils/text.utils";
 import { CheckingService } from "../../services/checking.service";
+import { IgnoreService } from "../../services/ignore.service";
 import { SpellcheckerComponent } from "../spellchecker.component";
-import {IAlert, IAlternatives} from "../../data/types";
-import { en, de } from '../../translations';
-import { useAnalytics } from 'src/app/analytics/analytics';
-import * as Sentry from '@sentry/browser';
+import { IAlert, IAlternatives } from "../../data/types";
+import { en, de } from "../../translations";
+import { useAnalytics } from "src/app/analytics/analytics";
+import * as Sentry from "@sentry/browser";
 
 const analytics = useAnalytics();
 
 @Component({
-  selector: 'app-error',
-  templateUrl: './error.component.html',
-  styleUrls: ['./error.component.scss']
+  selector: "app-error",
+  templateUrl: "./error.component.html",
+  styleUrls: ["./error.component.scss"],
 })
 export class ErrorComponent {
-
   @Input()
   error?: ISpellingError;
 
@@ -35,22 +35,32 @@ export class ErrorComponent {
   isOpen = false;
   suggestions: IAlternatives[] = [];
   showLearningBite: boolean = false;
-  
+
   alerts: IAlert[] = this.spellcheckerComponent.alerts;
 
-  paragraphsWithIds: { text: string, id: string }[] = this.spellcheckerComponent.paragraphsWithIds;
+  paragraphsWithIds: { text: string; id: string }[] =
+    this.spellcheckerComponent.paragraphsWithIds;
 
   highlights: ISpellingError[] = this.spellcheckerComponent.highlights;
-  
-  lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
-  constructor(private spellcheckerService: CheckingService, private spellcheckerComponent: SpellcheckerComponent) {
-  }
+  lang =
+    Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de"
+      ? de
+      : en;
+
+  constructor(
+    private spellcheckerService: CheckingService,
+    private spellcheckerComponent: SpellcheckerComponent,
+    private ignoreService: IgnoreService
+  ) {}
 
   getContextErrorComponent(error: ISpellingError) {
     let ctxt = TextUtils.getContext(error, this.paragraphsWithIds);
     if (ctxt) {
-      ctxt = ctxt.replace(/()/g, '<img src="assets/icons/soft-return.svg" class="soft-return-icon" alt="Soft return icon"><br>');
+      ctxt = ctxt.replace(
+        /()/g,
+        '<img src="assets/icons/soft-return.svg" class="soft-return-icon" alt="Soft return icon"><br>'
+      );
     } else {
       this.sendErrorToSentry();
     }
@@ -58,25 +68,31 @@ export class ErrorComponent {
   }
 
   async toggle(): Promise<void> {
-    this.suggestions = await this.spellcheckerService.getSuggestions(this.error!);
+    this.suggestions = await this.spellcheckerService.getSuggestions(
+      this.error!
+    );
     const alertRelevantToSuggestion = this.alerts.find((alert) => {
       return alert.data.text === this.error?.word;
     });
 
     this.suggestions = this.suggestions.map((suggestion) => {
       if (suggestion && suggestion.text) {
-        suggestion.text = suggestion.text.replace(/\(\(/g, '[').replace(/\)\)/g, ']');
-        }
+        suggestion.text = suggestion.text
+          .replace(/\(\(/g, "[")
+          .replace(/\)\)/g, "]");
+      }
       return suggestion;
     });
 
     if (!this.isOpen) {
       this.isOpen = true;
-      alertRelevantToSuggestion && analytics.popoverLogs(alertRelevantToSuggestion, 'popover_open');
-      this.sendHighlight()
+      alertRelevantToSuggestion &&
+        analytics.popoverLogs(alertRelevantToSuggestion, "popover_open");
+      this.sendHighlight();
     } else {
       this.isOpen = false;
-      alertRelevantToSuggestion && analytics.popoverLogs(alertRelevantToSuggestion, 'popover_close');
+      alertRelevantToSuggestion &&
+        analytics.popoverLogs(alertRelevantToSuggestion, "popover_close");
     }
   }
 
@@ -86,26 +102,53 @@ export class ErrorComponent {
 
   acceptSuggestion(suggestion: IAlternatives) {
     if (suggestion.remove) {
-      suggestion.text = '';
+      suggestion.text = "";
     }
     this.acceptSuggestionEvent.emit({ suggestion });
   }
-
 
   onClick(url: string | undefined) {
     this.showLearningBite = !this.showLearningBite;
     const alertRelevantToSuggestion = this.alerts.find((alert) => {
       return alert.data.text === this.error?.word;
     });
-    alertRelevantToSuggestion && analytics.popoverLogs(alertRelevantToSuggestion, 'learning_bites');
+    alertRelevantToSuggestion &&
+      analytics.popoverLogs(alertRelevantToSuggestion, "learning_bites");
     url && Office.context.ui?.openBrowserWindow(url);
   }
 
-  ignore() {
-    this.spellcheckerComponent.highlights = this.spellcheckerComponent.highlights.filter((error) => {
-      return error.word !== this.error?.word;
-    });
+  ignoreOnce() {
+    this.spellcheckerComponent.highlights =
+      this.spellcheckerComponent.highlights.filter((error) => {
+        return error.word !== this.error?.word;
+      });
     this.spellcheckerComponent.updatehighlights();
+  }
+
+  async ignorePermanently(word: string) {
+    try {
+      console.log(
+        `ErrorComponent: Starting ignorePermanently with word - ${word}`
+      );
+      const accessTokenWithTimestamp =
+        await this.spellcheckerComponent.getAccessTokenWithTimestamp();
+      console.log(
+        `ErrorComponent: Retrieved access token - ${accessTokenWithTimestamp.token}`
+      );
+      await this.ignoreService.ignoreWordPermanently(
+        word,
+        accessTokenWithTimestamp.token
+      );
+      console.log(`ErrorComponent: Successfully ignored word - ${word}`);
+
+      this.spellcheckerComponent.highlights =
+        this.spellcheckerComponent.highlights.filter((error) => {
+          return error.word !== this.error?.word;
+        });
+      this.spellcheckerComponent.updatehighlights();
+    } catch (error) {
+      console.error(`Error ignoring word '${word}' permanently:`, error);
+    }
   }
 
   get containerStyle() {
@@ -114,16 +157,18 @@ export class ErrorComponent {
     };
   }
 
-  getExplanationColor(
-    gravity: number | undefined,
-  ): string {
-    if (!gravity) return '#D3E4AC';
-    else if (gravity < 1.5) return '#F7D4D4';
-    else if (gravity > 2.5) return '#FFFFD3';
-    else return '#F8E7CB';
+  getExplanationColor(gravity: number | undefined): string {
+    if (!gravity) return "#D3E4AC";
+    else if (gravity < 1.5) return "#F7D4D4";
+    else if (gravity > 2.5) return "#FFFFD3";
+    else return "#F8E7CB";
   }
 
-  sendErrorToSentry() {
-    Sentry.captureException(new Error(`Error word: ${this.error?.word} not found in paragraph: ${this.error?.details?.context}`));
+  sendErrorToSentry(error?: any) {
+    Sentry.captureException(
+      new Error(
+        `Error word: ${this.error?.word} not found in paragraph: ${this.error?.details?.context}`
+      )
+    );
   }
 }
