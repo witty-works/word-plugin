@@ -170,6 +170,7 @@ export interface IAlternatives {
   inspiration: boolean;
   context: string;
   hovered?: boolean;
+  url: string;
 }
 
 export interface IExplanation {
