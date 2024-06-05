@@ -127,28 +127,19 @@ export class ErrorComponent {
 
   async ignorePermanently(word: string) {
     try {
-      console.log(
-        `ErrorComponent: Starting ignorePermanently with word - ${word}`
-      );
       const accessTokenWithTimestamp =
         await this.spellcheckerComponent.getAccessTokenWithTimestamp();
-      console.log(
-        `ErrorComponent: Retrieved access token - ${accessTokenWithTimestamp.token}`
-      );
       await this.ignoreService.ignoreWordPermanently(
         word,
         accessTokenWithTimestamp.token
       );
-      console.log(`ErrorComponent: Successfully ignored word - ${word}`);
 
       this.spellcheckerComponent.highlights =
         this.spellcheckerComponent.highlights.filter((error) => {
           return error.word !== this.error?.word;
         });
       this.spellcheckerComponent.updatehighlights();
-    } catch (error) {
-      console.error(`Error ignoring word '${word}' permanently:`, error);
-    }
+    } catch (error) {}
   }
 
   get containerStyle() {
