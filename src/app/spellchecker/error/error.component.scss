@@ -65,11 +65,12 @@
 .witty-works-ext-button-group {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  text-wrap: nowrap;
 }
 
 .witty-works-ext-button-group > div {
-  margin-right: 10px;
+  margin-right: 7px;
 }
 
 .witty-works-ext-wittyworks-container {

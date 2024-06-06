@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../environments/environment";
+import { de, en } from "../translations";
 import * as Sentry from "@sentry/browser";
 
 @Injectable({
@@ -28,6 +29,12 @@ export class IgnoreService {
       await this.http.put<void>(requestUrlIgnore, {}, httpOptions).toPromise();
     } catch (error: any) {
       Sentry.captureException(error);
+       const message = document.getElementById("warn-failed-ignore-error");
+      if (message) {
+        const lang = Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de" ? de : en;
+        message.style.display = "block";
+        message.innerHTML = lang.failedRequestText;
+      }
       throw error;
     }
   }
