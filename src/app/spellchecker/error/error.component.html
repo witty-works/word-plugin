@@ -113,6 +113,7 @@
             <div class="tag" *ngIf="!suggestion.hovered">
               <div *ngIf="suggestion.context">
                 <a
+                  class="suggestion-url"
                   *ngIf="suggestion.url"
                   [href]="suggestion.url"
                   target="_blank"
