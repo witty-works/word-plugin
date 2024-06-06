@@ -30,3 +30,6 @@ web:
             index:
                 - "index.html"
             passthru: "/index.html"
+        "/manifest":
+            root: "src"
+            passthru: "/manifest-prod.xml"
