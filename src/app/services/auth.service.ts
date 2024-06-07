@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { environment } from '../../environments/environment';
 import { de, en } from '../translations';
-
+import * as Sentry from '@sentry/browser';
 @Injectable({
   providedIn: 'root'
 })
@@ -12,7 +12,6 @@ export class AuthService {
   constructor(private http: HttpClient) { }
 
   async makeAuthRequest(): Promise<any> {
-    console.log('makeAuthRequest');
     try {
       let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
 
@@ -68,6 +67,7 @@ export class AuthService {
           }
         });
       } catch (error: any) {
+        Sentry.captureException(new Error(`Error in makeAuthRequest: ${error}`));
         const errorCodes = [13001, 13002, 13000, 5001];
         if (errorCodes.includes(error?.code)) {
           const message = document.getElementById("warn-not-signed-in-word")
