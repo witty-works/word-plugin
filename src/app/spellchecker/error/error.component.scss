@@ -189,11 +189,12 @@
   }
 }
 
-.witty-works-ext-lato-popover-text-gray {
-  font-family: $lato;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 20px; /* or 214% */
-  color: $extraDarkGray;
+.witty-works-ext-ignore-text {
+  padding: 0em 0 0.3em !important;
+  font-size: 14px;
+  padding-bottom: 0em;
+  white-space: nowrap !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  margin-right: 0.5em !important;
 }
