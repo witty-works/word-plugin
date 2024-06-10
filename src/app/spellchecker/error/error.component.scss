@@ -45,9 +45,15 @@
       margin-bottom: 8px;
     }
 
-    .suggestion-url {
-      color: $black;
-      text-wrap: nowrap;     
+    .suggestion-link {
+      text-decoration: none;
+      color: $black;;
+      white-space: nowrap;
+    }
+
+    .no-url-style {
+      color: $black;;
+      white-space: nowrap;
     }
 
     button {
