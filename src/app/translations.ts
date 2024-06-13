@@ -46,7 +46,7 @@ export const de = {
   arrowRightAlt: "Erklärungen schliessen",
   ignoreOnce: "Einmal ignorieren",
   ignorePermanently: "Für immer ignorieren",
-  failedRequestText: 'Bitte erneut probieren',
+  failedRequestText: 'Speicherung fehlgeschlagen. Bitte später erneut probieren.',
 
   //settings
   settingsIconAlt: "Witty Dashboard Einstellungen öffnen",
@@ -119,7 +119,7 @@ export const en = {
   arrowRightAlt: "Close explanation",
   ignoreOnce: "Ignore once",
   ignorePermanently: "Ignore permanently",
-  failedRequestText: 'Failed, please try again',
+  failedRequestText: 'Unable to save. Please try again later.',
 
   //settings
   settingsIconAlt: "Open Witty Dashboard settings",
