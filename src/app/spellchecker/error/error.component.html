@@ -111,30 +111,21 @@
               }}
             </button>
             <div *ngIf="suggestion.context || suggestion.url">
-                <div *ngIf="suggestion.context">
-                    <a *ngIf="suggestion.url" [href]="suggestion.url" target="_blank" class="suggestion-link"  rel="noopener noreferrer">
-                        <span *ngIf="suggestion.context.startsWith('💡')">
-                            <span>{{ suggestion.context | slice:0:3 }}</span>
-                            <u *ngIf="suggestion.url">{{ suggestion.context | slice:2 }}</u>
-                            <span *ngIf="!suggestion.url">{{ suggestion.context | slice:2 }}</span>
-                        </span>
-                        <span *ngIf="!suggestion.context.startsWith('💡')">
-                            <span>&nbsp;&nbsp;</span>
-                            <u *ngIf="suggestion.url">{{ suggestion.context }}</u>
-                            <span *ngIf="!suggestion.url">{{ suggestion.context }}</span>
-                        </span>
-                    </a>
-                    <span *ngIf="!suggestion.url" class="no-url-style">
-                        <span *ngIf="suggestion.context.startsWith('💡')">
-                            <span>{{ suggestion.context | slice:0:3 }}</span>
-                            {{ suggestion.context | slice:2 }}
-                        </span>
-                        <span *ngIf="!suggestion.context.startsWith('💡')">
-                            <span>&nbsp;&nbsp;</span>
-                            {{ suggestion.context }}
-                        </span>
-                    </span>
-                </div>
+              <div *ngIf="suggestion.context">
+                <a *ngIf="suggestion.url" [href]="suggestion.url" target="_blank" class="suggestion-link" rel="noopener noreferrer">
+                  <span *ngIf="suggestion.context.startsWith('💡')">
+                    <span>{{ suggestion.context | slice:0:3 }}</span>
+                    <u>{{ suggestion.context | slice:2 }}</u>
+                  </span>
+                  <span *ngIf="!suggestion.context.startsWith('💡')">
+                    <span>&nbsp;&nbsp;</span>
+                    <u>{{ suggestion.context }}</u>
+                  </span>
+                </a>
+                <span *ngIf="!suggestion.url">
+                    {{ suggestion.context }}
+                  </span>
+              </div>
             </div>
           </div>
         </ng-container>

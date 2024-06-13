@@ -41,23 +41,14 @@
 
     .suggestion-title {
       font-size: 16px;
-      color: $black;;
+      color: $black;
       margin-bottom: 8px;
     }
 
     .suggestion-link {
       text-decoration: none;
-      color: $black;;
+      color: $black;
       white-space: nowrap;
-    }
-
-    .no-url-style {
-      color: $black;;
-      white-space: nowrap;
-    }
-
-    button {
-      margin-right: 8px;
     }
 
     .ignore-button-container {
@@ -163,6 +154,10 @@
   flex-direction: row;
   align-items:center;
   margin-bottom: 8px;
+
+    button {
+        margin-right: 8px;
+      }
 }
 
 .witty-works-ext-button-wrapper.hovered {
