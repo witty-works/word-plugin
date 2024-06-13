@@ -425,9 +425,56 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
 
+  async highlightAndRemoveWordIncludingPreviousSpace(obj: { paragraphIndex: number, errorIndex: number, suggestion: IAlternatives}) {
+    await Word.run(async (context) => {
+        try {
+            const paragraphText = this.paragraphsWithIds[obj.paragraphIndex].text;
+            const error = this.highlights[obj.errorIndex];
+            const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
+
+            paragraphRange.load('text');
+            await context.sync();
+
+            const searchResults = paragraphRange.search(' ' + error.word, { matchCase: true}); //including previous space
+            context.load(searchResults, 'text');
+            await context.sync();
+
+            let previousStartOffset = 0;
+            let foundMatchingRange = false;
+            for (const item of searchResults.items) {
+                const startOffset = paragraphRange.text.indexOf(item.text, previousStartOffset) + 1; //+1 accounts for the space
+                if (startOffset === error.offset) {
+                    const errorRange = item;
+                    errorRange.select('Select');
+                    await context.sync();
+
+                    foundMatchingRange = true;
+                    break;
+                }
+                previousStartOffset = startOffset + 1;
+            }
+
+            if (!foundMatchingRange) {
+              this.handleError(new Error('The range for the error was not found: ' + error.word));
+            }
+            const highlightedText = context.document.getSelection()
+            highlightedText.load();
+            await context.sync();
+            highlightedText.insertText(obj.suggestion.text, "Replace");
+            await context.sync();
+        } catch (e) {
+            this.handleError(e);
+        }
+    });
+  }
+
   async acceptSuggestion(obj: { paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
     await Word.run(async (context) => {
       try {
+        if(obj.suggestion.remove) {
+          this.highlightAndRemoveWordIncludingPreviousSpace(obj);
+          return
+        }
         const highlightedText = context.document.getSelection()
         highlightedText.load();
         await context.sync();

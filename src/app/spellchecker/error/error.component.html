@@ -110,42 +110,48 @@
                   : error.word
               }}
             </button>
-            <div *ngIf="suggestion.context || suggestion.url">
-              <div *ngIf="suggestion.context">
-                <a *ngIf="suggestion.url" [href]="suggestion.url" target="_blank" class="suggestion-link" rel="noopener noreferrer">
-                  <span *ngIf="suggestion.context.startsWith('💡')">
-                    <span>{{ suggestion.context | slice:0:3 }}</span>
-                    <u>{{ suggestion.context | slice:2 }}</u>
-                  </span>
-                  <span *ngIf="!suggestion.context.startsWith('💡')">
-                    <span>&nbsp;&nbsp;</span>
-                    <u>{{ suggestion.context }}</u>
-                  </span>
-                </a>
-                <span *ngIf="!suggestion.url">
-                    {{ suggestion.context }}
-                  </span>
-              </div>
+            <div class="tag" *ngIf="!suggestion.hovered">
+              {{ suggestion.context }}
             </div>
           </div>
         </ng-container>
-        <div
-          (click)="ignore()"
-          class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer"
-        >
-          <span
-            className="witty-works-ext-margin-right witty-works-ext-cursor-pointer"
+        <div class="witty-works-ext-button-group">
+          <div
+            (click)="ignoreOnce()"
+            class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer"
           >
-            <img
-              class="witty-works-ext-margin-left"
-              src="assets/icons/ignore.svg"
-              alt="{lang.ignore}"
-              style="margin-bottom: -2px"
-            />
-          </span>
-          <span className="witty-works-ext-lato-popover-text-gray">
-            {{ lang.ignore }}
-          </span>
+            <span
+              class="witty-works-ext-margin-right witty-works-ext-cursor-pointer"
+            >
+              <img
+                class="witty-works-ext-margin-left"
+                src="assets/icons/ignore.svg"
+                alt="{{ lang.ignoreOnce }}"
+                style="margin-bottom: -2px"
+              />
+            </span>
+            <span class="witty-works-ext-lato-popover-text-gray witty-works-ext-ignore-text">
+              {{ lang.ignoreOnce }}
+            </span>
+          </div>
+          <div
+            (click)="ignorePermanently(error.word)"
+            class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer"
+          >
+            <span
+              class="witty-works-ext-margin-right witty-works-ext-cursor-pointer"
+            >
+              <img
+                class="witty-works-ext-margin-left"
+                src="assets/icons/ignore.svg"
+                alt="{{ lang.ignorePermanently }}"
+                style="margin-bottom: -2px"
+              />
+            </span>
+            <span class="witty-works-ext-lato-popover-text-gray witty-works-ext-ignore-text">
+              {{ lang.ignorePermanently }}
+            </span>
+          </div>
         </div>
       </section>
     </div>
