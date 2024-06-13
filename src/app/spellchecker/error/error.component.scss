@@ -58,7 +58,6 @@
 
     button {
       margin-right: 8px;
-      margin-bottom: 8px;
     }
 
     .ignore-button-container {
@@ -162,7 +161,8 @@
 .witty-works-ext-button-wrapper {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items:center;
+  margin-bottom: 8px;
 }
 
 .witty-works-ext-button-wrapper.hovered {
