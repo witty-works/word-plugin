@@ -111,7 +111,23 @@
               }}
             </button>
             <div class="tag" *ngIf="!suggestion.hovered">
-              {{ suggestion.context }}
+              <div *ngIf="suggestion.context || suggestion.url">
+                <div *ngIf="suggestion.context">
+                  <a *ngIf="suggestion.url" [href]="suggestion.url" target="_blank" class="suggestion-link" rel="noopener noreferrer">
+                    <span *ngIf="suggestion.context.startsWith('💡')">
+                      <span>{{ suggestion.context | slice:0:3 }}</span>
+                      <u>{{ suggestion.context | slice:2 }}</u>
+                    </span>
+                    <span *ngIf="!suggestion.context.startsWith('💡')">
+                      <span>&nbsp;&nbsp;</span>
+                      <u>{{ suggestion.context }}</u>
+                    </span>
+                  </a>
+                  <span *ngIf="!suggestion.url">
+                    {{ suggestion.context }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </ng-container>
