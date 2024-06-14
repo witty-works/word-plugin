@@ -44,9 +44,10 @@
       margin-bottom: 8px;
     }
 
-    button {
-      margin-right: 8px;
-      margin-bottom: 8px;
+    .suggestion-link {
+      text-decoration: none;
+      color: $black;
+      white-space: nowrap;
     }
 
     .ignore-button-container {
@@ -161,7 +162,12 @@
 .witty-works-ext-button-wrapper {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items:center;
+  margin-bottom: 8px;
+
+    button {
+        margin-right: 8px;
+      }
 }
 
 .witty-works-ext-button-wrapper.hovered {
