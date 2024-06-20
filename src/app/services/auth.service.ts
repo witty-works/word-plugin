@@ -17,8 +17,12 @@ export class AuthService {
       let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
 
       if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) { //check if token is older than 5 min
-        if (Office && Office.auth && typeof Office.auth.getAccessToken === 'function') {
-          const newAccessToken = await Office.auth.getAccessToken({
+           const canGetAccessToken = Office && Office.auth && typeof Office.auth.getAccessToken === 'function';
+        if (!canGetAccessToken) {
+          throw new Error('Office.auth.getAccessToken is not available');
+        }
+
+            const newAccessToken = await Office.auth.getAccessToken({
             allowSignInPrompt: true,
             allowConsentPrompt: true,
           });
@@ -28,10 +32,7 @@ export class AuthService {
             timestamp: new Date().getTime()
           }
           localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
-        } else {
-          throw new Error('Office.auth.getAccessToken is not a available');
-        }
-      }
+        } 
 
       const url = environment.api + 'v2.0/auth';
       const httpOptions = {
