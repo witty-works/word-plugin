@@ -17,7 +17,7 @@ export class AuthService {
       let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
 
       if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) { //check if token is older than 5 min
-           const canGetAccessToken = Office && Office.auth && typeof Office.auth.getAccessToken === 'function';
+        const canGetAccessToken = Office?.auth?.getAccessToken instanceof Function;
         if (!canGetAccessToken) {
           throw new Error('Office.auth.getAccessToken is not available');
         }
