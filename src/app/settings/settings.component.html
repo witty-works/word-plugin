@@ -1,8 +1,8 @@
 <div>
     <nav aria-label="{lang.areaLabelHeader}" class="witty-works-ext-header">
-        <img src="assets/icons/witty-logo.svg" alt="{lang.wittyIconAlt}" role="link" tabindex="0"
+        <img src="assets/icons/witty-logo.svg" alt="{{lang.wittyIconAlt}}" role="link" tabindex="0"
             (keydown.enter)="openWittyHomePage()" (click)="openWittyHomePage()">
-        <img *ngIf="isLoggedIn" src="assets/icons/settings.svg" alt="{lang.settingsIconAlt}" role="link" tabindex="0"
+        <img *ngIf="isLoggedIn" src="assets/icons/settings.svg" alt="{{lang.settingsIconAlt}}" role="link" tabindex="0"
             (keydown.enter)="openDashboard()" (click)="openDashboard()">
     </nav>
 

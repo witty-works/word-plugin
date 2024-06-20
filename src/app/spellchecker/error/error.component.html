@@ -14,10 +14,11 @@
           tabindex="0"
           (keydown.enter)="toggle()"
           role="button"
+          aria-expanded="false"
         >
           <img
             src="assets/icons/chevron-down.svg"
-            alt="{lang.arrowDownIconAlt}"
+            alt="{{lang.arrowDownIconAlt}}"
           />
         </div>
       </header>
@@ -66,7 +67,7 @@
                     <img
                       class="witty-works-ext-margin-left"
                       src="assets/icons/video.svg"
-                      alt="{lang.videoIconAlt}"
+                      alt="{{lang.videoIconAlt}}"
                     />
                   </ng-container>
                   <div
@@ -75,7 +76,7 @@
                   >
                     <img
                       src="assets/icons/arrow-right.svg"
-                      alt="{lang.arrowRightAlt}"
+                      alt="{{lang.learnMore}}"
                     />
                   </div>
                 </div>
@@ -135,6 +136,8 @@
           <div
             (click)="ignoreOnce()"
             class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer"
+            role="button"
+            tabindex="0"
           >
             <span
               class="witty-works-ext-margin-right witty-works-ext-cursor-pointer"
@@ -144,6 +147,7 @@
                 src="assets/icons/ignore.svg"
                 alt="{{ lang.ignoreOnce }}"
                 style="margin-bottom: -2px"
+                aria-hidden="true"
               />
             </span>
             <span class="witty-works-ext-lato-popover-text-gray witty-works-ext-ignore-text">
@@ -153,6 +157,8 @@
           <div
             (click)="ignorePermanently(error.word)"
             class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer"
+            role="button"
+            tabindex="0"
           >
             <span
               class="witty-works-ext-margin-right witty-works-ext-cursor-pointer"
@@ -162,6 +168,7 @@
                 src="assets/icons/ignore.svg"
                 alt="{{ lang.ignorePermanently }}"
                 style="margin-bottom: -2px"
+                aria-hidden="true"
               />
             </span>
             <span class="witty-works-ext-lato-popover-text-gray witty-works-ext-ignore-text">
