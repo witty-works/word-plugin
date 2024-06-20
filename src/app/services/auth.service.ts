@@ -66,8 +66,10 @@ export class AuthService {
             }
           }
         });
-      } catch (error: any) {
-        Sentry.captureException(new Error(`Error in makeAuthRequest: ${error}`));
+    } catch (error: any) {
+      const errorMessage = typeof error.message === 'string' ? error.message : JSON.stringify(error, Object.getOwnPropertyNames(error));
+
+        Sentry.captureException(new Error(`Error in makeAuthRequest: ${errorMessage}`));
         const errorCodes = [13001, 13002, 13000, 5001];
         if (errorCodes.includes(error?.code)) {
           const message = document.getElementById("warn-not-signed-in-word")
