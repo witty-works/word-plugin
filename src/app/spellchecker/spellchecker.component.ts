@@ -254,14 +254,13 @@ export class SpellcheckerComponent implements OnInit {
       chunks = chunks.filter((paragraph) => paragraph !== "");
 
       const allPageparagraphs = context.document.body.paragraphs
-      allPageparagraphs.load();
+      allPageparagraphs.load('items');
       await context.sync();
   
-      context.load(allPageparagraphs);
-      await context.sync();
       const paragraphCollection = allPageparagraphs.load({
-        text: true,
-      });
+      select: ['text', 'uniqueLocalId']
+    });
+      await context.sync();
 
       this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => (
         { text: paragraph.text.replace(/^\u000b+/, ''), id: paragraph.uniqueLocalId }))
