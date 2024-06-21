@@ -21,18 +21,17 @@ export class AuthService {
         if (!canGetAccessToken) {
           throw new Error('Office.auth.getAccessToken is not available');
         }
+        const newAccessToken = await Office.auth.getAccessToken({
+          allowSignInPrompt: true,
+          allowConsentPrompt: true,
+        });
 
-            const newAccessToken = await Office.auth.getAccessToken({
-            allowSignInPrompt: true,
-            allowConsentPrompt: true,
-          });
-
-          accessTokenWithTimestamp = {
-            token: newAccessToken,
-            timestamp: new Date().getTime()
-          }
-          localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
-        } 
+        accessTokenWithTimestamp = {
+          token: newAccessToken,
+          timestamp: new Date().getTime()
+        }
+        localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
+      }
 
       const url = environment.api + 'v2.0/auth';
       const httpOptions = {
@@ -66,9 +65,9 @@ export class AuthService {
           } else {
             const message = document.getElementById("warn-server-error")
             if (message) {
-                const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-                message.style.display = 'block';
-                message.innerHTML = lang.serverError;
+              const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+              message.style.display = 'block';
+              message.innerHTML = lang.serverError;
             }
           }
         });
@@ -80,9 +79,9 @@ export class AuthService {
       if (errorCodes.includes(error?.code)) {
         const message = document.getElementById("warn-not-signed-in-word")
         if (message) {
-            const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-            message.style.display = 'block';
-            message.innerHTML = lang.notSignedInWarning;
+          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+          message.style.display = 'block';
+          message.innerHTML = lang.notSignedInWarning;
         }
       }
       return error;
