@@ -233,7 +233,8 @@ export class SpellcheckerComponent implements OnInit {
             const body = context.document.body;
             body.load('text');
             await context.sync();
-            this.selectedText = body.text.substring(0, maxTextLength);
+            this.selectedText = body.text.substring(0, maxTextLength); 
+            this.hitMaxTextLength = true;
           } else if (this.selectedText.length > maxTextLength) {
             this.hitMaxTextLength = true;
             const selectedTextWithinRange = this.selectedText.substring(0, maxTextLength);
