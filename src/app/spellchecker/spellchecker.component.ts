@@ -262,7 +262,9 @@ export class SpellcheckerComponent implements OnInit {
     });
       await context.sync();
 
-      this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => (
+      this.paragraphsWithIds = paragraphCollection.items
+        .filter(paragraph => paragraph.uniqueLocalId !== null)
+        .map((paragraph) => (
         { text: paragraph.text.replace(/^\u000b+/, ''), id: paragraph.uniqueLocalId }))
         .filter(paragraph => paragraph.text !== "");
       let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
