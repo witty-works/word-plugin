@@ -69,22 +69,24 @@ export class AuthService {
             }
           }
         });
-      } catch (error: any) {
-        Sentry.captureException(new Error(`Error in makeAuthRequest: ${error}`));
-        const errorCodes = [13001, 13002, 13000, 5001];
-        if (errorCodes.includes(error?.code)) {
-          const message = document.getElementById("warn-not-signed-in-word")
-          if (message) {
-            const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-            
-             const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.notSignedInWarning);
-              message.style.display = 'block';
-              message.appendChild(errorMessageElement);
-          }
+    } catch (error: any) {
+      const errorMessage = typeof error.message === 'string' ? error.message : JSON.stringify(error, Object.getOwnPropertyNames(error));
+
+      Sentry.captureException(new Error(`Error in makeAuthRequest: ${errorMessage}`));
+      const errorCodes = [13001, 13002, 13000, 5001];
+      if (errorCodes.includes(error?.code)) {
+        const message = document.getElementById("warn-not-signed-in-word")
+        if (message) {
+          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+          
+          const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.notSignedInWarning);
+          message.style.display = 'block';
+          message.appendChild(errorMessageElement); 
         }
-        return error;
       }
+      return error;
     }
+  }
 
   // makeRefreshTokenRequest(): Promise<any> {
   //   const refreshToken = localStorage.getItem('refresh_token');
