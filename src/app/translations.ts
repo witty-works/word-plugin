@@ -46,7 +46,7 @@ export const de = {
   ignoreOnce: "Einmal ignorieren",
   ignorePermanently: "Für immer ignorieren",
   failedRequestText: 'Speicherung fehlgeschlagen. Bitte später erneut probieren.',
-  cautionIconAlt: "Es ist ein Fehler aufgetreten",
+  cautionIconAlt: "Ein Fehler ist aufgetreten. Bitte überprüfen Sie die folgende Nachricht für Details.",
 
   //settings
   settingsIconAlt: "Witty Dashboard Einstellungen öffnen",
@@ -119,7 +119,7 @@ export const en = {
   ignoreOnce: "Ignore once",
   ignorePermanently: "Ignore permanently",
   failedRequestText: 'Unable to save. Please try again later.',
-  cautionIconAlt: "There's been an error",
+  cautionIconAlt: "An error has occurred. Please check the following message for details.",
 
   //settings
   settingsIconAlt: "Open Witty Dashboard settings",
