@@ -21,7 +21,7 @@
 
 <body class="ms-font-m ms-welcome">
   <div id="ie-warn"
-    style="display: none;margin: 20px;padding: 20px;background-color: #1ebbee;color: white;font-size: 16px;">
+    style="display: none;margin: 20px;padding: 20px;background-color: #1ebbee;color: white;font-size: 16px; white-space: normal;">
     <img src="assets/icons/caution-sign.svg" alt="{{lang.cautionIconAlt}}" style="margin-right: 5px;">
     This add-in does not work with this version of Microsoft Office. Please update to a newer version.
   </div>
@@ -51,7 +51,7 @@
     if (navigator.userAgent.indexOf("Trident") !== -1 || navigator.userAgent.indexOf("Edge") !== -1) {
       const ieMessage = document.getElementById("ie-warn");
       if (ieMessage) {
-             ieMessage.style.display = 'block';
+        ieMessage.style.display = 'block';
       }
     }
 
