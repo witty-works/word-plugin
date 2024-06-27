@@ -31,6 +31,15 @@
         }
       }
     }
+  
+    button {
+      background-color: transparent;
+      flex-direction: row;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-width: 5px;
+    }
   }
 
   .suggestions {
@@ -68,10 +77,6 @@
   align-items: center;
   flex-wrap: nowrap;
   text-wrap: nowrap;
-}
-
-.witty-works-ext-button-group > div {
-  margin-right: 7px;
 }
 
 .witty-works-ext-wittyworks-container {
@@ -186,6 +191,7 @@
 .witty-works-ext-ignore-color-transformer {
   filter: invert(38%) sepia(2%) saturate(0%) hue-rotate(73deg) brightness(100%)
     contrast(89%);
+    background-color: transparent;
 
   &:hover {
     filter: invert(39%) sepia(86%) saturate(747%) hue-rotate(323deg)

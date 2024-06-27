@@ -3,13 +3,14 @@ import { HttpClient } from "@angular/common/http";
 import { environment } from '../../environments/environment';
 import { de, en } from '../translations';
 import * as Sentry from '@sentry/browser';
+import { ErrorUtils } from '../utils/error.utils';
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   isDevEnv = window.location.hostname === 'localhost'
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private ErrorUtils: ErrorUtils) { }
 
   async makeAuthRequest(): Promise<any> {
     try {
@@ -60,9 +61,11 @@ export class AuthService {
           } else {
             const message = document.getElementById("warn-server-error")
             if (message) {
-                const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-                message.style.display = 'block';
-                message.innerHTML = lang.serverError;
+              const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+              
+              const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.serverError);
+              message.style.display = 'block';
+              message.appendChild(errorMessageElement); 
             }
           }
         });
@@ -74,9 +77,11 @@ export class AuthService {
       if (errorCodes.includes(error?.code)) {
         const message = document.getElementById("warn-not-signed-in-word")
         if (message) {
-            const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-            message.style.display = 'block';
-            message.innerHTML = lang.notSignedInWarning;
+          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+          
+          const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.notSignedInWarning);
+          message.style.display = 'block';
+          message.appendChild(errorMessageElement); 
         }
       }
       return error;

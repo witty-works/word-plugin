@@ -9,6 +9,7 @@ import DocumentUtils from '../utils/word.utils';
 import { useAnalytics } from '../analytics/analytics';
 import { DialogRef, DialogService } from "@ngneat/dialog";
 import * as Sentry from '@sentry/browser';
+import { ErrorUtils } from '../utils/error.utils';
 
 const analytics = useAnalytics();
 
@@ -152,8 +153,10 @@ export class SpellcheckerComponent implements OnInit {
       if (response?.code === 13013) { //edge case: throttled
         this.showSpinner = true;
         if (throttleWarning) {
+          const lang = Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de" ? de : en;
+          const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.throttleWarning);
           throttleWarning.style.display = 'block';
-          throttleWarning.innerHTML = this.lang.throttleWarning;
+          throttleWarning.appendChild(errorMessageElement);
         }
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
@@ -365,8 +368,9 @@ export class SpellcheckerComponent implements OnInit {
         const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
         const message = document.getElementById("issue-checking-text")
         if (message) {
-          message.style.display = 'block';
-          message.innerHTML = lang.issueCheckingText;
+           const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.issueCheckingText);
+            message.style.display = 'block';
+            message.appendChild(errorMessageElement);
         }
       }
       console.error(error);
