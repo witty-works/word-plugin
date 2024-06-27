@@ -40,6 +40,6 @@
     <div class="witty-works-ext-separator"></div>
     <div class="witty-works-ext-wittyworks-container">
         {{lang.wittyVersion}} {{ appVersion }}
-        <button class="witty-works-ext-link" (click)="openHelpCenter()">{{lang.help}}</button>
+        <button class="witty-works-ext-link" (click)="openHelpCenter()" [attr.aria-label]="lang.help">{{lang.help}}</button>
     </div>
 </footer>
