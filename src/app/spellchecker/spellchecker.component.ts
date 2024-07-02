@@ -155,8 +155,21 @@ export class SpellcheckerComponent implements OnInit {
         if (throttleWarning) {
           const lang = Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de" ? de : en;
           const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.throttleWarning);
+          const existingErrorMessage = throttleWarning.querySelector('.error-message');
+
           throttleWarning.style.display = 'block';
-          throttleWarning.appendChild(errorMessageElement);
+          if (existingErrorMessage) {
+              throttleWarning.replaceChild(errorMessageElement, existingErrorMessage);
+          } else {
+              throttleWarning.appendChild(errorMessageElement);
+          }
+
+            window.addEventListener('online', () => {
+                if (existingErrorMessage) {
+                    throttleWarning.removeChild(existingErrorMessage);
+                }
+                throttleWarning.style.display = 'none';
+            });
         }
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
@@ -367,11 +380,24 @@ export class SpellcheckerComponent implements OnInit {
       } else {
         const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
         const message = document.getElementById("issue-checking-text")
-        if (message) {
-           const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.issueCheckingText);
-            message.style.display = 'block';
+     if (message) {
+        const existingErrorMessage = message.querySelector('.error-message');
+        const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.issueCheckingText);
+       
+        message.style.display = 'block';
+        if (existingErrorMessage) {
+            message.replaceChild(errorMessageElement, existingErrorMessage);
+        } else {
             message.appendChild(errorMessageElement);
         }
+
+          window.addEventListener('online', () => {
+            if (existingErrorMessage) {
+                message.removeChild(existingErrorMessage);
+            }
+            message.style.display = 'none';
+          });
+      }     
       }
       console.error(error);
     }

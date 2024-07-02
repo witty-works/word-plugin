@@ -10,6 +10,8 @@ export class ErrorUtils {
     const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
     const message = document.createElement('div');
+    message.classList.add('error-message');
+    
     const cautionImg = document.createElement('img');
     cautionImg.src = "assets/icons/caution-sign.svg";
     cautionImg.alt = lang.cautionIconAlt;
