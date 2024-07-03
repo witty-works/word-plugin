@@ -62,10 +62,7 @@ export class AuthService {
             const message = document.getElementById("warn-server-error")
             if (message) {
               const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-              
-              const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.serverError);
-              message.style.display = 'block';
-              message.appendChild(errorMessageElement); 
+              ErrorUtils.displayErrorMessage(message, "serverError", lang);
             }
           }
         });
@@ -78,11 +75,8 @@ export class AuthService {
         const message = document.getElementById("warn-not-signed-in-word")
         if (message) {
           const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-          
-          const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.notSignedInWarning);
-          message.style.display = 'block';
-          message.appendChild(errorMessageElement); 
-        }
+          ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
+          }
       }
       return error;
     }

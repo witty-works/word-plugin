@@ -156,9 +156,7 @@ export class SpellcheckerComponent implements OnInit {
         this.showSpinner = true;
         if (throttleWarning) {
           const lang = Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de" ? de : en;
-          const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.throttleWarning);
-          throttleWarning.style.display = 'block';
-          throttleWarning.appendChild(errorMessageElement);
+          ErrorUtils.displayErrorMessage(throttleWarning, "throttleWarning", lang);
         }
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
@@ -369,11 +367,9 @@ export class SpellcheckerComponent implements OnInit {
       } else {
         const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
         const message = document.getElementById("issue-checking-text")
-        if (message) {
-           const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.issueCheckingText);
-            message.style.display = 'block';
-            message.appendChild(errorMessageElement);
-        }
+      if (message) {
+        ErrorUtils.displayErrorMessage(message, "issueCheckingText", lang);
+    }
       }
       console.error(error);
     }

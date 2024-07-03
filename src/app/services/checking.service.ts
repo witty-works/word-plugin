@@ -58,9 +58,7 @@ export class CheckingService {
       if (error?.code === 13013) { //edge case: throttled
         const throttleWarning = document.getElementById("throttle-warning");
         if (throttleWarning) {
-          const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.throttleWarning);
-          throttleWarning.style.display = 'block';
-          throttleWarning.appendChild(errorMessageElement);
+          ErrorUtils.displayErrorMessage(throttleWarning, "throttleWarning", lang);
         }
       }
 
@@ -69,10 +67,8 @@ export class CheckingService {
         const message = document.getElementById("warn-not-signed-in-word");
 
         if (message) {
-          const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.notSignedInWarning);
-          message.style.display = 'block';
-          message.appendChild(errorMessageElement);
-        }
+          ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
+          }
       }
       throw error;
     }
