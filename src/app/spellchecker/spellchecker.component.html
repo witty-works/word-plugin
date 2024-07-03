@@ -36,6 +36,8 @@
         <span>{{lang.hitMaxTextLength1}}</span>
         <span class="max-length-reached-banner-link" role="link" tabindex="0" (click)="highlightCheckedText()" (keyup.enter)="highlightCheckedText()" [attr.aria-label]="lang.hitMaxTextLengthHere">{{lang.hitMaxTextLengthHere}}</span>
         <span>{{lang.hitMaxTextLength2}}</span>
+        <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale" [showSpinner]="isHighlightingCheckedText" style="opacity: 70%; z-index: 99999999;">
+        </ngx-spinner>
     </div>
 
     <app-errors-list [highlights]="highlights" [paragraphs]="paragraphsWithIds" (highlightEvent)="highlight($event)"
