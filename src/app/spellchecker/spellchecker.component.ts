@@ -30,6 +30,8 @@ export class SpellcheckerComponent implements OnInit {
 
   isLoggedin = false;
 
+  isHighlightingCheckedText = false;
+
   showSpinner = false;
 
   lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
@@ -524,7 +526,8 @@ export class SpellcheckerComponent implements OnInit {
     }
   }
 
-  async highlightCheckedText() {
+    async highlightCheckedText() {
+    this.isHighlightingCheckedText = true;
     await Word.run(async (context) => {
         try {
             if (!this.selectedText || this.selectedText.length <= 255) {
@@ -534,31 +537,34 @@ export class SpellcheckerComponent implements OnInit {
             let chunks = this.selectedText.split(/\r/);
             chunks = chunks.filter((paragraph) => paragraph !== "" && paragraph !== "\u000b");
 
-            const searchChunk = async (chunk: string) => {
+            // Prepare all search operations first
+            const searchPromises = chunks.map(async (chunk) => {
                 if (chunk.length > 200) {
-                  chunk = chunk.substring(0, 200);
+                    chunk = chunk.substring(0, 200);
                 }
                 const searchResults = context.document.body.search(chunk, { matchCase: true, matchWholeWord: false });
                 context.load(searchResults, 'items');
-                await context.sync();
-                return searchResults.items;
-            };
+                return searchResults; // Return the promise for later resolution
+            });
+
+            await context.sync();
 
             let firstRangeFound = null;
             let lastRangeFound = null;
 
-            for (let i = 0; i < chunks.length; i++) {
-                const searchResults = await searchChunk(chunks[i]);
-                if (searchResults.length > 0) {
+            // Process search results
+            for (const searchPromise of searchPromises) {
+                const searchResults = await searchPromise; // Resolve each promise
+                const items = searchResults.items;
+                if (items.length > 0) {
                     if (!firstRangeFound) {
-                        firstRangeFound = searchResults[0];
+                        firstRangeFound = items[0];
                     }
-                    lastRangeFound = searchResults[searchResults.length - 1];
+                    lastRangeFound = items[items.length - 1];
                 }
             }
 
             if (!firstRangeFound || !lastRangeFound) {
-                // console.log('Text not found in the document.');
                 return;
             }
 
@@ -569,5 +575,6 @@ export class SpellcheckerComponent implements OnInit {
             this.handleError(e);
         }
     });
+    this.isHighlightingCheckedText = false;
   }
 }
