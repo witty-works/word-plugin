@@ -33,24 +33,7 @@ export class IgnoreService {
        const message = document.getElementById("warn-failed-ignore-error");
       if (message) {
         const lang = Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de" ? de : en;
-           
-        const existingErrorMessage = message.querySelector('.error-message');
-        const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.failedRequestText);
-       
-        message.style.display = 'block';
-        
-        if (existingErrorMessage) {
-            message.replaceChild(errorMessageElement, existingErrorMessage);
-        } else {
-            message.appendChild(errorMessageElement);
-        }
-
-          window.addEventListener('online', () => {
-              if (existingErrorMessage) {
-                  message.removeChild(existingErrorMessage);
-              }
-              message.style.display = 'none';
-          });
+        ErrorUtils.displayErrorMessage(message, "failedRequestText", lang);
       }
       throw error;
     }

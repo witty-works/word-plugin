@@ -62,24 +62,7 @@ export class AuthService {
             const message = document.getElementById("warn-server-error")
             if (message) {
               const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-             
-              const existingErrorMessage = message.querySelector('.error-message');
-              const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.serverError);
-              
-              message.style.display = 'block';
-
-              if (existingErrorMessage) {
-                  message.replaceChild(errorMessageElement, existingErrorMessage);
-              } else {
-                  message.appendChild(errorMessageElement);
-              }
-
-                window.addEventListener('online', () => {
-                    if (existingErrorMessage) {
-                        message.removeChild(existingErrorMessage);
-                    }
-                    message.style.display = 'none';
-                });
+              ErrorUtils.displayErrorMessage(message, "serverError", lang);
             }
           }
         });
@@ -92,24 +75,7 @@ export class AuthService {
         const message = document.getElementById("warn-not-signed-in-word")
         if (message) {
           const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-          
-          const existingErrorMessage = message.querySelector('.error-message');
-          const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.notSignedInWarning);
-               
-          message.style.display = 'block';
-          
-          if (existingErrorMessage) {
-              message.replaceChild(errorMessageElement, existingErrorMessage);
-          } else {
-              message.appendChild(errorMessageElement);
-          }
-
-            window.addEventListener('online', () => {
-                if (existingErrorMessage) {
-                    message.removeChild(existingErrorMessage);
-                }
-                message.style.display = 'none';
-            });
+          ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
           }
       }
       return error;

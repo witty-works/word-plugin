@@ -58,22 +58,7 @@ export class CheckingService {
       if (error?.code === 13013) { //edge case: throttled
         const throttleWarning = document.getElementById("throttle-warning");
         if (throttleWarning) {
-          const existingErrorMessage = throttleWarning.querySelector('.error-message');
-          const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.throttleWarning);
- 
-          throttleWarning.style.display = 'block';
-          if (existingErrorMessage) {
-              throttleWarning.replaceChild(errorMessageElement, existingErrorMessage);
-          } else {
-              throttleWarning.appendChild(errorMessageElement);
-          }
-
-            window.addEventListener('online', () => {
-                if (existingErrorMessage) {
-                    throttleWarning.removeChild(existingErrorMessage);
-                }
-                throttleWarning.style.display = 'none';
-            });
+          ErrorUtils.displayErrorMessage(throttleWarning, "throttleWarning", lang);
         }
       }
 
@@ -82,22 +67,7 @@ export class CheckingService {
         const message = document.getElementById("warn-not-signed-in-word");
 
         if (message) {
-          const existingErrorMessage = message.querySelector('.error-message');  
-          const errorMessageElement = ErrorUtils.createErrorMessageElement(lang.notSignedInWarning);
-  
-          message.style.display = 'block';
-          if (existingErrorMessage) {
-              message.replaceChild(errorMessageElement, existingErrorMessage);
-          } else {
-              message.appendChild(errorMessageElement);
-          }
-
-            window.addEventListener('online', () => {
-                if (existingErrorMessage) {
-                    message.removeChild(existingErrorMessage);
-                }
-                message.style.display = 'none';
-            });
+          ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
           }
       }
       throw error;

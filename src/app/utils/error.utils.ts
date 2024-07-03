@@ -23,4 +23,23 @@ export class ErrorUtils {
 
     return message;
   }
+
+  static displayErrorMessage(messageContainer: HTMLElement, errorType: string, lang: any) {
+    const existingErrorMessage = messageContainer.querySelector('.error-message');
+    const errorMessageElement = this.createErrorMessageElement(lang[errorType]);
+
+    messageContainer.style.display = 'block';
+    if (existingErrorMessage) {
+      messageContainer.replaceChild(errorMessageElement, existingErrorMessage);
+    } else {
+      messageContainer.appendChild(errorMessageElement);
+    }
+
+    window.addEventListener('online', () => {
+      if (existingErrorMessage) {
+        messageContainer.removeChild(existingErrorMessage);
+      }
+      messageContainer.style.display = 'none';
+    });
+  }
 }
