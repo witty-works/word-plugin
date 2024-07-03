@@ -11,6 +11,8 @@ export class ErrorUtils {
 
     const message = document.createElement('div');
     message.classList.add('error-message');
+    message.setAttribute('role', 'alert');
+    message.setAttribute('aria-live', 'assertive');
     
     const cautionImg = document.createElement('img');
     cautionImg.src = "assets/icons/caution-sign.svg";
