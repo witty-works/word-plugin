@@ -43,10 +43,10 @@ export const de = {
   learnMore: "Warum das so ist",
   arrowDownIconAlt: "Erklärung öffnen",
   videoIconAlt: "Ein Erklärungsvideo ist verfügbar",
-  arrowRightAlt: "Erklärungen schliessen",
   ignoreOnce: "Einmal ignorieren",
   ignorePermanently: "Für immer ignorieren",
   failedRequestText: 'Speicherung fehlgeschlagen. Bitte später erneut probieren.',
+  cautionIconAlt: "Ein Fehler ist aufgetreten. Bitte überprüfen Sie die folgende Nachricht für Details.",
 
   //settings
   settingsIconAlt: "Witty Dashboard Einstellungen öffnen",
@@ -116,10 +116,10 @@ export const en = {
   learnMore: "Dig deeper",
   arrowDownIconAlt: "Open explanation",
   videoIconAlt: "A video is available for more learning",
-  arrowRightAlt: "Close explanation",
   ignoreOnce: "Ignore once",
   ignorePermanently: "Ignore permanently",
   failedRequestText: 'Unable to save. Please try again later.',
+  cautionIconAlt: "An error has occurred. Please check the following message for details.",
 
   //settings
   settingsIconAlt: "Open Witty Dashboard settings",

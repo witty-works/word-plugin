@@ -8,18 +8,17 @@
           [innerHTML]="contextValue | highlight : error"
         ></div>
         <div class="preview" *ngIf="!showContext">{{ error.word }}</div>
-        <div
+        <button
           class="toggle"
           [class.active]="isOpen"
-          tabindex="0"
-          (keydown.enter)="toggle()"
-          role="button"
+          [attr.aria-expanded]="isOpen ? 'true' : 'false'"
+          [attr.aria-label]="lang.arrowDownIconAlt"
         >
           <img
             src="assets/icons/chevron-down.svg"
-            alt="{lang.arrowDownIconAlt}"
+            alt="{{lang.arrowDownIconAlt}}"
           />
-        </div>
+        </button>
       </header>
 
       <section class="suggestions" *ngIf="isOpen">
@@ -49,16 +48,15 @@
             </div>
 
             <ng-container *ngIf="error.details.explanation?.url">
-              <div
+              <a href="{{error.details.explanation.url}}"
+                target="_blank"
+                rel="noopener noreferrer"
                 class="witty-works-ext-container-row witty-works-ext-justify-end witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer"
-                (click)="onClick(error.details.explanation.url)"
-                tabindex="0"
-                (keydown.enter)="onClick(error.details.explanation.url)"
-                role="link"
-              >
+                style="text-decoration: none;">
+             
                 <div
                   class="witty-works-ext-secondary-button-red witty-works-ext-container-row witty-works-ext-margin-top"
-                >
+                  >
                   {{ lang.learnMore }}
                   <ng-container
                     *ngIf="error.details.explanation.content === 'video'"
@@ -66,7 +64,7 @@
                     <img
                       class="witty-works-ext-margin-left"
                       src="assets/icons/video.svg"
-                      alt="{lang.videoIconAlt}"
+                      alt="{{lang.videoIconAlt}}"
                     />
                   </ng-container>
                   <div
@@ -74,12 +72,12 @@
                     style="pointer-events: 'none'"
                   >
                     <img
-                      src="assets/icons/arrow-right.svg"
-                      alt="{lang.arrowRightAlt}"
+                      src="assets/icons/external-link.svg"
+                      alt="{{lang.learnMore}}"
                     />
                   </div>
                 </div>
-              </div>
+              </a>
             </ng-container>
           </div>
         </div>
@@ -120,7 +118,7 @@
                     </span>
                     <span *ngIf="!suggestion.context.startsWith('💡')">
                       <span>&nbsp;&nbsp;</span>
-                      <u>{{ suggestion.context }}</u>
+                        <u>{{ suggestion.context }}</u>
                     </span>
                   </a>
                   <span *ngIf="!suggestion.url">
@@ -132,42 +130,34 @@
           </div>
         </ng-container>
         <div class="witty-works-ext-button-group">
-          <div
+          <button
             (click)="ignoreOnce()"
-            class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer"
-          >
-            <span
-              class="witty-works-ext-margin-right witty-works-ext-cursor-pointer"
+            class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer witty-works-ext-cursor-pointer"
+            [attr.aria-label]="lang.ignoreOnce"
             >
-              <img
-                class="witty-works-ext-margin-left"
-                src="assets/icons/ignore.svg"
-                alt="{{ lang.ignoreOnce }}"
-                style="margin-bottom: -2px"
-              />
-            </span>
+            <img
+              src="assets/icons/ignore.svg"
+              alt="{{ lang.ignoreOnce }}"
+              style="margin-bottom: -2px"
+              aria-hidden="true"
+            />
             <span class="witty-works-ext-lato-popover-text-gray witty-works-ext-ignore-text">
               {{ lang.ignoreOnce }}
             </span>
-          </div>
-          <div
-            (click)="ignorePermanently(error.word)"
-            class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer"
-          >
-            <span
-              class="witty-works-ext-margin-right witty-works-ext-cursor-pointer"
-            >
-              <img
-                class="witty-works-ext-margin-left"
-                src="assets/icons/ignore.svg"
-                alt="{{ lang.ignorePermanently }}"
-                style="margin-bottom: -2px"
-              />
-            </span>
-            <span class="witty-works-ext-lato-popover-text-gray witty-works-ext-ignore-text">
-              {{ lang.ignorePermanently }}
-            </span>
-          </div>
+          </button>
+            <button 
+              (click)="ignorePermanently(error.word)"
+              class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer witty-works-ext-cursor-pointer"
+              [attr.aria-label]="lang.ignorePermanently">
+              <img 
+              src="assets/icons/ignore.svg" 
+              alt="{{lang.ignorePermanently}}" 
+              style="margin-bottom: -2px" 
+              aria-hidden="true" />
+              <span class="witty-works-ext-lato-popover-text-gray witty-works-ext-ignore-text">
+                  {{ lang.ignorePermanently }}
+              </span>
+            </button>
         </div>
       </section>
     </div>

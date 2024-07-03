@@ -6,6 +6,7 @@ import { ISpellingError } from "../data/data-structures";
 import { environment } from '../../environments/environment';
 import { de, en } from '../translations';
 import * as Sentry from '@sentry/browser';
+import { ErrorUtils } from "../utils/error.utils";
 
 @Injectable({
   providedIn: "root",
@@ -57,8 +58,7 @@ export class CheckingService {
       if (error?.code === 13013) { //edge case: throttled
         const throttleWarning = document.getElementById("throttle-warning");
         if (throttleWarning) {
-          throttleWarning.style.display = "block";
-          throttleWarning.innerHTML = lang.throttleWarning;
+          ErrorUtils.displayErrorMessage(throttleWarning, "throttleWarning", lang);
         }
       }
 
@@ -67,9 +67,8 @@ export class CheckingService {
         const message = document.getElementById("warn-not-signed-in-word");
 
         if (message) {
-          message.style.display = "block";
-          message.innerHTML = lang.notSignedInWarning;
-        }
+          ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
+          }
       }
       throw error;
     }

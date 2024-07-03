@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { environment } from "../../environments/environment";
 import { de, en } from "../translations";
 import * as Sentry from "@sentry/browser";
+import { ErrorUtils } from "../utils/error.utils";
 
 @Injectable({
   providedIn: "root",
@@ -32,8 +33,7 @@ export class IgnoreService {
        const message = document.getElementById("warn-failed-ignore-error");
       if (message) {
         const lang = Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de" ? de : en;
-        message.style.display = "block";
-        message.innerHTML = lang.failedRequestText;
+        ErrorUtils.displayErrorMessage(message, "failedRequestText", lang);
       }
       throw error;
     }

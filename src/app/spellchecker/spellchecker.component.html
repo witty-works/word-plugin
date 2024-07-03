@@ -1,7 +1,7 @@
 <div>
     <div style="display: flex; align-items: center; justify-content: space-between;">
         <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
-            (click)="checkText()">{{lang.wittyCheck}}</button>
+            (click)="checkText()" [attr.aria-label]="lang.wittyCheck">{{lang.wittyCheck}}</button>
             <div class="witty-works-ext-selection-info">{{lang.howToSelectText}}</div>
         <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale"
             [showSpinner]="isSpellchecking" style="opacity: 70%; z-index: 99999999;"></ngx-spinner>
@@ -21,7 +21,7 @@
         <br />
         <div class="button-spinner-row">
             <button class="witty-works-ext-button witty-works-ext-primary-button-red"
-                (click)="register()">{{lang.register}}</button>
+                (click)="register()" [attr.aria-label]="lang.register">{{lang.register}}</button>
       
             <div *ngIf="showSpinner" class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
         </div>
@@ -32,9 +32,12 @@
     </div>
 
     <div *ngIf="hitMaxTextLength && isLoggedInWord && !isFirstRun && highlights.length > 0" class="max-length-reached-banner">
+        <img src="assets/icons/caution-sign.svg" alt="{{lang.cautionIconAlt}}" style="margin-right: 5px;">
         <span>{{lang.hitMaxTextLength1}}</span>
-        <span class="max-length-reached-banner-link" (click)="highlightCheckedText()">{{lang.hitMaxTextLengthHere}}</span>
+        <span class="max-length-reached-banner-link" role="link" tabindex="0" (click)="highlightCheckedText()" (keyup.enter)="highlightCheckedText()" [attr.aria-label]="lang.hitMaxTextLengthHere">{{lang.hitMaxTextLengthHere}}</span>
         <span>{{lang.hitMaxTextLength2}}</span>
+        <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale" [showSpinner]="isHighlightingCheckedText" style="opacity: 70%; z-index: 99999999;">
+        </ngx-spinner>
     </div>
 
     <app-errors-list [highlights]="highlights" [paragraphs]="paragraphsWithIds" (highlightEvent)="highlight($event)"
@@ -59,8 +62,8 @@
         </div>
         <footer>
             <button class="secondary" (click)="dialogRef?.close(undefined)"
-                style="margin-right: 12px;">{{lang.dontAnalyzeAgain}}</button>
-            <button (click)="dialogRef?.close('search')">{{lang.analyzeAgain}}</button>
+                style="margin-right: 12px;" [attr.aria-label]="lang.dontAnalyzeAgain">{{lang.dontAnalyzeAgain}}</button>
+            <button (click)="dialogRef?.close('search')" [attr.aria-label]="lang.analyzeAgain">{{lang.analyzeAgain}}</button>
         </footer>
     </ng-template>
 </div>

@@ -9,6 +9,7 @@ import DocumentUtils from '../utils/word.utils';
 import { useAnalytics } from '../analytics/analytics';
 import { DialogRef, DialogService } from "@ngneat/dialog";
 import * as Sentry from '@sentry/browser';
+import { ErrorUtils } from '../utils/error.utils';
 
 const analytics = useAnalytics();
 
@@ -28,6 +29,8 @@ export class SpellcheckerComponent implements OnInit {
   isLoggedInWord = true;
 
   isLoggedin = false;
+
+  isHighlightingCheckedText = false;
 
   showSpinner = false;
 
@@ -152,8 +155,8 @@ export class SpellcheckerComponent implements OnInit {
       if (response?.code === 13013) { //edge case: throttled
         this.showSpinner = true;
         if (throttleWarning) {
-          throttleWarning.style.display = 'block';
-          throttleWarning.innerHTML = this.lang.throttleWarning;
+          const lang = Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de" ? de : en;
+          ErrorUtils.displayErrorMessage(throttleWarning, "throttleWarning", lang);
         }
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
@@ -233,7 +236,10 @@ export class SpellcheckerComponent implements OnInit {
             const body = context.document.body;
             body.load('text');
             await context.sync();
-            this.selectedText = body.text.substring(0, maxTextLength);
+            this.selectedText = body.text.substring(0, maxTextLength); 
+            if(body.text.length > maxTextLength) {
+              this.hitMaxTextLength = true;
+            }
           } else if (this.selectedText.length > maxTextLength) {
             this.hitMaxTextLength = true;
             const selectedTextWithinRange = this.selectedText.substring(0, maxTextLength);
@@ -254,16 +260,17 @@ export class SpellcheckerComponent implements OnInit {
       chunks = chunks.filter((paragraph) => paragraph !== "");
 
       const allPageparagraphs = context.document.body.paragraphs
-      allPageparagraphs.load();
+      allPageparagraphs.load('items');
       await context.sync();
   
-      context.load(allPageparagraphs);
-      await context.sync();
       const paragraphCollection = allPageparagraphs.load({
-        text: true,
-      });
+      select: ['text', 'uniqueLocalId']
+    });
+      await context.sync();
 
-      this.paragraphsWithIds = paragraphCollection.items.map((paragraph) => (
+      this.paragraphsWithIds = paragraphCollection.items
+        .filter(paragraph => paragraph.uniqueLocalId !== null)
+        .map((paragraph) => (
         { text: paragraph.text.replace(/^\u000b+/, ''), id: paragraph.uniqueLocalId }))
         .filter(paragraph => paragraph.text !== "");
       let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
@@ -360,10 +367,9 @@ export class SpellcheckerComponent implements OnInit {
       } else {
         const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
         const message = document.getElementById("issue-checking-text")
-        if (message) {
-          message.style.display = 'block';
-          message.innerHTML = lang.issueCheckingText;
-        }
+      if (message) {
+        ErrorUtils.displayErrorMessage(message, "issueCheckingText", lang);
+    }
       }
       console.error(error);
     }
@@ -516,75 +522,55 @@ export class SpellcheckerComponent implements OnInit {
     }
   }
 
-  //overly complicated function to highlight the text that was checked (mostly because search is limited to 255 characters), look into simplifying
-  async highlightCheckedText() {
+    async highlightCheckedText() {
+    this.isHighlightingCheckedText = true;
     await Word.run(async (context) => {
-      try {
-        if (!this.selectedText || this.selectedText.length <= 255) {
-          // console.log('Text is too short or not specified.');
-          return;
+        try {
+            if (!this.selectedText || this.selectedText.length <= 255) {
+                return;
+            }
+
+            let chunks = this.selectedText.split(/\r/);
+            chunks = chunks.filter((paragraph) => paragraph !== "" && paragraph !== "\u000b");
+
+            // Prepare all search operations first
+            const searchPromises = chunks.map(async (chunk) => {
+                if (chunk.length > 200) {
+                    chunk = chunk.substring(0, 200);
+                }
+                const searchResults = context.document.body.search(chunk, { matchCase: true, matchWholeWord: false });
+                context.load(searchResults, 'items');
+                return searchResults; // Return the promise for later resolution
+            });
+
+            await context.sync();
+
+            let firstRangeFound = null;
+            let lastRangeFound = null;
+
+            // Process search results
+            for (const searchPromise of searchPromises) {
+                const searchResults = await searchPromise; // Resolve each promise
+                const items = searchResults.items;
+                if (items.length > 0) {
+                    if (!firstRangeFound) {
+                        firstRangeFound = items[0];
+                    }
+                    lastRangeFound = items[items.length - 1];
+                }
+            }
+
+            if (!firstRangeFound || !lastRangeFound) {
+                return;
+            }
+
+            const completeRange = firstRangeFound.expandTo(lastRangeFound);
+            completeRange.select('Select');
+            await context.sync();
+        } catch (e) {
+            this.handleError(e);
         }
-
-        const chunkSize = 255; // Maximum size for each search
-        const overlap = 50; // Overlap size to ensure continuity
-        let startPosition = 0;
-        let endPosition = chunkSize;
-        let firstRangeFound = null;
-        let lastRangeFound = null;
-
-        while (startPosition < this.selectedText.length && !firstRangeFound) {
-          const searchChunk = this.selectedText.substring(startPosition, Math.min(endPosition, this.selectedText.length));
-          const searchResults = context.document.body.search(searchChunk, { matchCase: true, matchWholeWord: false });
-          context.load(searchResults, 'items');
-          await context.sync();
-
-          if (searchResults.items.length > 0) {
-            firstRangeFound = searchResults.items[0];
-            lastRangeFound = searchResults.items[0];
-            break; // Found the first chunk, break the loop to proceed with the next step
-          }
-
-          // Adjust positions for the next chunk, considering overlap
-          startPosition += (chunkSize - overlap);
-          endPosition = startPosition + chunkSize;
-        }
-
-        if (!firstRangeFound) {
-          // console.log('Text not found in the document.');
-          return;
-        }
-
-        // Now find the rest of the text, ensuring each chunk is in sequence
-        while (endPosition < this.selectedText.length && firstRangeFound && lastRangeFound) {
-          const nextChunkStart = endPosition - overlap;
-          const nextChunkEnd = nextChunkStart + chunkSize;
-          const nextSearchChunk = this.selectedText.substring(nextChunkStart, Math.min(nextChunkEnd, this.selectedText.length));
-
-          const nextSearchResults = context.document.body.search(nextSearchChunk, { matchCase: true, matchWholeWord: false });
-          context.load(nextSearchResults, 'items');
-          await context.sync();
-
-          if (nextSearchResults.items.length > 0) {
-            // Assume the first match is the correct continuation
-            lastRangeFound = nextSearchResults.items[0];
-            endPosition = nextChunkEnd;
-          } else {
-            // console.log('Could not find the next part of the text.');
-            return;
-          }
-        }
-
-        if (!lastRangeFound) {
-          // console.log('Text not found in the document.');
-          return;
-        }
-        // Highlight the entire text from the first to the last found range
-        const completeRange = firstRangeFound.expandTo(lastRangeFound);
-        completeRange.select('Select');
-        await context.sync();
-      } catch (e) {
-        this.handleError(e);
-      }
     });
+    this.isHighlightingCheckedText = false;
   }
 }
