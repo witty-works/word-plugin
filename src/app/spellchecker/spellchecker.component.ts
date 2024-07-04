@@ -11,6 +11,7 @@ import { DialogRef, DialogService } from "@ngneat/dialog";
 import * as Sentry from '@sentry/browser';
 import { ErrorUtils } from '../utils/error.utils';
 import { KEYBOARD_SHORTCUTS_CONFIG } from '../keyboard-shortcuts.config';
+import { MaxLengthUtils } from '../utils/maxlenght.utils';
 
 const analytics = useAnalytics();
 
@@ -228,43 +229,59 @@ export class SpellcheckerComponent implements OnInit {
     return accessTokenWithTimestamp;
   }
 
-  async checkText(): Promise<void> {
+async checkText(): Promise<void> {
     this.hitMaxTextLength = false;
     this.isFirstRun = false;
     this.isSpellchecking = true;
-    this.selectedText = ''
+    this.selectedText = '';
     this.highlights = [];
     this.previouslyCheckedParagraphs = [];
     
-    return Word.run(async (context) => {
-      Office.context.document.getSelectedDataAsync(Office.CoercionType.Text, async (asyncResult) => {
-        if (asyncResult.status == Office.AsyncResultStatus.Failed) {
-          console.log('Action failed. Error: ' + asyncResult.error.message);
-        } else {
-          this.selectedText = asyncResult.value as string;  
-          const maxTextLength = environment.maxTextLength;
-          if (this.selectedText.length === 0) {
-            const body = context.document.body;
-            body.load('text');
-            await context.sync();
-            this.selectedText = body.text.substring(0, maxTextLength); 
-            if(body.text.length > maxTextLength) {
-              this.hitMaxTextLength = true;
-            }
-          } else if (this.selectedText.length > maxTextLength) {
-            this.hitMaxTextLength = true;
-            const selectedTextWithinRange = this.selectedText.substring(0, maxTextLength);
-            const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
-            this.selectedText = this.selectedText.substring(0, lastSpace);
-          }
+    try {
+        await Word.run(async (context) => {
+            return new Promise<void>((resolve, reject) => {
+                Office.context.document.getSelectedDataAsync(Office.CoercionType.Text, async (asyncResult) => {
+                    if (asyncResult.status == Office.AsyncResultStatus.Failed) {
+                        console.log('Action failed. Error: ' + asyncResult.error.message);
+                        reject(asyncResult.error.message);
+                    } else {
+                        this.selectedText = asyncResult.value as string;
+                        const maxTextLength = environment.maxTextLength;
+                        if (this.selectedText.length === 0) {
+                            const body = context.document.body;
+                            body.load('text');
+                            await context.sync();
+                            this.selectedText = body.text.substring(0, maxTextLength);
+                            if (body.text.length > maxTextLength) {
+                                this.hitMaxTextLength = true;
+                            }
+                        } else if (this.selectedText.length > maxTextLength) {
+                            this.hitMaxTextLength = true;
+                            const selectedTextWithinRange = this.selectedText.substring(0, maxTextLength);
+                            const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
+                            this.selectedText = this.selectedText.substring(0, lastSpace);
+                        }
           
-          // Continue with further operations inside this callback or call a separate async function
-          await this.processSelectedText(context);
+                        // Continue with further operations inside this callback or call a separate async function
+                        await this.processSelectedText(context);
+                        resolve();
+                    }
+                });
+            });
+        });
+} catch (error) {
+    const lang = Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de" ? de : en;
+    if (this.hitMaxTextLength && this.isLoggedInWord && !this.isFirstRun && this.highlights.length > 0) {
+        const bannerElement = document.getElementById("max-length-reached-banner");
+        if (bannerElement) {
+            MaxLengthUtils.displayErrorMessage(bannerElement, ["hitMaxTextLength1", "hitMaxTextLengthHere", "hitMaxTextLength2"], lang);
+        } else {
+            console.error("Element with ID 'max-length-reached-banner' not found.");
         }
-      });
-    });
-  }
-  
+    }
+}
+}
+
   async processSelectedText(context: Word.RequestContext ): Promise<void> {
     try {
       let chunks = this.selectedText.split(/\r/);
