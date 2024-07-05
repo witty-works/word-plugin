@@ -1,5 +1,5 @@
 export const environment = {
-  package_version: "1.3.25",
+  package_version: "1.3.26",
   production: true,
   environment: "production",
   sentry_dsn: "https://9fe0bcbcd55e6ebae036cd0625603c71@o4507044685938688.ingest.de.sentry.io/4507044705206352",
