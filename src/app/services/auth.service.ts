@@ -12,9 +12,9 @@ export class AuthService {
 
   constructor(private http: HttpClient, private ErrorUtils: ErrorUtils) { }
 
-async makeAuthRequest(): Promise<any> {
+  async makeAuthRequest(): Promise<any> {
   let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
-    try {
+  try {
 
       if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) { //check if token is older than 5 min
         const newAccessToken = await Office.auth.getAccessToken({
@@ -41,8 +41,7 @@ async makeAuthRequest(): Promise<any> {
       const response = await this.http.post<any>(url, {}, httpOptions).toPromise();
       return response;
     } catch (error: any) {
-      if (error.status === 403) {
-        console.log(`403 error in makeAuthRequest: ${error.message}`);        
+      if (error.status === 403) {    
         localStorage.removeItem('word_access_token_with_timestamp'); //ensures that we get new token
         const authFailCounter = localStorage.getItem('authFailCounter') ?? '0';
         if (parseInt(authFailCounter) <= 2) { //has to be 2 to avoid reaching api limit 
