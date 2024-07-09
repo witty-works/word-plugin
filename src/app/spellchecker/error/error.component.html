@@ -133,6 +133,7 @@
           <button
             (click)="ignoreOnce()"
             class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer witty-works-ext-cursor-pointer"
+            tabindex="0"
             [attr.aria-label]="lang.ignoreOnce"
             >
             <img
@@ -148,6 +149,7 @@
             <button 
               (click)="ignorePermanently(error.word)"
               class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer witty-works-ext-cursor-pointer"
+              tabindex="0"
               [attr.aria-label]="lang.ignorePermanently">
               <img 
               src="assets/icons/ignore.svg" 

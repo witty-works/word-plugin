@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
 import { SettingsService } from "../services/settings.service";
 import { Subscription } from "rxjs";
 import { en, de } from '../translations';
@@ -21,6 +21,24 @@ export class SettingsComponent implements OnInit, OnDestroy {
   public appVersion = '-';
 
   private showContextSubscription?: Subscription;
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.ctrlKey && event.shiftKey) {
+      event.preventDefault();
+      switch (event.key) {
+        case 'D':
+          this.openDashboard();
+          break;
+        case 'F1': // Changed to F1 for openHelpCenter
+          this.openHelpCenter();
+          break;
+        case 'W':
+          this.openWittyHomePage();
+          break;
+      }
+    }
+  }
 
   constructor(private settingsService: SettingsService) {
   }

@@ -1,9 +1,9 @@
 <div>
     <nav [attr.aria-label]="lang.areaLabelHeader" class="witty-works-ext-header">
-        <button (click)="openWittyHomePage()" aria-label="Open Witty Works homepage">
+        <button (click)="openWittyHomePage()" tabindex="0" aria-label="Open Witty Works homepage">
             <img src="assets/icons/witty-logo.svg" alt="{{lang.wittyIconAlt}}">
         </button>
-        <button *ngIf="isLoggedIn" (click)="openDashboard()" [attr.aria-label]="lang.settingsIconAlt">
+        <button *ngIf="isLoggedIn" (click)="openDashboard()" tabindex="0" [attr.aria-label]="lang.settingsIconAlt">
             <img src="assets/icons/settings.svg" alt="{{lang.settingsIconAlt}}">
         </button>
     </nav>
@@ -40,6 +40,6 @@
     <div class="witty-works-ext-separator"></div>
     <div class="witty-works-ext-wittyworks-container">
         {{lang.wittyVersion}} {{ appVersion }}
-        <button class="witty-works-ext-link" (click)="openHelpCenter()" [attr.aria-label]="lang.help">{{lang.help}}</button>
+        <button class="witty-works-ext-link" (click)="openHelpCenter()" tabindex="0" [attr.aria-label]="lang.help">{{lang.help}}</button>
     </div>
 </footer>

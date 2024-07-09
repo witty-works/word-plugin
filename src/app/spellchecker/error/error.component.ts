@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, EventEmitter, Input, Output, HostListener } from "@angular/core";
 import { ISpellingError } from "../../data/data-structures";
 import TextUtils from "../../utils/text.utils";
 import { CheckingService } from "../../services/checking.service";
@@ -31,6 +31,24 @@ export class ErrorComponent {
 
   @Output()
   acceptSuggestionEvent = new EventEmitter<{ suggestion: IAlternatives }>();
+
+@HostListener('keydown', ['$event'])
+handleKeyboardEvent(event: KeyboardEvent) {
+  if (event.ctrlKey && event.shiftKey) {
+    switch (event.key) {
+      case 'I':
+        event.preventDefault();
+        this.ignoreOnce();
+        break;
+      case 'P':
+        event.preventDefault();
+        if (this.error?.word) {
+          this.ignorePermanently(this.error.word);
+        }
+        break;
+    }
+  }
+}
 
   isOpen = false;
   suggestions: IAlternatives[] = [];
