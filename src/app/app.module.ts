@@ -16,7 +16,7 @@ import { FormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
 import { provideDialogConfig } from '@ngneat/dialog';
 import { Router } from "@angular/router";
-import * as Sentry from "@sentry/angular-ivy";
+import * as Sentry from "@sentry/angular";
 
 @NgModule({
   declarations: [

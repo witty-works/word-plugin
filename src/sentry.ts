@@ -1,6 +1,6 @@
 import { enableProdMode } from "@angular/core";
 import { platformBrowserDynamic } from "@angular/platform-browser-dynamic";
-import * as Sentry from "@sentry/angular-ivy";
+import * as Sentry from "@sentry/angular";
 import { environment } from './environments/environment';
 import { AppModule } from "./app/app.module";
   
@@ -10,12 +10,7 @@ if (environment.sentry_dsn) {
     release: environment.package_version,
     dsn: environment.sentry_dsn,
     integrations: [
-    new Sentry.BrowserTracing({
-    // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-    tracingOrigins: [environment.sentry_api_url, /^\//],
-    routingInstrumentation: Sentry.routingInstrumentation,
-    }),
-    new Sentry.Replay(),
+      Sentry.browserTracingIntegration(),
     ],
     sampleRate: environment.sentry_sample_rate,
     tracesSampleRate: environment.sentry_traces_sample_rate,
