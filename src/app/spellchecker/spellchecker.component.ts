@@ -10,6 +10,7 @@ import { useAnalytics } from '../analytics/analytics';
 import { DialogRef, DialogService } from "@ngneat/dialog";
 import * as Sentry from '@sentry/browser';
 import { ErrorUtils } from '../utils/error.utils';
+import { KEYBOARD_SHORTCUTS_CONFIG } from '../keyboard-shortcuts.config';
 
 const analytics = useAnalytics();
 
@@ -58,6 +59,8 @@ export class SpellcheckerComponent implements OnInit {
   errorIntro = "";
   errorMessage = "";
   dialogRef?: DialogRef;
+
+  shortcuts = KEYBOARD_SHORTCUTS_CONFIG;
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {

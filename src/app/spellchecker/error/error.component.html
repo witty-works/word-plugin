@@ -135,6 +135,8 @@
             class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer witty-works-ext-cursor-pointer"
             tabindex="0"
             [attr.aria-label]="lang.ignoreOnce"
+            [attr.aria-keyshortcuts]="shortcuts.ignoreOnce.key"
+            title="{{ lang.ignoreOnce }} ({{shortcuts.ignoreOnce.key}})"
             >
             <img
               src="assets/icons/ignore.svg"
@@ -150,7 +152,9 @@
               (click)="ignorePermanently(error.word)"
               class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer witty-works-ext-cursor-pointer"
               tabindex="0"
-              [attr.aria-label]="lang.ignorePermanently">
+              [attr.aria-label]="lang.ignorePermanently"
+              [attr.aria-keyshortcuts]="shortcuts.ignorePermanently.key"
+              title="{{ lang.ignorePermanently }} ({{shortcuts.ignorePermanently.key}})">
               <img 
               src="assets/icons/ignore.svg" 
               alt="{{lang.ignorePermanently}}" 
