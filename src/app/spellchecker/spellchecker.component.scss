@@ -334,3 +334,30 @@
 .witty-works-ext-selection-info {
   font-size: 12px;
 }
+
+.keyboard-shortcut-info {
+  color: $black;
+  display: flex;
+  font-size: 12px;
+  white-space: nowrap;
+  position:absolute;
+  bottom: 60px;
+}
+
+.keyboard-shortcut-info table {
+  width: 100%;
+  border-collapse: separate; 
+  border-spacing: 0 4px;
+}
+
+.keyboard-shortcut-info th, .keyboard-shortcut-info td {
+  padding-left: 25px; 
+}
+
+.keyboard-shortcut-info th:first-child, .keyboard-shortcut-info td:first-child {
+  padding-left: 0; 
+}
+
+.keyboard-shortcut-info th {
+  text-align: left;
+}

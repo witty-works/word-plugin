@@ -1,7 +1,7 @@
 <div>
     <div style="display: flex; align-items: center; justify-content: space-between;">
         <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
-            (click)="checkText()" [attr.aria-label]="lang.wittyCheck">{{lang.wittyCheck}}</button>
+            (click)="checkText()" [attr.aria-label]="lang.wittyCheck" (keydown)="handleKeyboardEvent($event)" [attr.aria-keyshortcuts]="shortcuts.wittyCheck.key" title="{{ lang.wittyCheck }} ({{ shortcuts.wittyCheck.key }})">{{lang.wittyCheck}}</button>
             <div class="witty-works-ext-selection-info">{{lang.howToSelectText}}</div>
         <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale"
             [showSpinner]="isSpellchecking" style="opacity: 70%; z-index: 99999999;"></ngx-spinner>
@@ -46,6 +46,27 @@
 
     <div class="full-size-notification" *ngIf="isLoggedInWord && isFirstRun && isLoggedin">
         <span>{{lang.clickWittyCheck}}</span>
+        
+    <div class="keyboard-shortcut-info" tabindex="0">
+        <table>
+            <caption style="text-align: left;">Keyboard shortcuts for Witty</caption>
+            <tr>
+                <th scope="col">Keyboard shortcut</th>
+                <th scope="col">Function</th>
+            </tr>
+            <tr>
+                <td>{{shortcuts.wittyCheck.key}}</td>
+                <td>{{lang.wittyCheck}}</td>
+            </tr>
+            <tr>
+                <td>{{shortcuts.ignoreOnce.key}}</td>
+                <td>{{lang.ignoreOnce}}</td>
+            </tr>
+            <tr>
+                <td>{{shortcuts.ignorePermanently.key}}</td>
+                <td>{{lang.ignorePermanently}}</td>
+            </tr>
+        </table>
     </div>
 
     <div class="full-size-notification" *ngIf="isLoggedInWord && !isFirstRun && highlights.length === 0 && !isSpellchecking">
