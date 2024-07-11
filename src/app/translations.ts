@@ -61,6 +61,10 @@ export const de = {
   wittyVersion: "Witty Word Plugin Version: ",
   help: "Hilfe",
 
+  keyboardShortcuts: "Verfügbare Tastenkombination:",
+  keyboardShortcut: "Tastenkombination",
+  keyboardFunction: "Funktion",
+
   //warnings
   throttleWarning: "Bitte versuche es in ca. 30 Sekunden erneut.",
   notSignedInWarning:
@@ -133,6 +137,10 @@ export const en = {
   logOut: "Log out",
   wittyVersion: "Witty Word Plugin Version: ",
   help: "Help",
+
+  keyboardShortcuts: "Available Keyboard Shortcuts:",
+  keyboardShortcut: "Shortcut",
+  keyboardFunction: "Function",
 
   //warnings
   throttleWarning: "Please try again in about 30 seconds.",
