@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild, HostListener } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
 import { ISpellingError } from "../data/data-structures";
 import { IAlternatives, IAlert, IAuthResponse, ICheckResponse, ICheckResponseResult } from "../data/types";
@@ -11,6 +11,7 @@ import { DialogRef, DialogService } from "@ngneat/dialog";
 import * as Sentry from '@sentry/browser';
 import { ErrorUtils } from '../utils/error.utils';
 import { MaxLengthUtils } from '../utils/maxlenght.utils';
+import { KEYBOARD_SHORTCUTS_CONFIG } from '../keyboard-shortcuts.config';
 
 const analytics = useAnalytics();
 
@@ -61,6 +62,16 @@ export class SpellcheckerComponent implements OnInit {
   errorIntro = "";
   errorMessage = "";
   dialogRef?: DialogRef;
+
+  shortcuts = KEYBOARD_SHORTCUTS_CONFIG;
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.ctrlKey && event.shiftKey && event.key === 'C') {
+      event.preventDefault();
+      this.checkText();
+    }
+  }
 
   constructor(
     private spellcheckerService: CheckingService,
