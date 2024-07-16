@@ -96,3 +96,12 @@ button {
   margin-bottom: 2px;
   color: #66b3ff;
 }
+
+.error-message-blue-banner body {
+  display: none;
+  margin: 20px;
+  padding: 20px;
+  background-color: #1ebbee;
+  color: white;
+  font-size: 16px;
+}
