@@ -12,6 +12,7 @@ import * as Sentry from '@sentry/browser';
 import { ErrorUtils } from '../utils/error.utils';
 import { MaxLengthUtils } from '../utils/maxlenght.utils';
 import { KEYBOARD_SHORTCUTS_CONFIG } from '../keyboard-shortcuts.config';
+import { MaxLengthUtils } from '../utils/maxlenght.utils';
 
 const analytics = useAnalytics();
 
