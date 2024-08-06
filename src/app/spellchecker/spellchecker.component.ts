@@ -369,7 +369,7 @@ export class SpellcheckerComponent implements OnInit {
           //within the paragraph, order by start offset
         }
     } catch (error: any) {
-      Sentry.captureException(new Error(`Error in processSelectedText: ${error}`));
+      Sentry.captureException(new Error(`Error in processSelectedText: ${JSON.stringify(error, null, 2)}`));
       if (error.name === 'HttpErrorResponse' && error.status === 422) {
         //TODO: handle this
       } else if (error?.code === 13001) {
