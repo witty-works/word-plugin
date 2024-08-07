@@ -1,10 +1,10 @@
 <div>
     <nav [attr.aria-label]="lang.areaLabelHeader" class="witty-works-ext-header">
         <button (click)="openWittyHomePage()" tabindex="0" aria-label="Open Witty Works homepage">
-            <img src="assets/icons/witty-logo.svg" alt="{{lang.wittyIconAlt}}">
+            <img src="assets/icons/witty-logo.svg" alt="">
         </button>
-        <button *ngIf="isLoggedIn" (click)="openDashboard()" tabindex="0" [attr.aria-label]="lang.settingsIconAlt">
-            <img src="assets/icons/settings.svg" alt="{{lang.settingsIconAlt}}">
+        <button title="{{ lang.settingsIconAlt }}" *ngIf="isLoggedIn" (click)="openDashboard()" tabindex="0" [attr.aria-label]="lang.settingsIconAlt">
+            <img src="assets/icons/settings.svg" alt=""> 
         </button>
     </nav>
 
@@ -39,7 +39,7 @@
 <footer class="witty-works-ext-lato-popup-text">
     <div class="witty-works-ext-separator"></div>
     <div class="witty-works-ext-wittyworks-container">
-        {{lang.wittyVersion}} {{ appVersion }}
+        <p>{{lang.wittyVersion}} {{ appVersion }}</p>
         <button class="witty-works-ext-link" (click)="openHelpCenter()" tabindex="0" [attr.aria-label]="lang.help">{{lang.help}}</button>
     </div>
 </footer>

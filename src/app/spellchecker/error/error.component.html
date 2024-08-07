@@ -9,14 +9,15 @@
         ></div>
         <div class="preview" *ngIf="!showContext">{{ error.word }}</div>
         <button
+          title="{{ error.word }}"
           class="toggle"
           [class.active]="isOpen"
           [attr.aria-expanded]="isOpen ? 'true' : 'false'"
-          [attr.aria-label]="lang.arrowDownIconAlt"
+          [attr.aria-label]="error.word"
         >
           <img
             src="assets/icons/chevron-down.svg"
-            alt="{{lang.arrowDownIconAlt}}"
+            alt=""
           />
         </button>
       </header>
@@ -32,7 +33,7 @@
             <div
               class="witty-works-ext-container-row witty-works-ext-justify-start"
             >
-              <div class="witty-works-ext-explanation-icon">
+              <div class="witty-works-ext-explanation-icon" aria-hidden="true">
                 {{ error.details.explanation.icon }}
               </div>
               <div>
@@ -73,7 +74,7 @@
                   >
                     <img
                       src="assets/icons/external-link.svg"
-                      alt="{{lang.learnMore}}"
+                      alt="Opens in a new window"
                     />
                   </div>
                 </div>
