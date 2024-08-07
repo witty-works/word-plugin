@@ -29,8 +29,12 @@ export class AuthService {
         };
         localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
       } else {
-          throw new Error('Office.auth.getAccessToken is not available.');
+        const message = document.getElementById("warn-not-signed-in-word");
+        if (message) {
+          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+          ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
         }
+      }
     }
 
       const url = environment.api + 'v2.0/auth';
