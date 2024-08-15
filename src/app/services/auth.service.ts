@@ -13,29 +13,12 @@ export class AuthService {
   constructor(private http: HttpClient, private ErrorUtils: ErrorUtils) { }
 
   async makeAuthRequest(): Promise<any> {
-  let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
-  try {
-
-    if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) { //check if token is older than 5 min
-      if (Office && Office.auth && typeof Office.auth.getAccessToken === 'function') { // Check if Office.auth is defined before calling getAccessToken
-        const newAccessToken = await Office.auth.getAccessToken({
-          allowSignInPrompt: true,
-          allowConsentPrompt: true,
-        });
-
-        accessTokenWithTimestamp = {
-          token: newAccessToken,
-          timestamp: new Date().getTime()
-        };
-        localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
-      } else {
-        const message = document.getElementById("warn-not-signed-in-word");
-        if (message) {
-          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-          ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
-        }
+    let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+    try {
+      // Check if token is present and not older than 5 minutes
+      if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) {
+        await this.fetchNewAccessToken();
       }
-    }
 
       const url = environment.api + 'v2.0/auth';
       const httpOptions = {
@@ -45,12 +28,13 @@ export class AuthService {
           Authorization: `Bearer ${accessTokenWithTimestamp.token}`,
         }
       };
+
       // Making the HTTP POST request
       const response = await this.http.post<any>(url, {}, httpOptions).toPromise();
       return response;
     } catch (error: any) {
-      if (error.status === 403) {    
-        localStorage.removeItem('word_access_token_with_timestamp'); //ensures that we get new token
+      if (error.status === 403 || error.status === 401) {
+        localStorage.removeItem('word_access_token_with_timestamp'); // Clear cached token
         const authFailCounter = localStorage.getItem('authFailCounter') ?? '0';
         if (parseInt(authFailCounter) <= 2) { //has to be 2 to avoid reaching api limit 
           const newCounter = parseInt(authFailCounter) + 1;
@@ -87,6 +71,28 @@ export class AuthService {
       return error;
     }
   }
+
+  private async fetchNewAccessToken() {
+    if (Office && Office.auth && typeof Office.auth.getAccessToken === 'function') {
+      const newAccessToken = await Office.auth.getAccessToken({
+        allowSignInPrompt: true,
+        allowConsentPrompt: true,
+      });
+
+      const accessTokenWithTimestamp = {
+        token: newAccessToken,
+        timestamp: new Date().getTime()
+      };
+      localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
+    } else {
+      const message = document.getElementById("warn-not-signed-in-word");
+      if (message) {
+        const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+        ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
+      }
+    }
+  }
+
 
   // makeRefreshTokenRequest(): Promise<any> {
   //   const refreshToken = localStorage.getItem('refresh_token');
