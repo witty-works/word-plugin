@@ -265,109 +265,111 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
   
-  async processSelectedText(context: Word.RequestContext ): Promise<void> {
+    async processSelectedText(context: Word.RequestContext): Promise<void> {
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    const delayDuration = environment.delayDuration; 
     try {
       let chunks = this.selectedText.split(/\r/);
       chunks = chunks.filter((paragraph) => paragraph !== "");
-
-      const allPageparagraphs = context.document.body.paragraphs
+  
+      const allPageparagraphs = context.document.body.paragraphs;
       allPageparagraphs.load('items');
       await context.sync();
   
       const paragraphCollection = allPageparagraphs.load({
-      select: ['text', 'uniqueLocalId']
-    });
+        select: ['text', 'uniqueLocalId']
+      });
       await context.sync();
-
+  
       this.paragraphsWithIds = paragraphCollection.items
         .filter(paragraph => paragraph.uniqueLocalId !== null)
         .map((paragraph) => (
-        { text: paragraph.text.replace(/^\u000b+/, ''), id: paragraph.uniqueLocalId }))
-        .filter(paragraph => paragraph.text !== "");
-      let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
+          { text: paragraph.text.replace(/^\u000b+/, ''), id: paragraph.uniqueLocalId }))
+        .filter(paragraph => paragraph.text !== "");  
+      let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();  
       for (let textChunk of chunks) {
-      if(textChunk === "") continue;
-      const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/^\u000b+/, ''), accessTokenWithTimestamp.token);
-      if (!newHighlights) return;
-      const newHighlightsExcludingOrthography = {
-        ...newHighlights,
-        results: newHighlights.results.filter((result: any) => {
-          return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
-        })
-      };
-      this.checkEndpointResponse = newHighlightsExcludingOrthography;
-      if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {  //prompt user to register on dashboard   
-        const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
-        Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
-          if (result.status === Office.AsyncResultStatus.Failed) {
-            console.log('result.error', result.error);
-          }
-        });
-      }
-      const checkLogEventId = Math.random().toString(36).substring(2, 15);
-      analytics.checkLog(newHighlightsExcludingOrthography, null, this.selectedText.length, 'check', false, checkLogEventId);
-
-      if (this.authResponse?.plan !== 'witty_free') {
-        newHighlightsExcludingOrthography.results.forEach((result: any) => {
-          analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false,checkLogEventId)
-        });
-      }
-      //mostly for analytics purposes
-      const newAlerts = newHighlightsExcludingOrthography.results.map((result) => ({
-            id: `${result.text}-${result.category}-${result.start}${result.end}`,
-            startOffset: result.start,
-            endOffset: result.end,
-            popOverIsOpen: false,
-            organizationId: this.authResponse?.organization_id,
-            userId: this.authResponse?.id,
-            plan: this.authResponse?.plan,
-            data: {
-              language: this.checkEndpointResponse?.language || 'en',
-              category: result.category,
-              subcategory: result.subcategory,
-              context: result.context,
-              text: result.text,
-              label: result.label,
-              explanation: result.explanation,
-              alternatives: result.alternatives,
-              gravity: result.gravity,
-            },
-          }))
-          this.alerts = this.alerts.concat(newAlerts);
-
-
-          newHighlightsExcludingOrthography.results.forEach(highlight => {
-            const paragraphIndex = this.paragraphsWithIds.findIndex((paragraph) => {
-              //filter out highlights if previous paragraph had identical text -> because we can not differentiate and highlight always the first in this case
-              if(this.previouslyCheckedParagraphs.some((checkedParagraph) => checkedParagraph.text === paragraph.text && checkedParagraph.errors.some((error) => error.text === highlight.text))) {
-                return false;
-              } 
-              const errorMargin = 0;
-              return paragraph.text.substring(highlight.start - errorMargin, highlight.end + errorMargin).includes(highlight.text)
-            });
-            if (paragraphIndex === -1) return;          
-            const paragraph = this.paragraphsWithIds[paragraphIndex];
-            this.previouslyCheckedParagraphs.push({
-                text: paragraph.text,
-                id: paragraph.id,
-                errors: [highlight]
-              });
-                      
-            this.highlights.push({
-              paragraphUniqueId: paragraph.id,
-              paragraph: paragraphIndex,
-              offset: highlight.start,
-              length: highlight.end - highlight.start,
-              word: highlight.text,
-              details: highlight
-            });
+        if (textChunk === "") continue;  
+        await delay(delayDuration); // Introduce delay before processing each chunk  
+        const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/^\u000b+/, ''), accessTokenWithTimestamp.token);
+        if (!newHighlights) return;  
+        const newHighlightsExcludingOrthography = {
+          ...newHighlights,
+          results: newHighlights.results.filter((result: any) => {
+            return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
+          })
+        };  
+        this.checkEndpointResponse = newHighlightsExcludingOrthography;  
+        if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {  //prompt user to register on dashboard   
+          const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
+          Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
+            if (result.status === Office.AsyncResultStatus.Failed) {
+              console.log('result.error', result.error);
+            }
           });
-          // sort highlights by paragraph -> make sure highlights come in the right order
-          this.highlights.sort((a, b) => {
-            return a.paragraph - b.paragraph;
+        }  
+        const checkLogEventId = Math.random().toString(36).substring(2, 15);
+        analytics.checkLog(newHighlightsExcludingOrthography, null, this.selectedText.length, 'check', false, checkLogEventId);
+  
+        if (this.authResponse?.plan !== 'witty_free') {
+          newHighlightsExcludingOrthography.results.forEach((result: any) => {
+            analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false, checkLogEventId);
           });
-          //within the paragraph, order by start offset
-        }
+        }  
+        //mostly for analytics purposes
+        const newAlerts = newHighlightsExcludingOrthography.results.map((result) => ({
+          id: `${result.text}-${result.category}-${result.start}${result.end}`,
+          startOffset: result.start,
+          endOffset: result.end,
+          popOverIsOpen: false,
+          organizationId: this.authResponse?.organization_id,
+          userId: this.authResponse?.id,
+          plan: this.authResponse?.plan,
+          data: {
+            language: this.checkEndpointResponse?.language || 'en',
+            category: result.category,
+            subcategory: result.subcategory,
+            context: result.context,
+            text: result.text,
+            label: result.label,
+            explanation: result.explanation,
+            alternatives: result.alternatives,
+            gravity: result.gravity,
+          },
+        }));  
+        this.alerts = this.alerts.concat(newAlerts);
+  
+        newHighlightsExcludingOrthography.results.forEach(highlight => {
+          const paragraphIndex = this.paragraphsWithIds.findIndex((paragraph) => {
+            //filter out highlights if previous paragraph had identical text -> because we can not differentiate and highlight always the first in this case
+            if (this.previouslyCheckedParagraphs.some((checkedParagraph) => checkedParagraph.text === paragraph.text && checkedParagraph.errors.some((error) => error.text === highlight.text))) {
+              return false;
+            }
+            const errorMargin = 0;
+            return paragraph.text.substring(highlight.start - errorMargin, highlight.end + errorMargin).includes(highlight.text);
+          });
+          if (paragraphIndex === -1) return;
+          const paragraph = this.paragraphsWithIds[paragraphIndex];
+          this.previouslyCheckedParagraphs.push({
+            text: paragraph.text,
+            id: paragraph.id,
+            errors: [highlight]
+          });
+  
+          this.highlights.push({
+            paragraphUniqueId: paragraph.id,
+            paragraph: paragraphIndex,
+            offset: highlight.start,
+            length: highlight.end - highlight.start,
+            word: highlight.text,
+            details: highlight
+          });
+        });  
+        // sort highlights by paragraph -> make sure highlights come in the right order
+        this.highlights.sort((a, b) => {
+          return a.paragraph - b.paragraph;
+        });
+        //within the paragraph, order by start offset
+      }
     } catch (error: any) {
       Sentry.captureException(new Error(`Error in processSelectedText: ${JSON.stringify(error, null, 2)}`));
       if (error.name === 'HttpErrorResponse' && error.status === 422) {
@@ -377,10 +379,10 @@ export class SpellcheckerComponent implements OnInit {
         this.isLoggedin = false;
       } else {
         const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-        const message = document.getElementById("issue-checking-text")
-      if (message) {
-        ErrorUtils.displayErrorMessage(message, "issueCheckingText", lang);
-    }
+        const message = document.getElementById("issue-checking-text");
+        if (message) {
+          ErrorUtils.displayErrorMessage(message, "issueCheckingText", lang);
+        }
       }
       console.error(error);
     }
