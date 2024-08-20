@@ -267,7 +267,7 @@ export class SpellcheckerComponent implements OnInit {
   
     async processSelectedText(context: Word.RequestContext): Promise<void> {
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-    const delayDuration = 500; 
+    const delayDuration = environment.delayDuration; 
     try {
       let chunks = this.selectedText.split(/\r/);
       chunks = chunks.filter((paragraph) => paragraph !== "");
