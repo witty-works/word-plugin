@@ -230,6 +230,13 @@
 }
 
 /////
+.lds-spinner-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 40px 0px;
+}
+
 .lds-spinner {
   color: #f06464;
   display: inline-block;

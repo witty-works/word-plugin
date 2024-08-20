@@ -3,7 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  package_version: "1.3.30-dev",
+  package_version: "1.3.31-dev",
   production: false,
   environment: "development",
   sentry_dsn: "",
@@ -16,6 +16,7 @@ export const environment = {
   plugin: "https://localhost:4200/word-plugin/",
   maxChunkSize: 500,
   maxTextLength: 2000,
+  delayDuration: 500,
 };
 
 /*

@@ -3,8 +3,6 @@
         <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
             (click)="checkText()" [attr.aria-label]="lang.wittyCheck" (keydown)="handleKeyboardEvent($event)" [attr.aria-keyshortcuts]="shortcuts.wittyCheck.key" title="{{ lang.wittyCheck }} ({{ shortcuts.wittyCheck.key }})">{{lang.wittyCheck}}</button>
             <div *ngIf="isLoggedin"class="witty-works-ext-selection-info">{{lang.howToSelectText}}</div>
-        <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale"
-            [showSpinner]="isSpellchecking" style="opacity: 70%; z-index: 99999999;"></ngx-spinner>
     </div>
 
     <div *ngIf="!isLoggedin && !isLoggedInWord" tabindex="0" class="number-spelling-errors">
@@ -27,6 +25,12 @@
         </div>
     </div>
 
+        <div [ngClass]="{'lds-spinner-container': isSpellchecking}">
+            <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale"
+                [showSpinner]="isSpellchecking" style="opacity: 70%; z-index: 99999999;" [fullScreen]="false">
+            </ngx-spinner>
+        </div>
+
     <div *ngIf="isLoggedInWord && highlights.length > 0" class="number-spelling-errors">
         {{ highlights.length }} {{highlights.length == 1 ? lang.suggstion : lang.suggstions}}:
     </div>
@@ -36,10 +40,8 @@
         <span>{{lang.hitMaxTextLength1}}</span>
         <a href="#" class="max-length-reached-banner-link" role="link" tabindex="0" (click)="$event.preventDefault(); highlightCheckedText()" (keyup.enter)="highlightCheckedText()" [attr.aria-label]="lang.hitMaxTextLengthHere" aria-describedby="maxTextLengthDescription">{{lang.hitMaxTextLengthHere}}</a>
         <span id="maxTextLengthDescription">{{lang.hitMaxTextLength2}}</span>
-        <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale" [showSpinner]="isHighlightingCheckedText" style="opacity: 70%; z-index: 99999999;">
-        </ngx-spinner>
     </div>
-
+    
     <app-errors-list [highlights]="highlights" [paragraphs]="paragraphsWithIds" (highlightEvent)="highlight($event)"
         (acceptSuggestionEvent)="acceptSuggestion($event)" *ngIf="isLoggedInWord && !isFirstRun && highlights.length > 0">
     </app-errors-list>
