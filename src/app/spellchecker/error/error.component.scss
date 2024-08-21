@@ -77,6 +77,10 @@
   align-items: center;
   flex-wrap: nowrap;
   text-wrap: nowrap;
+
+  button:focus {
+    outline-offset: 4px;
+  }
 }
 
 .witty-works-ext-wittyworks-container {
