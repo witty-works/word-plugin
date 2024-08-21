@@ -2,14 +2,8 @@
     <div style="display: flex; align-items: center; justify-content: space-between;">
         <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
             (click)="checkText()" [attr.aria-label]="lang.wittyCheck" (keydown)="handleKeyboardEvent($event)" [attr.aria-keyshortcuts]="shortcuts.wittyCheck.key" title="{{ lang.wittyCheck }} ({{ shortcuts.wittyCheck.key }})">{{lang.wittyCheck}}</button>
-<<<<<<< HEAD
-            <div *ngIf="isLoggedin"class="witty-works-ext-selection-info">{{lang.howToSelectText}}</div>
-=======
             <div *ngIf="isLoggedin"class="witty-works-ext-selection-info">
                 <p>{{lang.howToSelectText}}</p></div>
-        <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale"
-            [showSpinner]="isSpellchecking" style="opacity: 70%; z-index: 99999999;"></ngx-spinner>
->>>>>>> Improve img alt, heading & labels, <p> tags, tab pattern
     </div>
 
     <div *ngIf="!isLoggedin && !isLoggedInWord" tabindex="0" class="number-spelling-errors">
@@ -38,8 +32,10 @@
             </ngx-spinner>
         </div>
 
-    <div *ngIf="isLoggedInWord && highlights.length > 0" class="number-spelling-errors">
-        {{ highlights.length }} {{highlights.length == 1 ? lang.suggstion : lang.suggstions}}:
+    <div *ngIf="isLoggedInWord">
+        <div *ngIf="highlights.length > 0" aria-live="polite" aria-atomic="true" class="number-spelling-errors">
+            {{ highlights.length }} {{highlights.length == 1 ? lang.suggstion : lang.suggstions}}:
+        </div>
     </div>
 
     <div *ngIf="hitMaxTextLength && isLoggedInWord && !isFirstRun && highlights.length > 0" class="max-length-reached-banner" role="alert" aria-live="assertive">
