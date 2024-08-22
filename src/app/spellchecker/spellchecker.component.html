@@ -29,6 +29,7 @@
         <div [ngClass]="{'lds-spinner-container': isSpellchecking}">
             <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale"
                 [showSpinner]="isSpellchecking" style="opacity: 70%; z-index: 99999999;" [fullScreen]="false">
+                <p style="color:#f06464; padding-top: 85px;" aria-live="polite" role="alert">{{lang.loading}}</p>
             </ngx-spinner>
         </div>
 
