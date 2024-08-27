@@ -13,7 +13,8 @@ export class AuthService {
   constructor(private http: HttpClient, private ErrorUtils: ErrorUtils) { }
 
   async makeAuthRequest(): Promise<any> {
-      let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+    let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+    const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
       try {
         // Check if token is present and not older than 5 minutes
         if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) {
@@ -32,6 +33,17 @@ export class AuthService {
   
         // Making the HTTP POST request
         const response = await this.http.post<any>(url, {}, httpOptions).toPromise();
+        
+        const authErrorMessage = document.getElementById("warn-not-signed-in-word");
+        if (authErrorMessage) {
+          ErrorUtils.removeErrorMessage(authErrorMessage, "notSignedInWarning", lang);
+        }
+
+        const serverErrorMessage = document.getElementById("warn-server-error");
+        if (serverErrorMessage) {
+          ErrorUtils.removeErrorMessage(serverErrorMessage, "serverError", lang);
+        }
+
         return response;
       } catch (error: any) {
         if (error.status === 403 || error.status === 401) {
@@ -58,13 +70,11 @@ export class AuthService {
           if (errorCodes.includes(error?.code)) {
             const message = document.getElementById("warn-not-signed-in-word");
             if (message) {
-              const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
               ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
             }
           } else {
             const message = document.getElementById("warn-server-error");
             if (message) {
-              const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
               ErrorUtils.displayErrorMessage(message, "serverError", lang);
             }
           }

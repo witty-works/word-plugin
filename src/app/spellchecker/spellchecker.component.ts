@@ -377,6 +377,11 @@ export class SpellcheckerComponent implements OnInit {
           return a.paragraph - b.paragraph;
         });
         //within the paragraph, order by start offset
+        const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+        const message = document.getElementById("issue-checking-text");
+        if (message) {
+          ErrorUtils.removeErrorMessage(message, "issueCheckingText", lang);
+        }
       }
     } catch (error: any) {
       Sentry.captureException(new Error(`Error in processSelectedText: ${JSON.stringify(error, null, 2)}`));

@@ -23,6 +23,8 @@ export class CheckingService {
     sentence: string,
     accessToken: string
   ): Promise<ICheckResponse> {
+    const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+
     try {
       const url = environment.api + "v2.4/check";
 
@@ -46,6 +48,17 @@ export class CheckingService {
           Authorization: `Bearer ${accessToken}`,
         },
       };
+
+      const throttleWarning = document.getElementById("throttle-warning");
+      if (throttleWarning) {
+        ErrorUtils.removeErrorMessage(throttleWarning, "throttleWarning", lang);
+      }
+
+       const authErrorMessage = document.getElementById("warn-not-signed-in-word");
+      if (authErrorMessage) {
+        ErrorUtils.removeErrorMessage(authErrorMessage, "notSignedInWarning", lang);
+      }
+      
       return this.http
         .post<any>(url, body, httpOptions)
         .toPromise()
@@ -54,7 +67,6 @@ export class CheckingService {
         });
     } catch (error: any) {
        Sentry.captureException(new Error(`Error in checkText: ${error}`));
-      const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
       if (error?.code === 13013) { //edge case: throttled
         const throttleWarning = document.getElementById("throttle-warning");
         if (throttleWarning) {
@@ -65,7 +77,6 @@ export class CheckingService {
       const errorCodes = [13001, 13002, 13000, 5001];
       if (errorCodes.includes(error?.code)) {
         const message = document.getElementById("warn-not-signed-in-word");
-
         if (message) {
           ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
           }

@@ -44,4 +44,14 @@ export class ErrorUtils {
       messageContainer.style.display = 'none';
     });
   }
+
+  static removeErrorMessage(messageContainer: HTMLElement, errorType: string, lang: any) {
+    const errorMessageElement = messageContainer.querySelector('.error-message');
+    if (errorMessageElement && errorMessageElement.textContent === lang[errorType]) {
+      messageContainer.removeChild(errorMessageElement);
+      if (messageContainer.children.length === 0) {
+        messageContainer.style.display = 'none';
+      }
+    }
+  }
 }

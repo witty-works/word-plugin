@@ -15,6 +15,8 @@ export class IgnoreService {
     word: string,
     accessToken: string
   ): Promise<void> {
+    const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+
     try {
       const requestUrlIgnore = `${environment.dashboard}api/user/language/ignore-words?false_positive=${word}`;
 
@@ -27,12 +29,16 @@ export class IgnoreService {
         body: {},
       };
 
+      const message = document.getElementById("warn-failed-ignore-error");
+      if (message) {
+        ErrorUtils.removeErrorMessage(message, "failedRequestText", lang);
+      }
+
       await this.http.put<void>(requestUrlIgnore, {}, httpOptions).toPromise();
     } catch (error: any) {
       Sentry.captureException(error);
        const message = document.getElementById("warn-failed-ignore-error");
       if (message) {
-        const lang = Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de" ? de : en;
         ErrorUtils.displayErrorMessage(message, "failedRequestText", lang);
       }
       throw error;
