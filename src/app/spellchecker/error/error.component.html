@@ -11,6 +11,7 @@
         <button
           title="{{ error.word }}"
           class="toggle"
+          id="toggle"
           [class.active]="isOpen"
           [attr.aria-expanded]="isOpen ? 'true' : 'false'"
           [attr.aria-label]="error.word"

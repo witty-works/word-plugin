@@ -33,8 +33,8 @@
             </ngx-spinner>
         </div>
 
-    <div *ngIf="isLoggedInWord">
-        <div *ngIf="highlights.length > 0" aria-live="polite" aria-atomic="true" class="number-spelling-errors">
+    <div aria-live="polite" aria-atomic="true">
+        <div *ngIf="isLoggedInWord && highlights.length > 0" class="number-spelling-errors">
             {{ highlights.length }} {{highlights.length == 1 ? lang.suggstion : lang.suggstions}}:
         </div>
     </div>
