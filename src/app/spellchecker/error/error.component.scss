@@ -77,6 +77,10 @@
   align-items: center;
   flex-wrap: nowrap;
   text-wrap: nowrap;
+
+  button:focus {
+    outline-offset: 4px;
+  }
 }
 
 .witty-works-ext-wittyworks-container {
@@ -182,10 +186,6 @@
 .witty-works-ext-button-wrapper.hovered button {
   height: auto;
   white-space: normal;
-}
-
-.witty-works-ext-button-wrapper.hovered .tag {
-  display: none;
 }
 
 .witty-works-ext-ignore-color-transformer {

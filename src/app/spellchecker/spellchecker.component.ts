@@ -257,9 +257,17 @@ export class SpellcheckerComponent implements OnInit {
             const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
             this.selectedText = this.selectedText.substring(0, lastSpace);
           }
-          
-          // Continue with further operations inside this callback or call a separate async function
-          await this.processSelectedText(context);
+
+          this.highlights = [];
+
+          setTimeout(async () => {
+                  // Continue with further operations inside this callback or call a separate async function
+                  await this.processSelectedText(context);
+                    
+                  setTimeout(() => {
+                  this.focusElement("toggle");
+                  }, 100);
+                }, 100);
         }
       });
     });
@@ -500,9 +508,10 @@ export class SpellcheckerComponent implements OnInit {
         highlightedText.insertText(obj.suggestion.text, "Replace");
         await context.sync();
       } catch (e) {
-          this.handleError(e);
+        this.handleError(e);
       }
     });
+    this.focusElement("toggle");
   }
 
   insertGrammarError(errorIndex: number, error: ISpellingError) {
@@ -585,5 +594,14 @@ export class SpellcheckerComponent implements OnInit {
         }
     });
     this.isHighlightingCheckedText = false;
+    }
+  
+    focusElement(id: string) {
+    setTimeout(() => {
+      const elementToFocus = document.getElementById(id);
+      if (elementToFocus) {
+        elementToFocus.focus();
+      }
+    }, 100); 
   }
 }

@@ -234,7 +234,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  padding: 40px 0px;
+  padding: 50px 0px;
 }
 
 .lds-spinner {
@@ -367,4 +367,15 @@
 
 .keyboard-shortcut-info th {
   text-align: left;
+}
+
+.click-witty-check-text {
+  font-weight: 400;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  color: inherit;
+  font-family: inherit;
+  text-transform: none;
 }

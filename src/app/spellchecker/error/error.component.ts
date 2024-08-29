@@ -144,6 +144,7 @@ export class ErrorComponent {
         return error.word !== this.error?.word;
       });
     this.spellcheckerComponent.updatehighlights();
+    this.focusElement("toggle");
   }
 
   async ignorePermanently(word: string) {
@@ -160,7 +161,8 @@ export class ErrorComponent {
           return error.word !== this.error?.word;
         });
       this.spellcheckerComponent.updatehighlights();
-    } catch (error) {}
+    } catch (error) { }
+    this.focusElement("toggle");
   }
 
   get containerStyle() {
@@ -182,5 +184,14 @@ export class ErrorComponent {
         `Error word: ${this.error?.word} not found in paragraph: ${this.error?.details?.context}`
       )
     );
+  }
+
+  focusElement(id: string) {
+    setTimeout(() => {
+      const elementToFocus = document.getElementById(id);
+      if (elementToFocus) {
+        elementToFocus.focus();
+      }
+    }, 100); 
   }
 }
