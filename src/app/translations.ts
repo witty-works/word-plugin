@@ -73,6 +73,11 @@ export const de = {
     "Witty ist aktuell leider nicht verfügbar. Bitte versuche es in ein paar Minuten noch einmal.",
   issueCheckingText:
     "Es gab ein Problem bei der Überprüfung des Textes. Bitte versuche es in ein paar Minuten noch einmal.",
+
+//accessibility
+  openNewWindow: "Öffnet in einem neuen Fenster",
+  loading: "Lädt...",
+  loadingSuccess: "Laden erfolgreich",
 };
 
 export const en = {
@@ -150,4 +155,9 @@ export const en = {
     "Witty is currently not available. Please try again in a few minutes.",
   issueCheckingText:
     "There was an issue checking the text. Please try again in a few minutes.",
+  
+  //accessibility
+  openNewWindow: "Opens in a new window",
+  loading: "Loading...",
+  loadingSuccess: "Loaded successfully",
 };

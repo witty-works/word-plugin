@@ -9,14 +9,16 @@
         ></div>
         <div class="preview" *ngIf="!showContext">{{ error.word }}</div>
         <button
+          title="{{ error.word }}"
           class="toggle"
+          id="toggle"
           [class.active]="isOpen"
           [attr.aria-expanded]="isOpen ? 'true' : 'false'"
-          [attr.aria-label]="lang.arrowDownIconAlt"
+          [attr.aria-label]="error.word"
         >
           <img
             src="assets/icons/chevron-down.svg"
-            alt="{{lang.arrowDownIconAlt}}"
+            alt=""
           />
         </button>
       </header>
@@ -32,9 +34,14 @@
             <div
               class="witty-works-ext-container-row witty-works-ext-justify-start"
             >
-              <div class="witty-works-ext-explanation-icon">
-                {{ error.details.explanation.icon }}
-              </div>
+              <div aria-hidden="true">
+                  <ng-container *ngIf="error.details.explanation?.icon_image; else icon">
+                    <img class="witty-works-ext-explanation-icon-image"[src]="error.details.explanation.icon_image" alt=""/>
+                  </ng-container>
+                  <ng-template #icon>
+                    <span class="witty-works-ext-explanation-icon">{{ error.details.explanation.icon }}</span>
+                  </ng-template>
+                </div>
               <div>
                 <b>{{ error.details.label.split(":").pop() }}</b>
                 <br />
@@ -73,7 +80,7 @@
                   >
                     <img
                       src="assets/icons/external-link.svg"
-                      alt="{{lang.learnMore}}"
+                      alt="{{lang.openNewWindow}}"
                     />
                   </div>
                 </div>
@@ -108,23 +115,21 @@
                   : error.word
               }}
             </button>
-            <div class="tag" *ngIf="!suggestion.hovered">
-              <div *ngIf="suggestion.context || suggestion.url">
-                <div *ngIf="suggestion.context">
-                  <a *ngIf="suggestion.url" [href]="suggestion.url" target="_blank" class="suggestion-link" rel="noopener noreferrer">
-                    <span *ngIf="suggestion.context.startsWith('💡')">
-                      <span>{{ suggestion.context | slice:0:3 }}</span>
-                      <u>{{ suggestion.context | slice:2 }}</u>
-                    </span>
-                    <span *ngIf="!suggestion.context.startsWith('💡')">
-                      <span>&nbsp;&nbsp;</span>
-                        <u>{{ suggestion.context }}</u>
-                    </span>
-                  </a>
-                  <span *ngIf="!suggestion.url">
-                    {{ suggestion.context }}
+            <div *ngIf="suggestion.context || suggestion.url">
+              <div *ngIf="suggestion.context">
+                <a *ngIf="suggestion.url" [href]="suggestion.url" target="_blank" class="suggestion-link" rel="noopener noreferrer">
+                  <span *ngIf="suggestion.context.startsWith('💡')">
+                    <span>{{ suggestion.context | slice:0:3 }}</span>
+                    <u>{{ suggestion.context | slice:2 }}</u>
                   </span>
-                </div>
+                  <span *ngIf="!suggestion.context.startsWith('💡')">
+                    <span>&nbsp;&nbsp;</span>
+                      <u>{{ suggestion.context }}</u>
+                  </span>
+                </a>
+                <span *ngIf="!suggestion.url">
+                  {{ suggestion.context }}
+                </span>
               </div>
             </div>
           </div>

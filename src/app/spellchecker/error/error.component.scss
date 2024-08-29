@@ -77,6 +77,10 @@
   align-items: center;
   flex-wrap: nowrap;
   text-wrap: nowrap;
+
+  button:focus {
+    outline-offset: 4px;
+  }
 }
 
 .witty-works-ext-wittyworks-container {
@@ -118,6 +122,11 @@
 .witty-works-ext-explanation-icon {
   font-size: 2em;
   margin-right: 0.5em;
+}
+
+.witty-works-ext-explanation-icon-image {
+  width: 2em;
+  margin-right: 1em;
 }
 
 .witty-works-ext-container-row {
@@ -182,10 +191,6 @@
 .witty-works-ext-button-wrapper.hovered button {
   height: auto;
   white-space: normal;
-}
-
-.witty-works-ext-button-wrapper.hovered .tag {
-  display: none;
 }
 
 .witty-works-ext-ignore-color-transformer {
