@@ -4,26 +4,28 @@ import { HttpClient } from "@angular/common/http";
 import { IAlternatives, ICheckResponse } from "../data/types";
 import { ISpellingError } from "../data/data-structures";
 import { environment } from '../../environments/environment';
-import { de, en } from '../translations';
 import * as Sentry from '@sentry/browser';
 import { ErrorUtils } from "../utils/error.utils";
+import { getLanguageModule } from "../utils/language.utils";
 
 @Injectable({
   providedIn: "root",
 })
 export class CheckingService {
   isDevEnv = window.location.hostname === "localhost";
+  lang: any;
 
   constructor(
     private settingsService: SettingsService,
     private http: HttpClient
-  ) {}
+  ) {
+    this.lang = getLanguageModule(); 
+  }
 
   async checkText(
     sentence: string,
     accessToken: string
   ): Promise<ICheckResponse> {
-    const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
     try {
       const url = environment.api + "v2.4/check";
@@ -51,12 +53,12 @@ export class CheckingService {
 
       const throttleWarning = document.getElementById("throttle-warning");
       if (throttleWarning) {
-        ErrorUtils.removeErrorMessage(throttleWarning, "throttleWarning", lang);
+        ErrorUtils.removeErrorMessage(throttleWarning, "throttleWarning", this.lang);
       }
 
        const authErrorMessage = document.getElementById("warn-not-signed-in-word");
       if (authErrorMessage) {
-        ErrorUtils.removeErrorMessage(authErrorMessage, "notSignedInWarning", lang);
+        ErrorUtils.removeErrorMessage(authErrorMessage, "notSignedInWarning", this.lang);
       }
       
       return this.http
@@ -70,7 +72,7 @@ export class CheckingService {
       if (error?.code === 13013) { //edge case: throttled
         const throttleWarning = document.getElementById("throttle-warning");
         if (throttleWarning) {
-          ErrorUtils.displayErrorMessage(throttleWarning, "throttleWarning", lang);
+          ErrorUtils.displayErrorMessage(throttleWarning, "throttleWarning",this.lang);
         }
       }
 
@@ -78,7 +80,7 @@ export class CheckingService {
       if (errorCodes.includes(error?.code)) {
         const message = document.getElementById("warn-not-signed-in-word");
         if (message) {
-          ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
+          ErrorUtils.displayErrorMessage(message, "notSignedInWarning", this.lang);
           }
       }
       throw error;

@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
-import { de, en } from '../translations';
+import { getLanguageModule } from './language.utils';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ErrorUtils {
-  static createErrorMessageElement(errorMessageText: string): HTMLElement {
-  
-    const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+  private static defaultLang = getLanguageModule();
 
+  static createErrorMessageElement(errorMessageText: string, lang: any = ErrorUtils.defaultLang): HTMLElement {
     const message = document.createElement('div');
     message.classList.add('error-message');
     message.setAttribute('role', 'alert');
@@ -26,9 +25,9 @@ export class ErrorUtils {
     return message;
   }
 
-  static displayErrorMessage(messageContainer: HTMLElement, errorType: string, lang: any) {
+  static displayErrorMessage(messageContainer: HTMLElement, errorType: string, lang: any = ErrorUtils.defaultLang) {
     const existingErrorMessage = messageContainer.querySelector('.error-message');
-    const errorMessageElement = this.createErrorMessageElement(lang[errorType]);
+    const errorMessageElement = this.createErrorMessageElement(lang[errorType], lang);
 
     messageContainer.style.display = 'block';
     if (existingErrorMessage) {
@@ -45,7 +44,7 @@ export class ErrorUtils {
     });
   }
 
-  static removeErrorMessage(messageContainer: HTMLElement, errorType: string, lang: any) {
+  static removeErrorMessage(messageContainer: HTMLElement, errorType: string, lang: any = ErrorUtils.defaultLang) {
     const errorMessageElement = messageContainer.querySelector('.error-message');
     if (errorMessageElement && errorMessageElement.textContent === lang[errorType]) {
       messageContainer.removeChild(errorMessageElement);

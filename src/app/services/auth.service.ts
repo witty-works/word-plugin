@@ -1,20 +1,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { environment } from '../../environments/environment';
-import { de, en } from '../translations';
 import * as Sentry from '@sentry/browser';
 import { ErrorUtils } from '../utils/error.utils';
+import { getLanguageModule } from '../utils/language.utils';
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   isDevEnv = window.location.hostname === 'localhost'
+  lang: any;
 
-  constructor(private http: HttpClient, private ErrorUtils: ErrorUtils) { }
+  constructor(private http: HttpClient, private ErrorUtils: ErrorUtils) {
+    this.lang = getLanguageModule(); 
+   }
 
   async makeAuthRequest(): Promise<any> {
     let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
-    const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
       try {
         // Check if token is present and not older than 5 minutes
         if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) {
@@ -36,12 +38,12 @@ export class AuthService {
         
         const authErrorMessage = document.getElementById("warn-not-signed-in-word");
         if (authErrorMessage) {
-          ErrorUtils.removeErrorMessage(authErrorMessage, "notSignedInWarning", lang);
+          ErrorUtils.removeErrorMessage(authErrorMessage, "notSignedInWarning", this.lang);
         }
 
         const serverErrorMessage = document.getElementById("warn-server-error");
         if (serverErrorMessage) {
-          ErrorUtils.removeErrorMessage(serverErrorMessage, "serverError", lang);
+          ErrorUtils.removeErrorMessage(serverErrorMessage, "serverError", this.lang);
         }
 
         return response;
@@ -70,12 +72,12 @@ export class AuthService {
           if (errorCodes.includes(error?.code)) {
             const message = document.getElementById("warn-not-signed-in-word");
             if (message) {
-              ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
+              ErrorUtils.displayErrorMessage(message, "notSignedInWarning", this.lang);
             }
           } else {
             const message = document.getElementById("warn-server-error");
             if (message) {
-              ErrorUtils.displayErrorMessage(message, "serverError", lang);
+              ErrorUtils.displayErrorMessage(message, "serverError", this.lang);
             }
           }
         }
@@ -83,7 +85,7 @@ export class AuthService {
       }
     }
   
-    private async fetchNewAccessToken() {
+  private async fetchNewAccessToken() {
       if (Office && Office.auth && typeof Office.auth.getAccessToken === 'function') {
         const newAccessToken = await Office.auth.getAccessToken({
           allowSignInPrompt: true,
@@ -98,8 +100,7 @@ export class AuthService {
       } else {
         const message = document.getElementById("warn-not-signed-in-word");
         if (message) {
-          const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
-          ErrorUtils.displayErrorMessage(message, "notSignedInWarning", lang);
+          ErrorUtils.displayErrorMessage(message, "notSignedInWarning", this.lang);
         }
       }
     }
