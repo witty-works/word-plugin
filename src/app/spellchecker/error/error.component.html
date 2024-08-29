@@ -34,9 +34,14 @@
             <div
               class="witty-works-ext-container-row witty-works-ext-justify-start"
             >
-              <div class="witty-works-ext-explanation-icon" aria-hidden="true">
-                {{ error.details.explanation.icon }}
-              </div>
+              <div aria-hidden="true">
+                  <ng-container *ngIf="error.details.explanation?.icon_image; else icon">
+                    <img class="witty-works-ext-explanation-icon-image"[src]="error.details.explanation.icon_image" alt=""/>
+                  </ng-container>
+                  <ng-template #icon>
+                    <span class="witty-works-ext-explanation-icon">{{ error.details.explanation.icon }}</span>
+                  </ng-template>
+                </div>
               <div>
                 <b>{{ error.details.label.split(":").pop() }}</b>
                 <br />
