@@ -3,7 +3,6 @@ import { CheckingService } from "../services/checking.service";
 import { ISpellingError } from "../data/data-structures";
 import { IAlternatives, IAlert, IAuthResponse, ICheckResponse, ICheckResponseResult } from "../data/types";
 import { AuthService } from '../services/auth.service';
-import { en, de } from '../translations';
 import { environment } from '../../environments/environment';
 import DocumentUtils from '../utils/word.utils';
 import { useAnalytics } from '../analytics/analytics';
@@ -11,6 +10,7 @@ import { DialogRef, DialogService } from "@ngneat/dialog";
 import * as Sentry from '@sentry/browser';
 import { ErrorUtils } from '../utils/error.utils';
 import { KEYBOARD_SHORTCUTS_CONFIG } from '../keyboard-shortcuts.config';
+import { getLanguageModule } from '../utils/language.utils';
 
 const analytics = useAnalytics();
 
@@ -22,6 +22,7 @@ const analytics = useAnalytics();
 })
 export class SpellcheckerComponent implements OnInit {
   environment = window.location.hostname === 'localhost'
+  lang: any;
 
   isSpellchecking = false;
 
@@ -34,8 +35,6 @@ export class SpellcheckerComponent implements OnInit {
   isHighlightingCheckedText = false;
 
   showSpinner = false;
-
-  lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
 
   paragraphsWithIds: { text: string, id: string }[] = [];
 
@@ -80,6 +79,7 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.lang = getLanguageModule(); 
     this.register();
     Office.onReady((info) => {
       try {
@@ -166,8 +166,7 @@ export class SpellcheckerComponent implements OnInit {
       if (response?.code === 13013) { //edge case: throttled
         this.showSpinner = true;
         if (throttleWarning) {
-          const lang = Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de" ? de : en;
-          ErrorUtils.displayErrorMessage(throttleWarning, "throttleWarning", lang);
+          ErrorUtils.displayErrorMessage(throttleWarning, "throttleWarning", this.lang);
         }
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
@@ -273,7 +272,7 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
   
-    async processSelectedText(context: Word.RequestContext): Promise<void> {
+  async processSelectedText(context: Word.RequestContext): Promise<void> {
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
     const delayDuration = environment.delayDuration; 
     try {
@@ -377,6 +376,10 @@ export class SpellcheckerComponent implements OnInit {
           return a.paragraph - b.paragraph;
         });
         //within the paragraph, order by start offset
+        const message = document.getElementById("issue-checking-text");
+        if (message) {
+          ErrorUtils.removeErrorMessage(message, "issueCheckingText", this.lang);
+        }
       }
     } catch (error: any) {
       Sentry.captureException(new Error(`Error in processSelectedText: ${JSON.stringify(error, null, 2)}`));
@@ -386,10 +389,9 @@ export class SpellcheckerComponent implements OnInit {
         this.isLoggedInWord = false;
         this.isLoggedin = false;
       } else {
-        const lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
         const message = document.getElementById("issue-checking-text");
         if (message) {
-          ErrorUtils.displayErrorMessage(message, "issueCheckingText", lang);
+          ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang);
         }
       }
       console.error(error);

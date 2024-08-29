@@ -1,15 +1,19 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../environments/environment";
-import { de, en } from "../translations";
 import * as Sentry from "@sentry/browser";
 import { ErrorUtils } from "../utils/error.utils";
+import { getLanguageModule } from "../utils/language.utils";
 
 @Injectable({
   providedIn: "root",
 })
 export class IgnoreService {
-  constructor(private http: HttpClient) {}
+  private lang: any;
+
+  constructor(private http: HttpClient) {
+    this.lang = getLanguageModule(); // Initialize the language module once
+  }
 
   async ignoreWordPermanently(
     word: string,
@@ -27,13 +31,17 @@ export class IgnoreService {
         body: {},
       };
 
+      const message = document.getElementById("warn-failed-ignore-error");
+      if (message) {
+        ErrorUtils.removeErrorMessage(message, "failedRequestText", this.lang);
+      }
+
       await this.http.put<void>(requestUrlIgnore, {}, httpOptions).toPromise();
     } catch (error: any) {
       Sentry.captureException(error);
-       const message = document.getElementById("warn-failed-ignore-error");
+      const message = document.getElementById("warn-failed-ignore-error");
       if (message) {
-        const lang = Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de" ? de : en;
-        ErrorUtils.displayErrorMessage(message, "failedRequestText", lang);
+        ErrorUtils.displayErrorMessage(message, "failedRequestText", this.lang);
       }
       throw error;
     }
