@@ -1,5 +1,5 @@
 import { environment } from 'src/environments/environment';
-import { en, de } from './../translations';
+import { en, de, fr } from './../translations';
 
 export function getLanguageModule(): any {
   const langCode = Office.context?.displayLanguage?.split('-')[0].toLowerCase();
@@ -8,6 +8,8 @@ export function getLanguageModule(): any {
     switch (langCode) {
       case 'de':
         return de;
+      case 'fr':
+        return fr;
       // Add other cases for supported languages as needed
     }
   }

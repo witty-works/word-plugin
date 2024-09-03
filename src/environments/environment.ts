@@ -17,7 +17,7 @@ export const environment = {
   maxChunkSize: 500,
   maxTextLength: 2000,
   delayDuration: 500,
-  supportedLanguages: ['de', 'en']
+  supportedLanguages: ['de', 'en', 'fr']
 };
 
 /*
