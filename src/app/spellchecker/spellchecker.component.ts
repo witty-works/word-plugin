@@ -26,6 +26,8 @@ export class SpellcheckerComponent implements OnInit {
 
   isSpellchecking = false;
 
+  hasSpellcheckingRun = false;
+
   isFirstRun = true;
 
   isLoggedInWord = true;
@@ -273,39 +275,45 @@ export class SpellcheckerComponent implements OnInit {
   }
   
   async processSelectedText(context: Word.RequestContext): Promise<void> {
-    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-    const delayDuration = environment.delayDuration; 
-    try {
-      let chunks = this.selectedText.split(/\r/);
-      chunks = chunks.filter((paragraph) => paragraph !== "");
-  
-      const allPageparagraphs = context.document.body.paragraphs;
-      allPageparagraphs.load('items');
-      await context.sync();
-  
-      const paragraphCollection = allPageparagraphs.load({
-        select: ['text', 'uniqueLocalId']
-      });
-      await context.sync();
-  
-      this.paragraphsWithIds = paragraphCollection.items
-        .filter(paragraph => paragraph.uniqueLocalId !== null)
-        .map((paragraph) => (
-          { text: paragraph.text.replace(/^\u000b+/, ''), id: paragraph.uniqueLocalId }))
-        .filter(paragraph => paragraph.text !== "");  
-      let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();  
-      for (let textChunk of chunks) {
-        if (textChunk === "") continue;  
-        await delay(delayDuration); // Introduce delay before processing each chunk  
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+  const delayDuration = environment.delayDuration; 
+
+  try {
+    let chunks = this.selectedText.split(/\r/);
+    chunks = chunks.filter(paragraph => paragraph.trim() !== ""); // Filter out empty or whitespace-only paragraphs
+
+    const allPageparagraphs = context.document.body.paragraphs;
+    allPageparagraphs.load('items');
+    await context.sync();
+
+    const paragraphCollection = allPageparagraphs.load({
+    select: ['text', 'uniqueLocalId']
+    });
+    await context.sync();
+
+    this.paragraphsWithIds = paragraphCollection.items
+      .filter(paragraph => paragraph.uniqueLocalId !== null)
+      .map(paragraph => (
+        { text: paragraph.text.replace(/^\u000b+/, ''), id: paragraph.uniqueLocalId }))
+      .filter(paragraph => paragraph.text.trim() !== ""); // Filter out empty or whitespace-only paragraphs
+
+    let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
+
+    for (let textChunk of chunks) {
+      if (textChunk.trim() === "") continue;  // Skip empty or whitespace-only chunks  
+      await delay(delayDuration); // Introduce delay before processing each chunk  
+
+      try {
         const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/^\u000b+/, ''), accessTokenWithTimestamp.token);
-        if (!newHighlights) return;  
+        if (!newHighlights) return;
+
         const newHighlightsExcludingOrthography = {
           ...newHighlights,
           results: newHighlights.results.filter((result: any) => {
             return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
           })
-        };  
-        this.checkEndpointResponse = newHighlightsExcludingOrthography;  
+        };
+        this.checkEndpointResponse = newHighlightsExcludingOrthography;
         if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {  //prompt user to register on dashboard   
           const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
           Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
@@ -313,15 +321,15 @@ export class SpellcheckerComponent implements OnInit {
               console.log('result.error', result.error);
             }
           });
-        }  
+        }
         const checkLogEventId = Math.random().toString(36).substring(2, 15);
         analytics.checkLog(newHighlightsExcludingOrthography, null, this.selectedText.length, 'check', false, checkLogEventId);
-  
+
         if (this.authResponse?.plan !== 'witty_free') {
           newHighlightsExcludingOrthography.results.forEach((result: any) => {
             analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false, checkLogEventId);
           });
-        }  
+        }
         //mostly for analytics purposes
         const newAlerts = newHighlightsExcludingOrthography.results.map((result) => ({
           id: `${result.text}-${result.category}-${result.start}${result.end}`,
@@ -342,9 +350,9 @@ export class SpellcheckerComponent implements OnInit {
             alternatives: result.alternatives,
             gravity: result.gravity,
           },
-        }));  
+        }));
         this.alerts = this.alerts.concat(newAlerts);
-  
+
         newHighlightsExcludingOrthography.results.forEach(highlight => {
           const paragraphIndex = this.paragraphsWithIds.findIndex((paragraph) => {
             //filter out highlights if previous paragraph had identical text -> because we can not differentiate and highlight always the first in this case
@@ -361,7 +369,7 @@ export class SpellcheckerComponent implements OnInit {
             id: paragraph.id,
             errors: [highlight]
           });
-  
+
           this.highlights.push({
             paragraphUniqueId: paragraph.id,
             paragraph: paragraphIndex,
@@ -370,7 +378,7 @@ export class SpellcheckerComponent implements OnInit {
             word: highlight.text,
             details: highlight
           });
-        });  
+        });
         // sort highlights by paragraph -> make sure highlights come in the right order
         this.highlights.sort((a, b) => {
           return a.paragraph - b.paragraph;
@@ -380,26 +388,33 @@ export class SpellcheckerComponent implements OnInit {
         if (message) {
           ErrorUtils.removeErrorMessage(message, "issueCheckingText", this.lang);
         }
-      }
-    } catch (error: any) {
-      Sentry.captureException(new Error(`Error in processSelectedText: ${JSON.stringify(error, null, 2)}`));
-      if (error.name === 'HttpErrorResponse' && error.status === 422) {
-        //TODO: handle this
-      } else if (error?.code === 13001) {
-        this.isLoggedInWord = false;
-        this.isLoggedin = false;
-      } else {
-        const message = document.getElementById("issue-checking-text");
-        if (message) {
-          ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang);
+      } catch (error: any) {
+        if (error.name === 'HttpErrorResponse' && error.status === 422) {
+          Sentry.captureException(new Error(`422 Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`)); 
+          continue; // Ignore and continue processing the next chunk
+        } else {
+          console.error(error);
         }
       }
-      console.error(error);
+    }
+  } catch (error: any) {
+    Sentry.captureException(new Error(`Error in processSelectedText: ${JSON.stringify(error, null, 2)}`));
+    if (error?.code === 13001) {
+      this.isLoggedInWord = false;
+      this.isLoggedin = false;
+    } else {
+      const message = document.getElementById("issue-checking-text");
+      if (message) {
+        ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang);
+      }
+    }
+    console.error(error);
     }
     finally {
-      this.isSpellchecking = false;
-    }
+    this.isSpellchecking = false;
+    this.hasSpellcheckingRun = true;
   }
+}
 
   updatehighlights() {
     this.highlights = this.highlights.map((error, index) => {
