@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SettingsService } from "../services/settings.service";
 import { Subscription } from "rxjs";
-import { en, de } from '../translations';
 import { environment } from '../../environments/environment';
 import { useAnalytics } from '../analytics/analytics';
+import { getLanguageModule } from '../utils/language.utils';
 
 const analytics = useAnalytics();
 
@@ -16,7 +16,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   showContext: boolean = true;
   teamName = '';
-  lang = Office.context?.displayLanguage?.split('-')[0].toLowerCase() === 'de' ? de : en;
+  lang: any;
   isLoggedIn = false;
   public appVersion = '-';
 
@@ -63,6 +63,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
       this.showContext = ctx;
     });
     this.isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
+    this.lang = getLanguageModule();
   }
 
   ngOnDestroy() {
