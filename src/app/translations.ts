@@ -37,6 +37,7 @@ export const de = {
     " siehst du, wie weit dein Text geprüft wurde. Markiere den Text danach, um den Text weiter zu überprüfen.",
   howToSelectText:
     "Wähle einen Textabschnitt zum Prüfen aus. Alternativ werden die ersten 2000 Zeichen geprüft.",
+  noIssue: "Keine inklusiven Sprachprobleme gefunden.",
 
   //error
   tryInstead: "Wie wär's mit ...",
@@ -119,6 +120,7 @@ export const en = {
     " you can see what portion of the text was checked. Mark the text following to check the rest of the text.",
   howToSelectText:
     "Select text to choose a text portion to check. Alternatively the first 2000 characters will be checked.",
+  noIssue: "No inclusive language issues found.",
 
   //error
   tryInstead: "Try instead ...",
