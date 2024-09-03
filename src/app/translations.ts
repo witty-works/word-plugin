@@ -161,3 +161,85 @@ export const en = {
   loading: "Loading...",
   loadingSuccess: "Loaded successfully",
 };
+
+export const fr = {
+  //tabs
+  writing: "Écriture",
+  settings: "Paramètres",
+
+  //spellchecker
+  loginToUnlock: "Connectez-vous maintenant!",
+  signedOutText: "Vous manquez quelque chose",
+  areaLabelHeader: "Navigation Witty Works",
+  wittyIconAlt: "Icône Witty Works",
+  sadFaceIconAlt: "",
+  starIconAlt: "",
+  biasDetection: "Détection des biais dans plus de 40 dimensions de diversité",
+  inclusiveAlternatives: "Alternatives pour une écriture inclusive",
+  teamFeatures: "Fonctionnalités d'équipe, incl. dictionnaires partagés",
+  signIn: "Se connecter",
+  dontHaveAccount: "Vous n'avez pas de compte?",
+  signUp: "S'inscrire",
+  wittyCheck: "Vérifier le texte",
+  suggstion: "suggestion",
+  suggstions: "suggestions",
+  clickWittyCheck: "Choisissez «Vérifier le texte» pour obtenir des suggestions.",
+  noFurtherSuggestions: "Plus de suggestions.",
+  analyzing: "Analyse en cours...",
+  error: "Erreur",
+  tryAgain: "Veuillez réessayer.",
+  dontAnalyzeAgain: "Non, ne pas analyser le texte à nouveau",
+  analyzeAgain: "Oui, analyser le texte à nouveau",
+  register: "S'inscrire",
+  wittyInfos:
+    "Bienvenue sur Witty for Word, l'assistant d'écriture inclusive pour Microsoft Word.",
+  pleaseRegister:
+    "Veuillez vous inscrire pour pouvoir analyser votre texte.",
+  hitMaxTextLength1: "Vous avez atteint la longueur maximale du texte.",
+  hitMaxTextLengthHere: "Ici",
+  hitMaxTextLength2:
+    " vous pouvez voir quelle partie du texte a analysée. Sélectionnez le texte suivant pour analyser le reste du texte.",
+  howToSelectText:
+    "Sélectionnez du texte pour choisir une portion à analyser. Sinon, les 2000 premiers caractères seront vérifiés.",
+
+  //error
+  tryInstead: "Essayez plutôt...",
+  learnMore: "En savoir plus",
+  arrowDownIconAlt: "Ouvrir l'explication",
+  videoIconAlt: "Une vidéo est disponible pour en savoir plus",
+  ignoreOnce: "Ignorer une fois",
+  ignorePermanently: "Ignorer définitivement",
+  failedRequestText: "Impossible de sauvegarder. Veuillez réessayer plus tard.",
+  cautionIconAlt: "Une erreur est survenue. Veuillez vérifier le message suivant pour plus de détails.",
+
+  //settings
+  settingsIconAlt: "Ouvrir les paramètres du tableau de bord Witty",
+  quickSettings: "Paramètres rapides",
+  caseSensitivity: "Vérifier la casse",
+  spellChecking: "Vérifier la grammaire et l'orthographe",
+  showContext: "Afficher le contexte",
+  goToDashboard: "Aller à l'éditeur Witty",
+  signedInTo: "Connecté à ",
+  ariaLabelLogOut: "",
+  logOut: "Se déconnecter",
+  wittyVersion: "Version du plugin Witty Word: ",
+  help: "Aide",
+
+  keyboardShortcuts: "Raccourcis clavier disponibles:",
+  keyboardShortcut: "Raccourci",
+  keyboardFunction: "Fonction",
+
+  //warnings
+  throttleWarning: "Veuillez réessayer dans environ 30 secondes.",
+  notSignedInWarning:
+    "Witty n'a pas pu vous authentifier, veuillez vous assurer que vous êtes connecté à Word. Une fois connecté, veuillez fermer et rouvrir Witty for Word.",
+  serverError:
+    "Witty n'est actuellement pas disponible. Veuillez réessayer dans quelques minutes.",
+  issueCheckingText:
+    "Il y a eu un problème lors de la vérification du texte. Veuillez réessayer dans quelques minutes.",
+  
+  //accessibility
+  openNewWindow: "S'ouvre dans une nouvelle fenêtre",
+  loading: "Chargement...",
+  loadingSuccess: "Chargé avec succès",
+};
