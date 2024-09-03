@@ -120,7 +120,7 @@ export const en = {
     " you can see what portion of the text was checked. Mark the text following to check the rest of the text.",
   howToSelectText:
     "Select text to choose a text portion to check. Alternatively the first 2000 characters will be checked.",
-  noIssue: "No inclusive language issues were found.",
+  noIssue: "No inclusive language issues found.",
 
   //error
   tryInstead: "Try instead ...",

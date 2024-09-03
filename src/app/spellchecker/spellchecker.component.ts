@@ -389,9 +389,14 @@ export class SpellcheckerComponent implements OnInit {
           ErrorUtils.removeErrorMessage(message, "issueCheckingText", this.lang);
         }
       } catch (error: any) {
-        if (error.name === 'HttpErrorResponse' && error.status === 422) {
-          Sentry.captureException(new Error(`422 Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`)); 
-          continue; // Ignore and continue processing the next chunk
+        if (error.name === 'HttpErrorResponse') {
+          if (error.status === 422) {
+            Sentry.captureException(new Error(`422 Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`)); 
+            continue; // Ignore and continue processing the next chunk
+          } else if (error.status >= 400 && error.status < 500) {
+            Sentry.captureException(new Error(`4xx Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`));
+            continue; 
+          }
         } else {
           console.error(error);
         }
