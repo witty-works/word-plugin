@@ -233,7 +233,7 @@ export const fr = {
   //warnings
   throttleWarning: "Veuillez réessayer dans environ 30 secondes.",
   notSignedInWarning:
-    "Witty n'a pas pu vous authentifier, vérifiez que vous êtes connecté·e à Word. Une fois connecté·e, fermez et rouvrez Witty for Word.", --> "Witty for Word" ou "Witty Word" ? Note that I added a point médian here also.
+    "Witty n'a pas pu vous authentifier, vérifiez que vous êtes connecté·e à Word. Une fois connecté·e, fermez et rouvrez Witty for Word.", // "Witty for Word" ou "Witty Word" Note that I added a point médian here also.
   serverError:
     "Witty n'est actuellement pas disponible. Veuillez réessayer dans quelques minutes.",
   issueCheckingText:
