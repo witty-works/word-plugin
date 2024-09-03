@@ -37,7 +37,7 @@ export const de = {
     " siehst du, wie weit dein Text geprüft wurde. Markiere den Text danach, um den Text weiter zu überprüfen.",
   howToSelectText:
     "Wähle einen Textabschnitt zum Prüfen aus. Alternativ werden die ersten 2000 Zeichen geprüft.",
-  noIssue: "Keine inklusiven Sprachprobleme gefunden.",
+  noIssue: "Glückwunsch, keine Sprachprobleme im Bereich Inklusion gefunden.",
 
   //error
   tryInstead: "Wie wär's mit ...",
@@ -75,7 +75,7 @@ export const de = {
   issueCheckingText:
     "Es gab ein Problem bei der Überprüfung des Textes. Bitte versuche es in ein paar Minuten noch einmal.",
 
-//accessibility
+  //accessibility
   openNewWindow: "Öffnet in einem neuen Fenster",
   loading: "Lädt...",
   loadingSuccess: "Laden erfolgreich",
@@ -120,7 +120,7 @@ export const en = {
     " you can see what portion of the text was checked. Mark the text following to check the rest of the text.",
   howToSelectText:
     "Select text to choose a text portion to check. Alternatively the first 2000 characters will be checked.",
-  noIssue: "No inclusive language issues found.",
+  noIssue: "Congratulations, no inclusive language issues found.",
 
   //error
   tryInstead: "Try instead ...",
@@ -157,7 +157,7 @@ export const en = {
     "Witty is currently not available. Please try again in a few minutes.",
   issueCheckingText:
     "There was an issue checking the text. Please try again in a few minutes.",
-  
+
   //accessibility
   openNewWindow: "Opens in a new window",
   loading: "Loading...",
@@ -168,7 +168,7 @@ export const fr = {
   //tabs
   writing: "Écriture",
   settings: "Paramètres",
-  
+
   //spellchecker
   loginToUnlock: "Se connecter",
   signedOutText: "Vous manquez quelque chose",
@@ -182,7 +182,7 @@ export const fr = {
   signIn: "Se connecter",
   dontHaveAccount: "Vous n'avez pas de compte ?",
   signUp: "S'inscrire",
-  wittyCheck: "Analyser le texte",
+  wittyCheck: "Analyser",
   suggstion: "suggestion",
   suggstions: "suggestions",
   clickWittyCheck: "Cliquez sur « Analyser le texte » pour obtenir des suggestions.",
@@ -203,7 +203,8 @@ export const fr = {
     " vous pouvez voir quelle partie du texte a été analysée. Sélectionnez la suite du texte pour analyser le reste du texte.",
   howToSelectText:
     "Sélectionnez du texte pour choisir quelle partie sera analysée. Autrement, les 2000 premiers caractères seront analysés.",
-  
+  noIssue: "Félicitations, votre texte est déjà inclusif !",
+
   //error
   tryInstead: "Essayez plutôt...",
   learnMore: "En savoir plus",
@@ -213,7 +214,7 @@ export const fr = {
   ignorePermanently: "Ignorer définitivement",
   failedRequestText: "Impossible d'enregistrer. Veuillez réessayer plus tard.",
   cautionIconAlt: "Une erreur est survenue. Consultez le message suivant pour en savoir plus.",
-  
+
   //settings
   settingsIconAlt: "Ouvrir les paramètres du tableau de bord Witty",
   quickSettings: "Paramètres rapides",
@@ -229,7 +230,7 @@ export const fr = {
   keyboardShortcuts: "Raccourcis clavier disponibles :",
   keyboardShortcut: "Raccourci",
   keyboardFunction: "Fonction",
-  
+
   //warnings
   throttleWarning: "Veuillez réessayer dans environ 30 secondes.",
   notSignedInWarning:
@@ -238,7 +239,7 @@ export const fr = {
     "Witty n'est actuellement pas disponible. Veuillez réessayer dans quelques minutes.",
   issueCheckingText:
     "Il y a eu un problème lors de l'analyse du texte. Veuillez réessayer dans quelques minutes.",
-  
+
   //accessibility
   openNewWindow: "Ouverture dans une nouvelle fenêtre",
   loading: "Chargement...",
