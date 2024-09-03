@@ -391,7 +391,6 @@ export class SpellcheckerComponent implements OnInit {
       } catch (error: any) {
         if (error.name === 'HttpErrorResponse') {
           if (error.status === 422) {
-            Sentry.captureException(new Error(`422 Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`)); 
             continue; // Ignore and continue processing the next chunk
           } else if (error.status >= 400 && error.status < 500) {
             Sentry.captureException(new Error(`4xx Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`));
