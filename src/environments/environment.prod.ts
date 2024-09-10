@@ -12,6 +12,6 @@ export const environment = {
   plugin: "https://word.witty.works/",
   maxChunkSize: 500,
   maxTextLength: 2000,
-  delayDuration: 500,
+  delayDuration: 300,
   supportedLanguages: ['de', 'en']
 };

@@ -229,50 +229,62 @@ export class SpellcheckerComponent implements OnInit {
     return accessTokenWithTimestamp;
   }
 
-  async checkText(): Promise<void> {
+async checkText(): Promise<void> {
     this.hitMaxTextLength = false;
     this.isFirstRun = false;
     this.isSpellchecking = true;
-    this.selectedText = ''
+    this.selectedText = '';
     this.highlights = [];
     this.previouslyCheckedParagraphs = [];
-    
-    return Word.run(async (context) => {
-      Office.context.document.getSelectedDataAsync(Office.CoercionType.Text, async (asyncResult) => {
-        if (asyncResult.status == Office.AsyncResultStatus.Failed) {
-          console.log('Action failed. Error: ' + asyncResult.error.message);
-        } else {
-          this.selectedText = asyncResult.value as string;  
-          const maxTextLength = environment.maxTextLength;
-          if (this.selectedText.length === 0) {
-            const body = context.document.body;
-            body.load('text');
-            await context.sync();
-            this.selectedText = body.text.substring(0, maxTextLength); 
-            if(body.text.length > maxTextLength) {
-              this.hitMaxTextLength = true;
+
+    try {
+        await Word.run(async (context) => {
+            // Wrap getSelectedDataAsync in a promise to handle async/await correctly
+            const asyncResult = await new Promise<any>((resolve, reject) => {
+                Office.context.document.getSelectedDataAsync(Office.CoercionType.Text, (result) => {
+                    if (result.status === Office.AsyncResultStatus.Succeeded) {
+                        resolve(result);
+                    } else {
+                        reject(new Error('Failed to get selected data: ' + result.error.message));
+                    }
+                });
+            });
+
+            this.selectedText = asyncResult.value as string;
+            const maxTextLength = environment.maxTextLength;
+
+            if (this.selectedText.length === 0) {
+                const body = context.document.body;
+                body.load('text');
+                await context.sync();
+                this.selectedText = body.text.substring(0, maxTextLength);
+
+                if (body.text.length > maxTextLength) {
+                    this.hitMaxTextLength = true;
+                }
+            } else if (this.selectedText.length > maxTextLength) {
+                this.hitMaxTextLength = true;
+                const selectedTextWithinRange = this.selectedText.substring(0, maxTextLength);
+                const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
+                this.selectedText = this.selectedText.substring(0, lastSpace);
             }
-          } else if (this.selectedText.length > maxTextLength) {
-            this.hitMaxTextLength = true;
-            const selectedTextWithinRange = this.selectedText.substring(0, maxTextLength);
-            const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
-            this.selectedText = this.selectedText.substring(0, lastSpace);
-          }
 
-          this.highlights = [];
+            this.highlights = [];
 
-          setTimeout(async () => {
+            // Now process the selected text
+            setTimeout(async () => {
                   // Continue with further operations inside this callback or call a separate async function
-                  await this.processSelectedText(context);
+                await this.processSelectedText(context);
                     
-                  setTimeout(() => {
-                  this.focusElement("toggle");
-                  }, 100);
+                setTimeout(() => {
+                    this.focusElement("toggle");
                 }, 100);
-        }
-      });
-    });
-  }
+            }, 100);
+        });
+    } catch (error) {
+        console.error('Error in checkText:', error);
+    }
+}
   
   async processSelectedText(context: Word.RequestContext): Promise<void> {
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
