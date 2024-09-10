@@ -16,7 +16,7 @@ export const environment = {
   plugin: "https://localhost:4200/word-plugin/",
   maxChunkSize: 500,
   maxTextLength: 2000,
-  delayDuration: 500,
+  delayDuration: 300,
   supportedLanguages: ['de', 'en', 'fr']
 };
 
