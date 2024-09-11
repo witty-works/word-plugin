@@ -60,6 +60,11 @@ export class CheckingService {
       if (authErrorMessage) {
         ErrorUtils.removeErrorMessage(authErrorMessage, "notSignedInWarning", this.lang);
       }
+
+      const unsupportedAccountErrorMessage = document.getElementById("warn-not-supported-account");
+      if (unsupportedAccountErrorMessage) {
+        ErrorUtils.removeErrorMessage(unsupportedAccountErrorMessage, "notSupportedAccountWarning", this.lang);
+      } 
       
       return this.http
         .post<any>(url, body, httpOptions)
@@ -76,12 +81,19 @@ export class CheckingService {
         }
       }
 
-      const errorCodes = [13001, 13002, 13000, 5001];
+      const errorCodes = [13001, 13002, 13000, 5001, 13003];
       if (errorCodes.includes(error?.code)) {
-        const message = document.getElementById("warn-not-signed-in-word");
-        if (message) {
-          ErrorUtils.displayErrorMessage(message, "notSignedInWarning", this.lang);
+        if (error.code === 13003) {
+          const message = document.getElementById("warn-not-supported-account");
+          if (message) {
+            ErrorUtils.displayErrorMessage(message, "notSupportedAccount", this.lang);
           }
+        } else {
+          const message = document.getElementById("warn-not-signed-in-word");
+          if (message) {
+            ErrorUtils.displayErrorMessage(message, "notSignedInWarning", this.lang);
+          }
+        }
       }
       throw error;
     }

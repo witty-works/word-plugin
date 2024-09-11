@@ -46,6 +46,11 @@ export class AuthService {
           ErrorUtils.removeErrorMessage(serverErrorMessage, "serverError", this.lang);
         }
 
+        const unsupportedAccountErrorMessage = document.getElementById("warn-not-supported-account");
+        if (unsupportedAccountErrorMessage) {
+          ErrorUtils.removeErrorMessage(unsupportedAccountErrorMessage, "notSupportedAccountWarning", this.lang);
+        }   
+
         return response;
       } catch (error: any) {
         if (error.status === 403 || error.status === 401) {
