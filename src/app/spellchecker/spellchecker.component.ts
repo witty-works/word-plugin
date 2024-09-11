@@ -213,21 +213,27 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   async getAccessTokenWithTimestamp(): Promise<{ token: string, timestamp: number }> {
-    let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
-    if (!accessTokenWithTimestamp?.token || new Date().getTime() - accessTokenWithTimestamp.timestamp > 300000) { //check if token is older than 5 min
-      const newAccessToken = await Office.auth.getAccessToken({
-        allowSignInPrompt: true,
-        allowConsentPrompt: true,
-      });
+      let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+      const currentTime = new Date().getTime();
+    
+      // Check if token exists and has more than 20 seconds of lifetime remaining
+      if (!accessTokenWithTimestamp?.token || currentTime - accessTokenWithTimestamp.timestamp > environment.tokenLifetime - environment.tokenBuffer) {
+        const newAccessToken = await Office.auth.getAccessToken({
+          allowSignInPrompt: true,
+          allowConsentPrompt: true,
+        });
 
-      accessTokenWithTimestamp = {
-        token: newAccessToken,
-        timestamp: new Date().getTime()
+        // Recalculate the current time to reflect the actual time the new token was fetched
+        const newTimestamp = new Date().getTime(); 
+
+        accessTokenWithTimestamp = {
+          token: newAccessToken,
+          timestamp: newTimestamp // Use new timestamp here
+        };
+        localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
       }
-      localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
+      return accessTokenWithTimestamp;
     }
-    return accessTokenWithTimestamp;
-  }
 
 async checkText(): Promise<void> {
     this.hitMaxTextLength = false;
