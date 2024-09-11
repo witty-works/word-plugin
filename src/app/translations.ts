@@ -74,7 +74,8 @@ export const de = {
     "Witty ist aktuell leider nicht verfügbar. Bitte versuche es in ein paar Minuten noch einmal.",
   issueCheckingText:
     "Es gab ein Problem bei der Überprüfung des Textes. Bitte versuche es in ein paar Minuten noch einmal.",
-
+  notSupportedAccount: "Dein Konto wird von Microsoft nicht unterstützt. Bitte kontaktiere: ",
+    
   //accessibility
   openNewWindow: "Öffnet in einem neuen Fenster",
   loading: "Lädt...",
@@ -157,6 +158,7 @@ export const en = {
     "Witty is currently not available. Please try again in a few minutes.",
   issueCheckingText:
     "There was an issue checking the text. Please try again in a few minutes.",
+  notSupportedAccount: "Your account is not supported by Microsoft. Please contact: ",
 
   //accessibility
   openNewWindow: "Opens in a new window",
@@ -239,6 +241,7 @@ export const fr = {
     "Witty n'est actuellement pas disponible. Veuillez réessayer dans quelques minutes.",
   issueCheckingText:
     "Il y a eu un problème lors de l'analyse du texte. Veuillez réessayer dans quelques minutes.",
+  notSupportedAccount: "Votre compte n'est pas pris en charge par Microsoft. Veuillez contacter: ",
 
   //accessibility
   openNewWindow: "Ouverture dans une nouvelle fenêtre",
