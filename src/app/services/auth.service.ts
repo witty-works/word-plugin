@@ -46,6 +46,11 @@ export class AuthService {
           ErrorUtils.removeErrorMessage(serverErrorMessage, "serverError", this.lang);
         }
 
+        const unsupportedAccountErrorMessage = document.getElementById("warn-not-supported-account");
+        if (unsupportedAccountErrorMessage) {
+          ErrorUtils.removeErrorMessage(unsupportedAccountErrorMessage, "notSupportedAccountWarning", this.lang);
+        }   
+
         return response;
       } catch (error: any) {
         if (error.status === 403 || error.status === 401) {
@@ -68,11 +73,18 @@ export class AuthService {
         } else {
           const errorMessage = typeof error.message === 'string' ? error.message : JSON.stringify(error, Object.getOwnPropertyNames(error));
           Sentry.captureException(new Error(`Error in makeAuthRequest: ${errorMessage}`));
-          const errorCodes = [13001, 13002, 13000, 5001];
+          const errorCodes = [13001, 13002, 13000, 5001, 13003];
           if (errorCodes.includes(error?.code)) {
-            const message = document.getElementById("warn-not-signed-in-word");
-            if (message) {
-              ErrorUtils.displayErrorMessage(message, "notSignedInWarning", this.lang);
+            if (error.code === 13003) {
+              const message = document.getElementById("warn-not-supported-account");
+              if (message) {
+                ErrorUtils.displayErrorMessage(message, "notSupportedAccount", this.lang);
+              }
+            } else {
+              const message = document.getElementById("warn-not-signed-in-word");
+              if (message) {
+                ErrorUtils.displayErrorMessage(message, "notSignedInWarning", this.lang);
+              }
             }
           } else {
             const message = document.getElementById("warn-server-error");

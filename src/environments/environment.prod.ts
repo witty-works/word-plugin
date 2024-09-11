@@ -1,5 +1,5 @@
 export const environment = {
-  package_version: "1.4.1",
+  package_version: "1.4.2",
   production: true,
   environment: "production",
   sentry_dsn: "https://9fe0bcbcd55e6ebae036cd0625603c71@o4507044685938688.ingest.de.sentry.io/4507044705206352",
@@ -12,6 +12,6 @@ export const environment = {
   plugin: "https://word.witty.works/",
   maxChunkSize: 500,
   maxTextLength: 2000,
-  delayDuration: 500,
+  delayDuration: 300,
   supportedLanguages: ['de', 'en']
 };
