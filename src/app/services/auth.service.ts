@@ -64,11 +64,14 @@ export class AuthService {
             }, 1000);
           } else {
             const url = `${environment.dashboard}office-register?token=${accessTokenWithTimestamp.token}`;
-            Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
-              if (result.status === Office.AsyncResultStatus.Failed) {
-                console.log('result.error', result.error);
-              }
-            });
+            if (Office && Office.context && Office.context.ui) {
+              Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
+                if (result.status === Office.AsyncResultStatus.Failed) {
+                  console.log("result.error", result.error);
+                }
+              });
+            } else {
+            }
           }
         } else {
           const errorMessage = typeof error.message === 'string' ? error.message : JSON.stringify(error, Object.getOwnPropertyNames(error));
