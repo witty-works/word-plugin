@@ -81,7 +81,7 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.lang = getLanguageModule(); 
+    this.lang = getLanguageModule();
     this.register();
     Office.onReady((info) => {
       try {
@@ -141,7 +141,7 @@ export class SpellcheckerComponent implements OnInit {
       }
       catch (e) {
         this.handleError(e);
-      }     
+      }
     });
   }
   hideSpinner() {
@@ -202,7 +202,7 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
 
-  // logout() { 
+  // logout() {
   //   localStorage.setItem('access_token', '');
   //   localStorage.setItem('refresh_token', '');
   // }
@@ -229,7 +229,7 @@ export class SpellcheckerComponent implements OnInit {
     return accessTokenWithTimestamp;
   }
 
-async checkText(): Promise<void> {
+  async checkText(): Promise<void> {
     this.hitMaxTextLength = false;
     this.isFirstRun = false;
     this.isSpellchecking = true;
@@ -238,199 +238,201 @@ async checkText(): Promise<void> {
     this.previouslyCheckedParagraphs = [];
 
     try {
-        await Word.run(async (context) => {
-            // Wrap getSelectedDataAsync in a promise to handle async/await correctly
-            const asyncResult = await new Promise<any>((resolve, reject) => {
-                Office.context.document.getSelectedDataAsync(Office.CoercionType.Text, (result) => {
-                    if (result.status === Office.AsyncResultStatus.Succeeded) {
-                        resolve(result);
-                    } else {
+      await Word.run(async (context) => {
+        // Wrap getSelectedDataAsync in a promise to handle async/await correctly
+        const asyncResult = await new Promise<any>((resolve, reject) => {
+          Office.context.document.getSelectedDataAsync(Office.CoercionType.Text, (result) => {
+            if (result.status === Office.AsyncResultStatus.Succeeded) {
+              resolve(result);
+            } else {
                         reject(new Error('Failed to get selected data: ' + result.error.message));
-                    }
-                });
-            });
-
-            this.selectedText = asyncResult.value as string;
-            const maxTextLength = environment.maxTextLength;
-
-            if (this.selectedText.length === 0) {
-                const body = context.document.body;
-                body.load('text');
-                await context.sync();
-                this.selectedText = body.text.substring(0, maxTextLength);
-
-                if (body.text.length > maxTextLength) {
-                    this.hitMaxTextLength = true;
-                }
-            } else if (this.selectedText.length > maxTextLength) {
-                this.hitMaxTextLength = true;
-                const selectedTextWithinRange = this.selectedText.substring(0, maxTextLength);
-                const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
-                this.selectedText = this.selectedText.substring(0, lastSpace);
             }
-
-            this.highlights = [];
-
-            // Now process the selected text
-            setTimeout(async () => {
-                  // Continue with further operations inside this callback or call a separate async function
-                await this.processSelectedText(context);
-                    
-                setTimeout(() => {
-                    this.focusElement("toggle");
-                }, 100);
-            }, 100);
+          });
         });
+
+        this.selectedText = asyncResult.value as string;
+        const maxTextLength = environment.maxTextLength;
+
+        if (this.selectedText.length === 0) {
+          const body = context.document.body;
+                body.load('text');
+          await context.sync();
+          this.selectedText = body.text.substring(0, maxTextLength);
+
+          if (body.text.length > maxTextLength) {
+            this.hitMaxTextLength = true;
+          }
+        } else if (this.selectedText.length > maxTextLength) {
+          this.hitMaxTextLength = true;
+          const selectedTextWithinRange = this.selectedText.substring(0, maxTextLength);
+                const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
+          this.selectedText = this.selectedText.substring(0, lastSpace);
+        }
+
+        this.highlights = [];
+
+        // Now process the selected text
+        setTimeout(async () => {
+          // Continue with further operations inside this callback or call a separate async function
+          await this.processSelectedText(context);
+
+          setTimeout(() => {
+            this.focusElement("toggle");
+          }, 100);
+        }, 100);
+      });
     } catch (error) {
         console.error('Error in checkText:', error);
     }
-}
-  
+  }
+
   async processSelectedText(context: Word.RequestContext): Promise<void> {
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-  const delayDuration = environment.delayDuration; 
+    const delayDuration = environment.delayDuration;
 
-  try {
-    let chunks = this.selectedText.split(/\r/);
+    try {
+      let chunks = this.selectedText.split(/\r/);
     chunks = chunks.filter(paragraph => paragraph.trim() !== ""); // Filter out empty or whitespace-only paragraphs
 
-    const allPageparagraphs = context.document.body.paragraphs;
+      const allPageparagraphs = context.document.body.paragraphs;
     allPageparagraphs.load('items');
-    await context.sync();
+      await context.sync();
 
-    const paragraphCollection = allPageparagraphs.load({
+      const paragraphCollection = allPageparagraphs.load({
     select: ['text', 'uniqueLocalId']
-    });
-    await context.sync();
+      });
+      await context.sync();
 
-    this.paragraphsWithIds = paragraphCollection.items
-      .filter(paragraph => paragraph.uniqueLocalId !== null)
-      .map(paragraph => (
-        { text: paragraph.text.replace(/^\u000b+/, ''), id: paragraph.uniqueLocalId }))
-      .filter(paragraph => paragraph.text.trim() !== ""); // Filter out empty or whitespace-only paragraphs
+      this.paragraphsWithIds = paragraphCollection.items
+        .filter((paragraph) => paragraph.uniqueLocalId !== null)
+        .map((paragraph) => ({
+          text: paragraph.text.replace(/\u000b+/g, "").trim(), // Remove all instances of \u000b and trim whitespace
+          id: paragraph.uniqueLocalId,
+        }))
+        .filter((paragraph) => paragraph.text !== "");
 
-    let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
+      let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
 
-    for (let textChunk of chunks) {
+      for (let textChunk of chunks) {
       if (textChunk.trim() === "") continue;  // Skip empty or whitespace-only chunks  
-      await delay(delayDuration); // Introduce delay before processing each chunk  
+        await delay(delayDuration); // Introduce delay before processing each chunk
 
-      try {
+        try {
         const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/^\u000b+/, ''), accessTokenWithTimestamp.token);
-        if (!newHighlights) return;
+          if (!newHighlights) return;
 
-        const newHighlightsExcludingOrthography = {
-          ...newHighlights,
-          results: newHighlights.results.filter((result: any) => {
+          const newHighlightsExcludingOrthography = {
+            ...newHighlights,
+            results: newHighlights.results.filter((result: any) => {
             return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
           })
-        };
-        this.checkEndpointResponse = newHighlightsExcludingOrthography;
+          };
+          this.checkEndpointResponse = newHighlightsExcludingOrthography;
         if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {  //prompt user to register on dashboard   
           const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
-          Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
-            if (result.status === Office.AsyncResultStatus.Failed) {
+            Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
+              if (result.status === Office.AsyncResultStatus.Failed) {
               console.log('result.error', result.error);
-            }
-          });
-        }
-        const checkLogEventId = Math.random().toString(36).substring(2, 15);
+              }
+            });
+          }
+          const checkLogEventId = Math.random().toString(36).substring(2, 15);
         analytics.checkLog(newHighlightsExcludingOrthography, null, this.selectedText.length, 'check', false, checkLogEventId);
 
         if (this.authResponse?.plan !== 'witty_free') {
-          newHighlightsExcludingOrthography.results.forEach((result: any) => {
+            newHighlightsExcludingOrthography.results.forEach((result: any) => {
             analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false, checkLogEventId);
-          });
-        }
-        //mostly for analytics purposes
-        const newAlerts = newHighlightsExcludingOrthography.results.map((result) => ({
-          id: `${result.text}-${result.category}-${result.start}${result.end}`,
-          startOffset: result.start,
-          endOffset: result.end,
-          popOverIsOpen: false,
-          organizationId: this.authResponse?.organization_id,
-          userId: this.authResponse?.id,
-          plan: this.authResponse?.plan,
-          data: {
+            });
+          }
+          //mostly for analytics purposes
+          const newAlerts = newHighlightsExcludingOrthography.results.map((result) => ({
+            id: `${result.text}-${result.category}-${result.start}${result.end}`,
+            startOffset: result.start,
+            endOffset: result.end,
+            popOverIsOpen: false,
+            organizationId: this.authResponse?.organization_id,
+            userId: this.authResponse?.id,
+            plan: this.authResponse?.plan,
+            data: {
             language: this.checkEndpointResponse?.language || 'en',
-            category: result.category,
-            subcategory: result.subcategory,
-            context: result.context,
-            text: result.text,
-            label: result.label,
-            explanation: result.explanation,
-            alternatives: result.alternatives,
-            gravity: result.gravity,
-          },
-        }));
-        this.alerts = this.alerts.concat(newAlerts);
+              category: result.category,
+              subcategory: result.subcategory,
+              context: result.context,
+              text: result.text,
+              label: result.label,
+              explanation: result.explanation,
+              alternatives: result.alternatives,
+              gravity: result.gravity,
+            },
+          }));
+          this.alerts = this.alerts.concat(newAlerts);
 
         newHighlightsExcludingOrthography.results.forEach(highlight => {
-          const paragraphIndex = this.paragraphsWithIds.findIndex((paragraph) => {
-            //filter out highlights if previous paragraph had identical text -> because we can not differentiate and highlight always the first in this case
+            const paragraphIndex = this.paragraphsWithIds.findIndex((paragraph) => {
+              //filter out highlights if previous paragraph had identical text -> because we can not differentiate and highlight always the first in this case
             if (this.previouslyCheckedParagraphs.some((checkedParagraph) => checkedParagraph.text === paragraph.text && checkedParagraph.errors.some((error) => error.text === highlight.text))) {
-              return false;
-            }
-            const errorMargin = 0;
+                return false;
+              }
+              const errorMargin = 0;
             return paragraph.text.substring(highlight.start - errorMargin, highlight.end + errorMargin).includes(highlight.text);
-          });
-          if (paragraphIndex === -1) return;
-          const paragraph = this.paragraphsWithIds[paragraphIndex];
-          this.previouslyCheckedParagraphs.push({
-            text: paragraph.text,
-            id: paragraph.id,
+            });
+            if (paragraphIndex === -1) return;
+            const paragraph = this.paragraphsWithIds[paragraphIndex];
+            this.previouslyCheckedParagraphs.push({
+              text: paragraph.text,
+              id: paragraph.id,
             errors: [highlight]
-          });
+            });
 
-          this.highlights.push({
-            paragraphUniqueId: paragraph.id,
-            paragraph: paragraphIndex,
-            offset: highlight.start,
-            length: highlight.end - highlight.start,
-            word: highlight.text,
+            this.highlights.push({
+              paragraphUniqueId: paragraph.id,
+              paragraph: paragraphIndex,
+              offset: highlight.start,
+              length: highlight.end - highlight.start,
+              word: highlight.text,
             details: highlight
+            });
           });
-        });
-        // sort highlights by paragraph -> make sure highlights come in the right order
-        this.highlights.sort((a, b) => {
-          return a.paragraph - b.paragraph;
-        });
-        //within the paragraph, order by start offset
+          // sort highlights by paragraph -> make sure highlights come in the right order
+          this.highlights.sort((a, b) => {
+            return a.paragraph - b.paragraph;
+          });
+          //within the paragraph, order by start offset
+          const message = document.getElementById("issue-checking-text");
+          if (message) {
+            ErrorUtils.removeErrorMessage(message, "issueCheckingText", this.lang);
+          }
+        } catch (error: any) {
+        if (error.name === 'HttpErrorResponse') {
+            if (error.status === 422) {
+              continue; // Ignore and continue processing the next chunk
+            } else if (error.status >= 400 && error.status < 500) {
+            Sentry.captureException(new Error(`4xx Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`));
+              continue;
+            }
+          } else {
+            console.error(error);
+          }
+        }
+      }
+    } catch (error: any) {
+      Sentry.captureException(new Error(`Error in processSelectedText: ${JSON.stringify(error, null, 2)}`));
+      if (error?.code === 13001) {
+        this.isLoggedInWord = false;
+        this.isLoggedin = false;
+      } else {
         const message = document.getElementById("issue-checking-text");
         if (message) {
-          ErrorUtils.removeErrorMessage(message, "issueCheckingText", this.lang);
-        }
-      } catch (error: any) {
-        if (error.name === 'HttpErrorResponse') {
-          if (error.status === 422) {
-            continue; // Ignore and continue processing the next chunk
-          } else if (error.status >= 400 && error.status < 500) {
-            Sentry.captureException(new Error(`4xx Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`));
-            continue; 
-          }
-        } else {
-          console.error(error);
+          ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang);
         }
       }
-    }
-  } catch (error: any) {
-    Sentry.captureException(new Error(`Error in processSelectedText: ${JSON.stringify(error, null, 2)}`));
-    if (error?.code === 13001) {
-      this.isLoggedInWord = false;
-      this.isLoggedin = false;
-    } else {
-      const message = document.getElementById("issue-checking-text");
-      if (message) {
-        ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang);
-      }
-    }
-    console.error(error);
+      console.error(error);
     }
     finally {
-    this.isSpellchecking = false;
-    this.hasSpellcheckingRun = true;
+      this.isSpellchecking = false;
+      this.hasSpellcheckingRun = true;
+    }
   }
-}
 
   updatehighlights() {
     this.highlights = this.highlights.map((error, index) => {
@@ -443,88 +445,88 @@ async checkText(): Promise<void> {
 
   async highlight(obj: { paragraphIndex: number, errorIndex: number }) {
     await Word.run(async (context) => {
-        try {
-            // Get the paragraph text and the error object using their respective indices.
-            const paragraphText = this.paragraphsWithIds[obj.paragraphIndex].text;
-            const error = this.highlights[obj.errorIndex];
-            // Fetch the paragraph range using the paragraph text.
-            const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
+      try {
+        // Get the paragraph text and the error object using their respective indices.
+        const paragraphText = this.paragraphsWithIds[obj.paragraphIndex].text;
+        const error = this.highlights[obj.errorIndex];
+        // Fetch the paragraph range using the paragraph text.
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
 
-            // Load the paragraph range text to obtain the full content, including any possible changes.
+        // Load the paragraph range text to obtain the full content, including any possible changes.
             paragraphRange.load('text');
-            await context.sync();
+        await context.sync();
 
-            // Search for all instances of the error word within the paragraph range.
+        // Search for all instances of the error word within the paragraph range.
             const searchResults = paragraphRange.search(error.word, { matchCase: true});
             context.load(searchResults, 'text');
+        await context.sync();
+
+        // Prepare to find the actual range to highlight by calculating offsets.
+        let previousStartOffset = 0;
+        let foundMatchingRange = false;
+        for (const item of searchResults.items) {
+          // Calculate the start offset of this instance of the error word.
+          const startOffset = paragraphRange.text.indexOf(item.text, previousStartOffset);
+          if (startOffset === error.offset) {
+            const errorRange = item;
+                    errorRange.select('Select');
             await context.sync();
 
-            // Prepare to find the actual range to highlight by calculating offsets.
-            let previousStartOffset = 0;
-            let foundMatchingRange = false;
-            for (const item of searchResults.items) {
-                // Calculate the start offset of this instance of the error word.
-                const startOffset = paragraphRange.text.indexOf(item.text, previousStartOffset);
-                if (startOffset === error.offset) {
-                    const errorRange = item;
-                    errorRange.select('Select');
-                    await context.sync();
-
-                    foundMatchingRange = true;
-                    break;
-                }
-                previousStartOffset = startOffset + 1;
-            }
-
-            if (!foundMatchingRange) {
-              this.handleError(new Error('The range for the error was not found: ' + error.word));
-            }
-        } catch (e) {
-            this.handleError(e);
+            foundMatchingRange = true;
+            break;
+          }
+          previousStartOffset = startOffset + 1;
         }
+
+        if (!foundMatchingRange) {
+              this.handleError(new Error('The range for the error was not found: ' + error.word));
+        }
+      } catch (e) {
+        this.handleError(e);
+      }
     });
   }
 
   async highlightAndRemoveWordIncludingPreviousSpace(obj: { paragraphIndex: number, errorIndex: number, suggestion: IAlternatives}) {
     await Word.run(async (context) => {
-        try {
-            const paragraphText = this.paragraphsWithIds[obj.paragraphIndex].text;
-            const error = this.highlights[obj.errorIndex];
-            const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
+      try {
+        const paragraphText = this.paragraphsWithIds[obj.paragraphIndex].text;
+        const error = this.highlights[obj.errorIndex];
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
 
             paragraphRange.load('text');
-            await context.sync();
+        await context.sync();
 
             const searchResults = paragraphRange.search(' ' + error.word, { matchCase: true}); //including previous space
             context.load(searchResults, 'text');
-            await context.sync();
+        await context.sync();
 
-            let previousStartOffset = 0;
-            let foundMatchingRange = false;
-            for (const item of searchResults.items) {
-                const startOffset = paragraphRange.text.indexOf(item.text, previousStartOffset) + 1; //+1 accounts for the space
-                if (startOffset === error.offset) {
-                    const errorRange = item;
+        let previousStartOffset = 0;
+        let foundMatchingRange = false;
+        for (const item of searchResults.items) {
+          const startOffset = paragraphRange.text.indexOf(item.text, previousStartOffset) + 1; //+1 accounts for the space
+          if (startOffset === error.offset) {
+            const errorRange = item;
                     errorRange.select('Select');
-                    await context.sync();
-
-                    foundMatchingRange = true;
-                    break;
-                }
-                previousStartOffset = startOffset + 1;
-            }
-
-            if (!foundMatchingRange) {
-              this.handleError(new Error('The range for the error was not found: ' + error.word));
-            }
-            const highlightedText = context.document.getSelection()
-            highlightedText.load();
             await context.sync();
-            highlightedText.insertText(obj.suggestion.text, "Replace");
-            await context.sync();
-        } catch (e) {
-            this.handleError(e);
+
+            foundMatchingRange = true;
+            break;
+          }
+          previousStartOffset = startOffset + 1;
         }
+
+        if (!foundMatchingRange) {
+              this.handleError(new Error('The range for the error was not found: ' + error.word));
+        }
+            const highlightedText = context.document.getSelection()
+        highlightedText.load();
+        await context.sync();
+        highlightedText.insertText(obj.suggestion.text, "Replace");
+        await context.sync();
+      } catch (e) {
+        this.handleError(e);
+      }
     });
   }
 
@@ -577,64 +579,64 @@ async checkText(): Promise<void> {
     }
   }
 
-    async highlightCheckedText() {
+  async highlightCheckedText() {
     this.isHighlightingCheckedText = true;
     await Word.run(async (context) => {
-        try {
-            if (!this.selectedText || this.selectedText.length <= 255) {
-                return;
-            }
-
-            let chunks = this.selectedText.split(/\r/);
-            chunks = chunks.filter((paragraph) => paragraph !== "" && paragraph !== "\u000b");
-
-            // Prepare all search operations first
-            const searchPromises = chunks.map(async (chunk) => {
-                if (chunk.length > 200) {
-                    chunk = chunk.substring(0, 200);
-                }
-                const searchResults = context.document.body.search(chunk, { matchCase: true, matchWholeWord: false });
-                context.load(searchResults, 'items');
-                return searchResults; // Return the promise for later resolution
-            });
-
-            await context.sync();
-
-            let firstRangeFound = null;
-            let lastRangeFound = null;
-
-            // Process search results
-            for (const searchPromise of searchPromises) {
-                const searchResults = await searchPromise; // Resolve each promise
-                const items = searchResults.items;
-                if (items.length > 0) {
-                    if (!firstRangeFound) {
-                        firstRangeFound = items[0];
-                    }
-                    lastRangeFound = items[items.length - 1];
-                }
-            }
-
-            if (!firstRangeFound || !lastRangeFound) {
-                return;
-            }
-
-            const completeRange = firstRangeFound.expandTo(lastRangeFound);
-            completeRange.select('Select');
-            await context.sync();
-        } catch (e) {
-            this.handleError(e);
+      try {
+        if (!this.selectedText || this.selectedText.length <= 255) {
+          return;
         }
+
+        let chunks = this.selectedText.split(/\r/);
+        chunks = chunks.filter((paragraph) => paragraph !== "" && paragraph !== "\u000b");
+
+        // Prepare all search operations first
+        const searchPromises = chunks.map(async (chunk) => {
+          if (chunk.length > 200) {
+            chunk = chunk.substring(0, 200);
+          }
+          const searchResults = context.document.body.search(chunk, { matchCase: true, matchWholeWord: false });
+                context.load(searchResults, 'items');
+          return searchResults; // Return the promise for later resolution
+        });
+
+        await context.sync();
+
+        let firstRangeFound = null;
+        let lastRangeFound = null;
+
+        // Process search results
+        for (const searchPromise of searchPromises) {
+          const searchResults = await searchPromise; // Resolve each promise
+          const items = searchResults.items;
+          if (items.length > 0) {
+            if (!firstRangeFound) {
+              firstRangeFound = items[0];
+            }
+            lastRangeFound = items[items.length - 1];
+          }
+        }
+
+        if (!firstRangeFound || !lastRangeFound) {
+          return;
+        }
+
+        const completeRange = firstRangeFound.expandTo(lastRangeFound);
+            completeRange.select('Select');
+        await context.sync();
+      } catch (e) {
+        this.handleError(e);
+      }
     });
     this.isHighlightingCheckedText = false;
-    }
-  
-    focusElement(id: string) {
+  }
+
+  focusElement(id: string) {
     setTimeout(() => {
       const elementToFocus = document.getElementById(id);
       if (elementToFocus) {
         elementToFocus.focus();
       }
-    }, 100); 
+    }, 100);
   }
 }
