@@ -3,7 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  package_version: "1.4.2-dev",
+  package_version: "1.4.3-dev",
   production: false,
   environment: "development",
   sentry_dsn: "",
@@ -17,6 +17,8 @@ export const environment = {
   maxChunkSize: 500,
   maxTextLength: 2000,
   delayDuration: 300,
+  tokenLifetime: 300000, // 5 minutes 
+  tokenBuffer: 20000, // 20 seconds
   supportedLanguages: ['de', 'en', 'fr']
 };
 
