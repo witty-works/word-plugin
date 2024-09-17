@@ -13,5 +13,7 @@ export const environment = {
   maxChunkSize: 500,
   maxTextLength: 2000,
   delayDuration: 300,
+  tokenLifetime: 300000,
+  tokenBuffer: 20000,
   supportedLanguages: ['de', 'en']
 };

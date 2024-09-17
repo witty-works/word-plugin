@@ -17,6 +17,8 @@ export const environment = {
   maxChunkSize: 500,
   maxTextLength: 2000,
   delayDuration: 300,
+  tokenLifetime: 300000, // 5 minutes 
+  tokenBuffer: 20000, // 20 seconds
   supportedLanguages: ['de', 'en', 'fr']
 };
 
