@@ -5,9 +5,7 @@
     </div>
 </div>
 
-<div id="tabs" role="tablist">
-    <div role="tab" [attr.aria-selected]="selectedTab === 'spellchecker'" (click)="tabChanged('spellchecker')"></div>
-    <div role="tab" [attr.aria-selected]="selectedTab === 'settings'" (click)="tabChanged('settings')"></div>
+<div id="tabs">
     <app-tabs [selectedTab]="selectedTab" (tabChangedEvent)="tabChanged($event)"></app-tabs>
 </div>
 
