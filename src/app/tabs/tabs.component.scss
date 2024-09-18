@@ -10,6 +10,13 @@
   border-top: 1px solid $darkGray;
   flex-shrink: 0;
 
+  .tablist {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+  } 
+  
   .tab {
     font-family: $lato;
     font-size: 14px;

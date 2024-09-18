@@ -1,11 +1,29 @@
-<div class="tab" 
-     [class.selected]="selectedTab === 'spellchecker'" 
-     (click)="tabChanged('spellchecker')"
-     (keydown.enter)="tabChanged('spellchecker')" 
-     tabindex="0">{{lang.writing}}</div>
+<div class="tablist" role="tablist">
+  <div class="tab" 
+       role="tab"
+       [class.selected]="selectedTab === 'spellchecker'" 
+       [attr.aria-selected]="selectedTab === 'spellchecker' ? 'true' : null"
+       (click)="tabChanged('spellchecker')"
+       (keydown.enter)="tabChanged('spellchecker')" 
+       tabindex="0">
+    {{lang.writing}}
+  </div>
 
-<div class="tab" 
-     [class.selected]="selectedTab === 'settings'" 
-     (click)="tabChanged('settings')"
-     (keydown.enter)="tabChanged('settings')" 
-     tabindex="0">{{lang.settings}}</div>
+  <div class="tab" 
+       role="tab"
+       [class.selected]="selectedTab === 'settings'" 
+       [attr.aria-selected]="selectedTab === 'settings' ? 'true' : null"
+       (click)="tabChanged('settings')"
+       (keydown.enter)="tabChanged('settings')" 
+       tabindex="0">
+    {{lang.settings}}
+  </div>
+</div>
+
+<div role="tabpanel" *ngIf="selectedTab === 'spellchecker'">
+  <!-- Content for spellchecker tab -->
+</div>
+
+<div role="tabpanel" *ngIf="selectedTab === 'settings'">
+  <!-- Content for settings tab -->
+</div>
