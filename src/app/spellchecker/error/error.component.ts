@@ -126,6 +126,7 @@ export class ErrorComponent {
       suggestion.text = "";
     }
     this.acceptSuggestionEvent.emit({ suggestion });
+    this.focusElement("toggle");
   }
 
   onClick(url: string | undefined) {
@@ -188,10 +189,30 @@ export class ErrorComponent {
 
   focusElement(id: string) {
     setTimeout(() => {
-      const elementToFocus = document.getElementById(id);
-      if (elementToFocus) {
-        elementToFocus.focus();
+      const elementToRemove = document.getElementById(id);
+      if (elementToRemove) {
+        const parent = elementToRemove.parentElement;
+        if (parent) {
+          const siblings = Array.from(parent.children);
+          const index = siblings.indexOf(elementToRemove);
+
+          // Remove the element from the DOM
+          elementToRemove.remove();
+
+          // Find the closest suggestion element
+          let elementToFocus: HTMLElement | null = null;
+          if (index > 0) {
+            elementToFocus = siblings[index - 1] as HTMLElement;
+          } else if (index < siblings.length - 1) {
+            elementToFocus = siblings[index] as HTMLElement;
+          }
+
+          // Move focus to the closest suggestion element
+          if (elementToFocus) {
+            elementToFocus.focus();
+          }
+        }
       }
-    }, 100); 
+    }, 100);
   }
 }
