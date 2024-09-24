@@ -48,6 +48,7 @@ export const de = {
   ignorePermanently: "Für immer ignorieren",
   failedRequestText: 'Speicherung fehlgeschlagen. Bitte später erneut probieren.',
   cautionIconAlt: "Ein Fehler ist aufgetreten. Bitte überprüfen Sie die folgende Nachricht für Details.",
+  visitSource: "Quelle besuchen",
 
   //settings
   settingsIconAlt: "Witty Dashboard Einstellungen öffnen",
@@ -75,7 +76,7 @@ export const de = {
   issueCheckingText:
     "Es gab ein Problem bei der Überprüfung des Textes. Bitte versuche es in ein paar Minuten noch einmal.",
   notSupportedAccount: "Dein Konto wird von Microsoft nicht unterstützt. Bitte kontaktiere: ",
-    
+
   //accessibility
   openNewWindow: "Öffnet in einem neuen Fenster",
   loading: "Lädt...",
@@ -132,6 +133,7 @@ export const en = {
   ignorePermanently: "Ignore permanently",
   failedRequestText: 'Unable to save. Please try again later.',
   cautionIconAlt: "An error has occurred. Please check the following message for details.",
+  visitSource: "Visit source",
 
   //settings
   settingsIconAlt: "Open Witty Dashboard settings",
@@ -216,6 +218,7 @@ export const fr = {
   ignorePermanently: "Ignorer définitivement",
   failedRequestText: "Impossible d'enregistrer. Veuillez réessayer plus tard.",
   cautionIconAlt: "Une erreur est survenue. Consultez le message suivant pour en savoir plus.",
+  visitSource: "Visiter la source",
 
   //settings
   settingsIconAlt: "Ouvrir les paramètres du tableau de bord Witty",

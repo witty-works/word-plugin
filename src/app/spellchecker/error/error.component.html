@@ -54,38 +54,52 @@
               </div>
             </div>
 
-            <ng-container *ngIf="error.details.explanation?.url">
-              <a href="{{error.details.explanation.url}}"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="witty-works-ext-container-row witty-works-ext-justify-end witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer"
-                style="text-decoration: none;">
+            <div class="witty-works-ext-container-row">
+              <ng-container *ngIf="error.details.explanation?.url">
+                <a href="{{error.details.explanation.url}}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="witty-works-ext-container-row witty-works-ext-justify-end witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer"
+                  style="text-decoration: none;">
              
-                <div
-                  class="witty-works-ext-secondary-button-red witty-works-ext-container-row witty-works-ext-margin-top"
-                  >
-                  {{ lang.learnMore }}
-                  <ng-container
-                    *ngIf="error.details.explanation.content === 'video'"
-                  >
-                    <img
-                      class="witty-works-ext-margin-left"
-                      src="assets/icons/video.svg"
-                      alt="{{lang.videoIconAlt}}"
-                    />
-                  </ng-container>
                   <div
-                    class="witty-works-ext-margin-left"
-                    style="pointer-events: 'none'"
-                  >
-                    <img
-                      src="assets/icons/external-link.svg"
-                      alt="{{lang.openNewWindow}}"
-                    />
+                    class="witty-works-ext-secondary-button-red witty-works-ext-container-row witty-works-ext-margin-top"
+                    >
+                    {{ lang.learnMore }}
+                    <ng-container
+                      *ngIf="error.details.explanation.content === 'video'"
+                    >
+                      <img
+                        class="witty-works-ext-margin-left"
+                        src="assets/icons/video.svg"
+                        alt="{{lang.videoIconAlt}}"
+                      />
+                    </ng-container>
+                    <div
+                      class="witty-works-ext-margin-left"
+                      style="pointer-events: 'none'"
+                    >
+                      <img
+                        src="assets/icons/external-link.svg"
+                        alt="{{lang.openNewWindow}}"
+                      />
+                    </div>
                   </div>
-                </div>
-              </a>
-            </ng-container>
+                </a>
+              </ng-container>
+              <ng-container *ngIf="error.details.source?.text">
+                <a href="{{error.details.source.url}}" target="_blank" rel="noopener noreferrer"
+                  class="witty-works-ext-container-row witty-works-ext-justify-end witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer"
+                  style="text-decoration: none;">
+                  <div class="witty-works-ext-secondary-button-red witty-works-ext-container-row witty-works-ext-margin-top">
+                    {{ lang.visitSource }}
+                    <div class="witty-works-ext-margin-left" style="pointer-events: 'none'">
+                      <img src="assets/icons/external-link.svg" alt="{{lang.openNewWindow}}" />
+                    </div>
+                  </div>
+                </a>
+              </ng-container>
+            </div>
           </div>
         </div>
         <div
