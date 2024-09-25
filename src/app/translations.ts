@@ -76,7 +76,8 @@ export const de = {
   issueCheckingText:
     "Es gab ein Problem bei der Überprüfung des Textes. Bitte versuche es in ein paar Minuten noch einmal.",
   notSupportedAccount: "Dein Konto wird von Microsoft nicht unterstützt. Bitte kontaktiere: ",
-
+  trialExpired: "Dein Witty Test ist abgelaufen. Um Witty weiterhin nutzen zu können, musst du auf ein kostenpflichtiges Abonnement umsteigen.",
+      
   //accessibility
   openNewWindow: "Öffnet in einem neuen Fenster",
   loading: "Lädt...",
@@ -161,6 +162,7 @@ export const en = {
   issueCheckingText:
     "There was an issue checking the text. Please try again in a few minutes.",
   notSupportedAccount: "Your account is not supported by Microsoft. Please contact: ",
+  trialExpired: "Your Witty trial has ended. To continue using Witty, you need to upgrade to a paid plan.",
 
   //accessibility
   openNewWindow: "Opens in a new window",
@@ -245,6 +247,7 @@ export const fr = {
   issueCheckingText:
     "Il y a eu un problème lors de l'analyse du texte. Veuillez réessayer dans quelques minutes.",
   notSupportedAccount: "Votre compte n'est pas pris en charge par Microsoft. Veuillez contacter: ",
+  trialExpired: "Votre essai Witty est terminé. Pour continuer à utiliser Witty, vous devez passer à un plan payant.",
 
   //accessibility
   openNewWindow: "Ouverture dans une nouvelle fenêtre",

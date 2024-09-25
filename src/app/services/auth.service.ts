@@ -12,7 +12,7 @@ export class AuthService {
   lang: any;
 
   constructor(private http: HttpClient, private ErrorUtils: ErrorUtils) {
-    this.lang = getLanguageModule(); 
+    this.lang = getLanguageModule();
   }
 
   async makeAuthRequest(): Promise<any> {
@@ -46,6 +46,13 @@ export class AuthService {
       // Making the HTTP POST request
       const response = await this.http.post<any>(url, {}, httpOptions).toPromise();
 
+      if (response.plan === null || response.plan === "none") {
+        const trialExpiredMessage = document.getElementById("trial-expired-message");
+        if (trialExpiredMessage) {
+          ErrorUtils.displayErrorMessage(trialExpiredMessage, "trialExpired", this.lang);
+        }
+      }
+
       const authErrorMessage = document.getElementById("warn-not-signed-in-word");
       if (authErrorMessage) {
         ErrorUtils.removeErrorMessage(authErrorMessage, "notSignedInWarning", this.lang);
@@ -66,24 +73,24 @@ export class AuthService {
       if (error.status === 403 || error.status === 401) {
         localStorage.removeItem('word_access_token_with_timestamp'); // Clear cached token
         const authFailCounter = localStorage.getItem('authFailCounter') ?? '0';
-          if (parseInt(authFailCounter) <= 2) { //has to be 2 to avoid reaching api limit 
-            const newCounter = parseInt(authFailCounter) + 1;
-            localStorage.setItem('authFailCounter', newCounter.toString());
-            setTimeout(() => {
-              this.makeAuthRequest();
-            }, 1000);
-          } else {
-            const url = `${environment.dashboard}office-register?token=${accessTokenWithTimestamp.token}`;
-            if (Office && Office.context && Office.context.ui) {
-              Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
-                if (result.status === Office.AsyncResultStatus.Failed) {
-                  console.log("result.error", result.error);
-                }
-              });
-            } else {
-            }
-          }
+        if (parseInt(authFailCounter) <= 2) { //has to be 2 to avoid reaching api limit 
+          const newCounter = parseInt(authFailCounter) + 1;
+          localStorage.setItem('authFailCounter', newCounter.toString());
+          setTimeout(() => {
+            this.makeAuthRequest();
+          }, 1000);
         } else {
+          const url = `${environment.dashboard}office-register?token=${accessTokenWithTimestamp.token}`;
+          if (Office && Office.context && Office.context.ui) {
+            Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
+              if (result.status === Office.AsyncResultStatus.Failed) {
+                console.log("result.error", result.error);
+              }
+            });
+          } else {
+          }
+        }
+      } else {
         const errorMessage = typeof error.message === 'string' ? error.message : JSON.stringify(error, Object.getOwnPropertyNames(error));
         Sentry.captureException(new Error(`Error in makeAuthRequest: ${errorMessage}`));
         const errorCodes = [13001, 13002, 13000, 5001, 13003];

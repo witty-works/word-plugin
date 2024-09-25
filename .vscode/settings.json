@@ -1,0 +1,6 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "witty-works",
+        "projectKey": "witty-works_word-plugin"
+    }
+}
