@@ -78,6 +78,7 @@ export interface ICheckResponseResult {
   gravity: number;
   language: string;
   limit_reached: boolean;
+  source: ISource;
 }
 
 //AUTH ENDPOINT
@@ -183,6 +184,11 @@ export interface IExplanation {
   content: string;
 }
 
+export interface ISource {
+  text: string;
+  url: string;
+}
+
 //ANALYTICS
 export interface ILogItems {
   request__type: string;
@@ -203,13 +209,14 @@ export interface ILogItems {
   response__data__explanation__icon: string;
   response__data__explanation__icon_image: string;
   response__data__explanation__url: string;
+  response__data__source: ISource;
   response__data__alternatives: IAlternatives[];
   response__data__gravity: number;
 }
 export interface IAlternativeLogItems extends ILogItems {
   request__alternative: string;
 }
-export interface IIgnoreLogItems extends ILogItems {}
+export interface IIgnoreLogItems extends ILogItems { }
 export interface IVoteLogRequest {
   request__type: string;
   request__lang: string;
