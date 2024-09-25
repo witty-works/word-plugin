@@ -48,6 +48,7 @@ export const de = {
   ignorePermanently: "Für immer ignorieren",
   failedRequestText: 'Speicherung fehlgeschlagen. Bitte später erneut probieren.',
   cautionIconAlt: "Ein Fehler ist aufgetreten. Bitte überprüfen Sie die folgende Nachricht für Details.",
+  visitSource: "Quelle",
 
   //settings
   settingsIconAlt: "Witty Dashboard Einstellungen öffnen",
@@ -75,7 +76,8 @@ export const de = {
   issueCheckingText:
     "Es gab ein Problem bei der Überprüfung des Textes. Bitte versuche es in ein paar Minuten noch einmal.",
   notSupportedAccount: "Dein Konto wird von Microsoft nicht unterstützt. Bitte kontaktiere: ",
-    
+  trialExpired: "Dein Witty Test ist abgelaufen. Um Witty weiterhin nutzen zu können, musst du auf ein kostenpflichtiges Abonnement umsteigen.",
+      
   //accessibility
   openNewWindow: "Öffnet in einem neuen Fenster",
   loading: "Lädt...",
@@ -132,6 +134,7 @@ export const en = {
   ignorePermanently: "Ignore permanently",
   failedRequestText: 'Unable to save. Please try again later.',
   cautionIconAlt: "An error has occurred. Please check the following message for details.",
+  visitSource: "Source",
 
   //settings
   settingsIconAlt: "Open Witty Dashboard settings",
@@ -159,6 +162,7 @@ export const en = {
   issueCheckingText:
     "There was an issue checking the text. Please try again in a few minutes.",
   notSupportedAccount: "Your account is not supported by Microsoft. Please contact: ",
+  trialExpired: "Your Witty trial has ended. To continue using Witty, you need to upgrade to a paid plan.",
 
   //accessibility
   openNewWindow: "Opens in a new window",
@@ -216,6 +220,7 @@ export const fr = {
   ignorePermanently: "Ignorer définitivement",
   failedRequestText: "Impossible d'enregistrer. Veuillez réessayer plus tard.",
   cautionIconAlt: "Une erreur est survenue. Consultez le message suivant pour en savoir plus.",
+  visitSource: "Source",
 
   //settings
   settingsIconAlt: "Ouvrir les paramètres du tableau de bord Witty",
@@ -242,6 +247,7 @@ export const fr = {
   issueCheckingText:
     "Il y a eu un problème lors de l'analyse du texte. Veuillez réessayer dans quelques minutes.",
   notSupportedAccount: "Votre compte n'est pas pris en charge par Microsoft. Veuillez contacter: ",
+  trialExpired: "Votre essai Witty est terminé. Pour continuer à utiliser Witty, vous devez passer à un plan payant.",
 
   //accessibility
   openNewWindow: "Ouverture dans une nouvelle fenêtre",

@@ -34,6 +34,8 @@ export class SpellcheckerComponent implements OnInit {
 
   isLoggedin = false;
 
+  trialExpired = false;
+
   isHighlightingCheckedText = false;
 
   showSpinner = false;
@@ -180,6 +182,16 @@ export class SpellcheckerComponent implements OnInit {
         throttleWarning.style.display = 'none';
       }
 
+      if (response.trialExpired) {
+        this.isLoggedin = false;
+        this.trialExpired = true;
+        const trialExpiredMessage = document.getElementById("trial-expired-message");
+        if (trialExpiredMessage) {
+          ErrorUtils.displayErrorMessage(trialExpiredMessage, "trialExpired", this.lang);
+        }
+        return;
+      }
+
       this.authResponse = response;
       this.isLoggedInWord = true;
       this.isLoggedin = true;
@@ -213,27 +225,27 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   async getAccessTokenWithTimestamp(): Promise<{ token: string, timestamp: number }> {
-      let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
-      const currentTime = new Date().getTime();
-    
-      // Check if token exists and has more than 20 seconds of lifetime remaining
-      if (!accessTokenWithTimestamp?.token || currentTime - accessTokenWithTimestamp.timestamp > environment.tokenLifetime - environment.tokenBuffer) {
-        const newAccessToken = await Office.auth.getAccessToken({
-          allowSignInPrompt: true,
-          allowConsentPrompt: true,
-        });
+    let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+    const currentTime = new Date().getTime();
 
-        // Recalculate the current time to reflect the actual time the new token was fetched
-        const newTimestamp = new Date().getTime(); 
+    // Check if token exists and has more than 20 seconds of lifetime remaining
+    if (!accessTokenWithTimestamp?.token || currentTime - accessTokenWithTimestamp.timestamp > environment.tokenLifetime - environment.tokenBuffer) {
+      const newAccessToken = await Office.auth.getAccessToken({
+        allowSignInPrompt: true,
+        allowConsentPrompt: true,
+      });
 
-        accessTokenWithTimestamp = {
-          token: newAccessToken,
-          timestamp: newTimestamp // Use new timestamp here
-        };
-        localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
-      }
-      return accessTokenWithTimestamp;
+      // Recalculate the current time to reflect the actual time the new token was fetched
+      const newTimestamp = new Date().getTime();
+
+      accessTokenWithTimestamp = {
+        token: newAccessToken,
+        timestamp: newTimestamp // Use new timestamp here
+      };
+      localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
     }
+    return accessTokenWithTimestamp;
+  }
 
   async checkText(): Promise<void> {
     this.hitMaxTextLength = false;
@@ -251,7 +263,7 @@ export class SpellcheckerComponent implements OnInit {
             if (result.status === Office.AsyncResultStatus.Succeeded) {
               resolve(result);
             } else {
-                        reject(new Error('Failed to get selected data: ' + result.error.message));
+              reject(new Error('Failed to get selected data: ' + result.error.message));
             }
           });
         });
@@ -261,7 +273,7 @@ export class SpellcheckerComponent implements OnInit {
 
         if (this.selectedText.length === 0) {
           const body = context.document.body;
-                body.load('text');
+          body.load('text');
           await context.sync();
           this.selectedText = body.text.substring(0, maxTextLength);
 
@@ -271,7 +283,7 @@ export class SpellcheckerComponent implements OnInit {
         } else if (this.selectedText.length > maxTextLength) {
           this.hitMaxTextLength = true;
           const selectedTextWithinRange = this.selectedText.substring(0, maxTextLength);
-                const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
+          const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
           this.selectedText = this.selectedText.substring(0, lastSpace);
         }
 
@@ -288,24 +300,24 @@ export class SpellcheckerComponent implements OnInit {
         }, 100);
       });
     } catch (error) {
-        console.error('Error in checkText:', error);
+      console.error('Error in checkText:', error);
     }
   }
 
   async processSelectedText(context: Word.RequestContext): Promise<void> {
-  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
     const delayDuration = environment.delayDuration;
 
     try {
       let chunks = this.selectedText.split(/\r/);
-    chunks = chunks.filter(paragraph => paragraph.trim() !== ""); // Filter out empty or whitespace-only paragraphs
+      chunks = chunks.filter(paragraph => paragraph.trim() !== ""); // Filter out empty or whitespace-only paragraphs
 
       const allPageparagraphs = context.document.body.paragraphs;
-    allPageparagraphs.load('items');
+      allPageparagraphs.load('items');
       await context.sync();
 
       const paragraphCollection = allPageparagraphs.load({
-    select: ['text', 'uniqueLocalId']
+        select: ['text', 'uniqueLocalId']
       });
       await context.sync();
 
@@ -320,34 +332,34 @@ export class SpellcheckerComponent implements OnInit {
       let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
 
       for (let textChunk of chunks) {
-      if (textChunk.trim() === "") continue;  // Skip empty or whitespace-only chunks  
+        if (textChunk.trim() === "") continue;  // Skip empty or whitespace-only chunks  
         await delay(delayDuration); // Introduce delay before processing each chunk
 
         try {
-        const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/^\u000b+/, ''), accessTokenWithTimestamp.token);
+          const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/^\u000b+/, ''), accessTokenWithTimestamp.token);
           if (!newHighlights) return;
 
           const newHighlightsExcludingOrthography = {
             ...newHighlights,
             results: newHighlights.results.filter((result: any) => {
-            return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
-          })
+              return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
+            })
           };
           this.checkEndpointResponse = newHighlightsExcludingOrthography;
-        if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {  //prompt user to register on dashboard   
-          const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
+          if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {  //prompt user to register on dashboard   
+            const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
             Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
               if (result.status === Office.AsyncResultStatus.Failed) {
-              console.log('result.error', result.error);
+                console.log('result.error', result.error);
               }
             });
           }
           const checkLogEventId = Math.random().toString(36).substring(2, 15);
-        analytics.checkLog(newHighlightsExcludingOrthography, null, this.selectedText.length, 'check', false, checkLogEventId);
+          analytics.checkLog(newHighlightsExcludingOrthography, null, this.selectedText.length, 'check', false, checkLogEventId);
 
-        if (this.authResponse?.plan !== 'witty_free') {
+          if (this.authResponse?.plan !== 'witty_free') {
             newHighlightsExcludingOrthography.results.forEach((result: any) => {
-            analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false, checkLogEventId);
+              analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false, checkLogEventId);
             });
           }
           //mostly for analytics purposes
@@ -360,7 +372,7 @@ export class SpellcheckerComponent implements OnInit {
             userId: this.authResponse?.id,
             plan: this.authResponse?.plan,
             data: {
-            language: this.checkEndpointResponse?.language || 'en',
+              language: this.checkEndpointResponse?.language || 'en',
               category: result.category,
               subcategory: result.subcategory,
               context: result.context,
@@ -373,21 +385,21 @@ export class SpellcheckerComponent implements OnInit {
           }));
           this.alerts = this.alerts.concat(newAlerts);
 
-        newHighlightsExcludingOrthography.results.forEach(highlight => {
+          newHighlightsExcludingOrthography.results.forEach(highlight => {
             const paragraphIndex = this.paragraphsWithIds.findIndex((paragraph) => {
               //filter out highlights if previous paragraph had identical text -> because we can not differentiate and highlight always the first in this case
-            if (this.previouslyCheckedParagraphs.some((checkedParagraph) => checkedParagraph.text === paragraph.text && checkedParagraph.errors.some((error) => error.text === highlight.text))) {
+              if (this.previouslyCheckedParagraphs.some((checkedParagraph) => checkedParagraph.text === paragraph.text && checkedParagraph.errors.some((error) => error.text === highlight.text))) {
                 return false;
               }
               const errorMargin = 0;
-            return paragraph.text.substring(highlight.start - errorMargin, highlight.end + errorMargin).includes(highlight.text);
+              return paragraph.text.substring(highlight.start - errorMargin, highlight.end + errorMargin).includes(highlight.text);
             });
             if (paragraphIndex === -1) return;
             const paragraph = this.paragraphsWithIds[paragraphIndex];
             this.previouslyCheckedParagraphs.push({
               text: paragraph.text,
               id: paragraph.id,
-            errors: [highlight]
+              errors: [highlight]
             });
 
             this.highlights.push({
@@ -396,7 +408,7 @@ export class SpellcheckerComponent implements OnInit {
               offset: highlight.start,
               length: highlight.end - highlight.start,
               word: highlight.text,
-            details: highlight
+              details: highlight
             });
           });
           // sort highlights by paragraph -> make sure highlights come in the right order
@@ -409,11 +421,11 @@ export class SpellcheckerComponent implements OnInit {
             ErrorUtils.removeErrorMessage(message, "issueCheckingText", this.lang);
           }
         } catch (error: any) {
-        if (error.name === 'HttpErrorResponse') {
+          if (error.name === 'HttpErrorResponse') {
             if (error.status === 422) {
               continue; // Ignore and continue processing the next chunk
             } else if (error.status >= 400 && error.status < 500) {
-            Sentry.captureException(new Error(`4xx Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`));
+              Sentry.captureException(new Error(`4xx Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`));
               continue;
             }
           } else {
@@ -459,12 +471,12 @@ export class SpellcheckerComponent implements OnInit {
         const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
 
         // Load the paragraph range text to obtain the full content, including any possible changes.
-            paragraphRange.load('text');
+        paragraphRange.load('text');
         await context.sync();
 
         // Search for all instances of the error word within the paragraph range.
             const searchResults = paragraphRange.search(error.word, { matchCase: true});
-            context.load(searchResults, 'text');
+        context.load(searchResults, 'text');
         await context.sync();
 
         // Prepare to find the actual range to highlight by calculating offsets.
@@ -475,7 +487,7 @@ export class SpellcheckerComponent implements OnInit {
           const startOffset = paragraphRange.text.indexOf(item.text, previousStartOffset);
           if (startOffset === error.offset) {
             const errorRange = item;
-                    errorRange.select('Select');
+            errorRange.select('Select');
             await context.sync();
 
             foundMatchingRange = true;
@@ -485,7 +497,7 @@ export class SpellcheckerComponent implements OnInit {
         }
 
         if (!foundMatchingRange) {
-              this.handleError(new Error('The range for the error was not found: ' + error.word));
+          this.handleError(new Error('The range for the error was not found: ' + error.word));
         }
       } catch (e) {
         this.handleError(e);
@@ -500,11 +512,11 @@ export class SpellcheckerComponent implements OnInit {
         const error = this.highlights[obj.errorIndex];
         const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
 
-            paragraphRange.load('text');
+        paragraphRange.load('text');
         await context.sync();
 
             const searchResults = paragraphRange.search(' ' + error.word, { matchCase: true}); //including previous space
-            context.load(searchResults, 'text');
+        context.load(searchResults, 'text');
         await context.sync();
 
         let previousStartOffset = 0;
@@ -513,7 +525,7 @@ export class SpellcheckerComponent implements OnInit {
           const startOffset = paragraphRange.text.indexOf(item.text, previousStartOffset) + 1; //+1 accounts for the space
           if (startOffset === error.offset) {
             const errorRange = item;
-                    errorRange.select('Select');
+            errorRange.select('Select');
             await context.sync();
 
             foundMatchingRange = true;
@@ -523,9 +535,9 @@ export class SpellcheckerComponent implements OnInit {
         }
 
         if (!foundMatchingRange) {
-              this.handleError(new Error('The range for the error was not found: ' + error.word));
+          this.handleError(new Error('The range for the error was not found: ' + error.word));
         }
-            const highlightedText = context.document.getSelection()
+        const highlightedText = context.document.getSelection()
         highlightedText.load();
         await context.sync();
         highlightedText.insertText(obj.suggestion.text, "Replace");
@@ -602,7 +614,7 @@ export class SpellcheckerComponent implements OnInit {
             chunk = chunk.substring(0, 200);
           }
           const searchResults = context.document.body.search(chunk, { matchCase: true, matchWholeWord: false });
-                context.load(searchResults, 'items');
+          context.load(searchResults, 'items');
           return searchResults; // Return the promise for later resolution
         });
 
@@ -628,7 +640,7 @@ export class SpellcheckerComponent implements OnInit {
         }
 
         const completeRange = firstRangeFound.expandTo(lastRangeFound);
-            completeRange.select('Select');
+        completeRange.select('Select');
         await context.sync();
       } catch (e) {
         this.handleError(e);

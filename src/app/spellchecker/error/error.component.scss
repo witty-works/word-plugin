@@ -89,7 +89,7 @@
 .witty-works-ext-wittyworks-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   padding-bottom: 0.5em;
 }
 
@@ -135,7 +135,11 @@
 .witty-works-ext-container-row {
   display: flex;
   flex-direction: row !important;
-  align-items: center;
+
+  &:nth-child(2) {
+    white-space: nowrap;
+    column-gap: 8px;
+  }
 }
 
 .witty-works-ext-justify-start {

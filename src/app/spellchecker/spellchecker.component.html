@@ -1,8 +1,8 @@
 <div>
     <div style="display: flex; align-items: center; justify-content: space-between;">
-        <button *ngIf="isLoggedin" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
+        <button *ngIf="isLoggedin && !trialExpired" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
             (click)="checkText()" [attr.aria-label]="lang.wittyCheck" (keydown)="handleKeyboardEvent($event)" [attr.aria-keyshortcuts]="shortcuts.wittyCheck.key" title="{{ lang.wittyCheck }} ({{ shortcuts.wittyCheck.key }})">{{lang.wittyCheck}}</button>
-            <div *ngIf="isLoggedin"class="witty-works-ext-selection-info">
+            <div *ngIf="isLoggedin && !trialExpired"class="witty-works-ext-selection-info">
                 <p>{{lang.howToSelectText}}</p></div>
     </div>
 

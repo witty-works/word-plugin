@@ -49,6 +49,15 @@
     style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
    </div>
 
+  <div id="trial-expired-message"
+    style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
+    <span>
+      <a href="{{environment.dashboard + '/team/subscription'}}"
+        style="color: inherit; font-weight: bold; text-decoration: underline; margin-left: 0.25em; cursor: pointer;"
+        role="link" tabindex="0" (click)=$event.preventDefault() target="_blank">Upgrade Witty</a>
+    </span>
+  </div>
+
   <div id="throttle-warning"
     style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
   </div>
