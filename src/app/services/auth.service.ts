@@ -119,16 +119,23 @@ export class AuthService {
 
   private async fetchNewAccessToken() {
     if (Office && Office.auth && typeof Office.auth.getAccessToken === 'function') {
-      const newAccessToken = await Office.auth.getAccessToken({
-        allowSignInPrompt: true,
-        allowConsentPrompt: true,
-      });
+      try {
+        const newAccessToken = await Office.auth.getAccessToken({
+          allowSignInPrompt: true,
+          allowConsentPrompt: true,
+        });
 
-      const accessTokenWithTimestamp = {
-        token: newAccessToken,
-        timestamp: new Date().getTime()
-      };
-      localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
+        const accessTokenWithTimestamp = {
+          token: newAccessToken,
+          timestamp: new Date().getTime()
+        };
+        localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
+      } catch (error) {
+        const message = document.getElementById("warn-server-error");
+        if (message) {
+          ErrorUtils.displayErrorMessage(message, "serverError", this.lang);
+        }
+      }
     } else {
       const message = document.getElementById("warn-not-signed-in-word");
       if (message) {
@@ -136,7 +143,7 @@ export class AuthService {
       }
     }
   }
-
+  
 
   // makeRefreshTokenRequest(): Promise<any> {
   //   const refreshToken = localStorage.getItem('refresh_token');
