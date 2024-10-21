@@ -20,8 +20,17 @@ export class AuthService {
     try {
       const currentTime = new Date().getTime();
 
+      // Check if token is missing, undefined (string), or expired
+      if (!accessTokenWithTimestamp?.token || accessTokenWithTimestamp?.token === 'undefined') {
+        const authErrorMessage = document.getElementById("warn-not-signed-in-word");
+        if (authErrorMessage) {
+          ErrorUtils.displayErrorMessage(authErrorMessage, "notSignedInWarning", this.lang);
+        }
+        return;
+      }
       // Check if token exists and has more than 20 seconds of lifetime remaining
-      if (!accessTokenWithTimestamp?.token || (currentTime - accessTokenWithTimestamp.timestamp) > environment.tokenLifetime - environment.tokenBuffer) {
+      if ((currentTime - accessTokenWithTimestamp.timestamp) > environment.tokenLifetime - environment.tokenBuffer) {
+        localStorage.removeItem('word_access_token_with_timestamp');
         await this.fetchNewAccessToken();
         accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
       }
@@ -87,7 +96,6 @@ export class AuthService {
                 console.log("result.error", result.error);
               }
             });
-          } else {
           }
         }
       } else {
@@ -143,7 +151,7 @@ export class AuthService {
       }
     }
   }
-  
+
 
   // makeRefreshTokenRequest(): Promise<any> {
   //   const refreshToken = localStorage.getItem('refresh_token');
