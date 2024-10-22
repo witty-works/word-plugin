@@ -22,11 +22,16 @@ export class AuthService {
 
       // Check if token is missing, undefined (string), or expired
       if (!accessTokenWithTimestamp?.token || accessTokenWithTimestamp?.token === 'undefined') {
-        const authErrorMessage = document.getElementById("warn-not-signed-in-word");
-        if (authErrorMessage) {
-          ErrorUtils.displayErrorMessage(authErrorMessage, "notSignedInWarning", this.lang);
+        await this.fetchNewAccessToken();
+        accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+
+        if (!accessTokenWithTimestamp?.token || accessTokenWithTimestamp?.token === 'undefined') {
+          const authErrorMessage = document.getElementById("warn-not-signed-in-word");
+          if (authErrorMessage) {
+            ErrorUtils.displayErrorMessage(authErrorMessage, "notSignedInWarning", this.lang);
+          }
+          return;
         }
-        return;
       }
       // Check if token exists and has more than 20 seconds of lifetime remaining
       if ((currentTime - accessTokenWithTimestamp.timestamp) > environment.tokenLifetime - environment.tokenBuffer) {
