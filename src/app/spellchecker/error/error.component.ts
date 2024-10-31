@@ -3,6 +3,7 @@ import { ISpellingError } from "../../data/data-structures";
 import TextUtils from "../../utils/text.utils";
 import { CheckingService } from "../../services/checking.service";
 import { IgnoreService } from "../../services/ignore.service";
+import { AuthService } from '../../services/auth.service';
 import { SpellcheckerComponent } from "../spellchecker.component";
 import { IAlert, IAlternatives } from "../../data/types";
 import { en, de } from "../../translations";
@@ -72,6 +73,7 @@ export class ErrorComponent {
   constructor(
     private spellcheckerService: CheckingService,
     private spellcheckerComponent: SpellcheckerComponent,
+    private authService: AuthService,
     private ignoreService: IgnoreService
   ) {}
 
@@ -150,8 +152,11 @@ export class ErrorComponent {
 
   async ignorePermanently(word: string) {
     try {
-      const accessTokenWithTimestamp =
-        await this.spellcheckerComponent.getAccessTokenWithTimestamp();
+      const accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
+      if (!accessTokenWithTimestamp) {
+        throw new Error('Valid access token not available');
+      }
+
       await this.ignoreService.ignoreWordPermanently(
         word,
         accessTokenWithTimestamp.token

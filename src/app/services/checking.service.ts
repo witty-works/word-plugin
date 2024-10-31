@@ -74,27 +74,6 @@ export class CheckingService {
         });
     } catch (error: any) {
        Sentry.captureException(new Error(`Error in checkText: ${error}`));
-      if (error?.code === 13013) { //edge case: throttled
-        const throttleWarning = document.getElementById("throttle-warning");
-        if (throttleWarning) {
-          ErrorUtils.displayErrorMessage(throttleWarning, "throttleWarning",this.lang);
-        }
-      }
-
-      const errorCodes = [13001, 13002, 13000, 5001, 13003];
-      if (errorCodes.includes(error?.code)) {
-        if (error.code === 13003) {
-          const message = document.getElementById("warn-not-supported-account");
-          if (message) {
-            ErrorUtils.displayErrorMessage(message, "notSupportedAccount", this.lang);
-          }
-        } else {
-          const message = document.getElementById("warn-not-signed-in-word");
-          if (message) {
-            ErrorUtils.displayErrorMessage(message, "notSignedInWarning", this.lang);
-          }
-        }
-      }
       throw error;
     }
   }
