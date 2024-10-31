@@ -109,13 +109,13 @@ export class SpellcheckerComponent implements OnInit {
         const previousParagraphsWithIds = this.paragraphsWithIds;
         this.paragraphsWithIds = updatedParagraphs.items.map((paragraph) => ({ text: paragraph.text, id: paragraph.uniqueLocalId })).filter(paragraph => paragraph.text !== "");
         const changedParagraph = this.paragraphsWithIds.find(paragraph => paragraph.id === event.uniqueLocalIds[0]);
-        if(!changedParagraph) return; 
+        if (!changedParagraph) return;
         await context.sync();
 
         let offsetChange = 0;
         let indexOfFirstChange = 0
         previousParagraphsWithIds.map((paragraph) => {
-          if(paragraph.id === event.uniqueLocalIds[0]) {
+          if (paragraph.id === event.uniqueLocalIds[0]) {
             offsetChange = changedParagraph.text.replace(/^\u000b+/, '').length - paragraph.text.replace(/^\u000b+/, '').length;
             //find the first change where previous paragraph and changed paragraph differ
             indexOfFirstChange = paragraph.text.replace(/^\u000b+/, '').split('').findIndex((char, index) => char !== changedParagraph.text.replace(/^\u000b+/, '')[index]);
@@ -162,7 +162,7 @@ export class SpellcheckerComponent implements OnInit {
         localStorage.setItem('is_logged_in', 'false');
         return;
       }
-      if (response === undefined || response?.status === 403) { //could not authenticate dashboard
+      if (!response || response === undefined || response?.status === 403) { //could not authenticate dashboard
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
         return;
@@ -222,29 +222,6 @@ export class SpellcheckerComponent implements OnInit {
   openWittyHomePage() {
     analytics.openLinkLog('homepage_open');
     Office.context.ui.openBrowserWindow('https://witty.works');
-  }
-
-  async getAccessTokenWithTimestamp(): Promise<{ token: string, timestamp: number }> {
-    let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
-    const currentTime = new Date().getTime();
-
-    // Check if token exists and has more than 20 seconds of lifetime remaining
-    if (!accessTokenWithTimestamp?.token || currentTime - accessTokenWithTimestamp.timestamp > environment.tokenLifetime - environment.tokenBuffer) {
-      const newAccessToken = await Office.auth.getAccessToken({
-        allowSignInPrompt: true,
-        allowConsentPrompt: true,
-      });
-
-      // Recalculate the current time to reflect the actual time the new token was fetched
-      const newTimestamp = new Date().getTime();
-
-      accessTokenWithTimestamp = {
-        token: newAccessToken,
-        timestamp: newTimestamp // Use new timestamp here
-      };
-      localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
-    }
-    return accessTokenWithTimestamp;
   }
 
   async checkText(): Promise<void> {
@@ -308,6 +285,8 @@ export class SpellcheckerComponent implements OnInit {
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
     const delayDuration = environment.delayDuration;
 
+    this.hasSpellcheckingRun = false;
+
     try {
       let chunks = this.selectedText.split(/\r/);
       chunks = chunks.filter(paragraph => paragraph.trim() !== ""); // Filter out empty or whitespace-only paragraphs
@@ -329,7 +308,10 @@ export class SpellcheckerComponent implements OnInit {
         }))
         .filter((paragraph) => paragraph.text !== "");
 
-      let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp();
+      let accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
+      if (!accessTokenWithTimestamp) {
+        throw new Error('Valid access token not available');
+      }
 
       for (let textChunk of chunks) {
         if (textChunk.trim() === "") continue;  // Skip empty or whitespace-only chunks  
@@ -421,34 +403,37 @@ export class SpellcheckerComponent implements OnInit {
             ErrorUtils.removeErrorMessage(message, "issueCheckingText", this.lang);
           }
         } catch (error: any) {
+          let additionalMessage = ""
           if (error.name === 'HttpErrorResponse') {
             if (error.status === 422) {
               continue; // Ignore and continue processing the next chunk
             } else if (error.status >= 400 && error.status < 500) {
               Sentry.captureException(new Error(`4xx Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`));
+              additionalMessage = "Status code " + `${error.status}`
+            } else {
+              // in case of f.e. a 500 we hope the next paragraph is ok
               continue;
             }
           } else {
             console.error(error);
+            additionalMessage = "Unknown error " + `${error}`
+          }
+          const message = document.getElementById("issue-checking-text");
+          if (message) {
+            ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang, "Paragraph check failed");
           }
         }
       }
+      this.hasSpellcheckingRun = true;
     } catch (error: any) {
       Sentry.captureException(new Error(`Error in processSelectedText: ${JSON.stringify(error, null, 2)}`));
-      if (error?.code === 13001) {
-        this.isLoggedInWord = false;
-        this.isLoggedin = false;
-      } else {
-        const message = document.getElementById("issue-checking-text");
-        if (message) {
-          ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang);
-        }
+      const message = document.getElementById("issue-checking-text");
+      if (message) {
+        ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang, "Check failed");
       }
       console.error(error);
-    }
-    finally {
+    } finally {
       this.isSpellchecking = false;
-      this.hasSpellcheckingRun = true;
     }
   }
 
@@ -475,7 +460,7 @@ export class SpellcheckerComponent implements OnInit {
         await context.sync();
 
         // Search for all instances of the error word within the paragraph range.
-            const searchResults = paragraphRange.search(error.word, { matchCase: true});
+        const searchResults = paragraphRange.search(error.word, { matchCase: true });
         context.load(searchResults, 'text');
         await context.sync();
 
@@ -505,7 +490,7 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
 
-  async highlightAndRemoveWordIncludingPreviousSpace(obj: { paragraphIndex: number, errorIndex: number, suggestion: IAlternatives}) {
+  async highlightAndRemoveWordIncludingPreviousSpace(obj: { paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
     await Word.run(async (context) => {
       try {
         const paragraphText = this.paragraphsWithIds[obj.paragraphIndex].text;
@@ -515,7 +500,7 @@ export class SpellcheckerComponent implements OnInit {
         paragraphRange.load('text');
         await context.sync();
 
-            const searchResults = paragraphRange.search(' ' + error.word, { matchCase: true}); //including previous space
+        const searchResults = paragraphRange.search(' ' + error.word, { matchCase: true }); //including previous space
         context.load(searchResults, 'text');
         await context.sync();
 
@@ -551,7 +536,7 @@ export class SpellcheckerComponent implements OnInit {
   async acceptSuggestion(obj: { paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }) {
     await Word.run(async (context) => {
       try {
-        if(obj.suggestion.remove) {
+        if (obj.suggestion.remove) {
           this.highlightAndRemoveWordIncludingPreviousSpace(obj);
           return
         }
