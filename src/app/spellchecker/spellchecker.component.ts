@@ -403,22 +403,25 @@ export class SpellcheckerComponent implements OnInit {
             ErrorUtils.removeErrorMessage(message, "issueCheckingText", this.lang);
           }
         } catch (error: any) {
+          let additionalMessage = ""
           if (error.name === 'HttpErrorResponse') {
             if (error.status === 422) {
               continue; // Ignore and continue processing the next chunk
             } else if (error.status >= 400 && error.status < 500) {
               Sentry.captureException(new Error(`4xx Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`));
+              additionalMessage = "Status code " + `${error.status}`
             } else {
               // in case of f.e. a 500 we hope the next paragraph is ok
               continue;
             }
           } else {
             console.error(error);
+            additionalMessage = "Unknown error " + `${error}`
           }
           const message = document.getElementById("issue-checking-text");
           if (message) {
-            ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang);
-          }    
+            ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang, "Paragraph check failed");
+          }
         }
       }
       this.hasSpellcheckingRun = true;
@@ -426,7 +429,7 @@ export class SpellcheckerComponent implements OnInit {
       Sentry.captureException(new Error(`Error in processSelectedText: ${JSON.stringify(error, null, 2)}`));
       const message = document.getElementById("issue-checking-text");
       if (message) {
-        ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang);
+        ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang, "Check failed");
       }
       console.error(error);
     } finally {

@@ -12,22 +12,25 @@ export class ErrorUtils {
     message.classList.add('error-message');
     message.setAttribute('role', 'alert');
     message.setAttribute('aria-live', 'assertive');
-    
+
     const cautionImg = document.createElement('img');
     cautionImg.src = "assets/icons/caution-sign.svg";
     cautionImg.alt = lang.cautionIconAlt;
     cautionImg.style.marginRight = '5px';
     message.appendChild(cautionImg);
-    
+
     const errorMessageTextNode = document.createTextNode(errorMessageText);
     message.appendChild(errorMessageTextNode);
 
     return message;
   }
 
-  static displayErrorMessage(messageContainer: HTMLElement, errorType: string, lang: any = ErrorUtils.defaultLang) {
+  static displayErrorMessage(messageContainer: HTMLElement, errorType: string, lang: any = ErrorUtils.defaultLang, additionalMessage = "") {
     const existingErrorMessage = messageContainer.querySelector('.error-message');
-    const errorMessageElement = this.createErrorMessageElement(lang[errorType], lang);
+    if (additionalMessage) {
+      additionalMessage = ` - ["${additionalMessage}"]`;
+    }
+    const errorMessageElement = this.createErrorMessageElement(lang[errorType] + additionalMessage, lang);
 
     messageContainer.style.display = 'block';
     if (existingErrorMessage) {
