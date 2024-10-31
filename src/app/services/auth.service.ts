@@ -42,10 +42,17 @@ export class AuthService {
     return true;
   }
 
-  async getAccessTokenWithTimestamp(): Promise<{ token: string, timestamp: number } | null> {
+  async getAccessTokenWithTimestamp(retry = true): Promise<{ token: string, timestamp: number } | null> {
     let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
     if (!this.isTokenValid(accessTokenWithTimestamp)) {
-      return null;
+      if (!retry) {
+        return null;
+      }
+
+      let result = await this.fetchNewAccessToken();
+      if (result) {
+        accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp(false)
+      }
     }
 
     return accessTokenWithTimestamp;
@@ -55,13 +62,6 @@ export class AuthService {
     let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp()
 
     try {
-      if (!accessTokenWithTimestamp) {
-        let result = await this.fetchNewAccessToken();
-        if (result) {
-          accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp()
-        }
-      }
-
       if (!accessTokenWithTimestamp?.token) {
         const authErrorMessage = document.getElementById("warn-not-signed-in-word");
         if (authErrorMessage) {
