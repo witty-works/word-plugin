@@ -15,37 +15,59 @@ export class AuthService {
     this.lang = getLanguageModule();
   }
 
-  async makeAuthRequest(): Promise<any> {
-    let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
-    try {
+  // Check if token is missing, undefined (string), or expired
+  private isTokenValid(accessTokenWithTimestamp: any) {
+    // Consider checking what a valid token actually looks like (length, can we decode it? can we get a valid email from it?)
+    let result = (accessTokenWithTimestamp?.token && accessTokenWithTimestamp.token !== 'undefined');
+
+    if (result) {
       const currentTime = new Date().getTime();
+      if ((currentTime - accessTokenWithTimestamp.timestamp) > environment.tokenLifetime - environment.tokenBuffer) {
+        result = false;
+      } else {
+        const remainingTime = environment.tokenBuffer - (currentTime - accessTokenWithTimestamp.timestamp); // Token lifetime in ms
 
-      // Check if token is missing, undefined (string), or expired
-      if (!accessTokenWithTimestamp?.token || accessTokenWithTimestamp?.token === 'undefined') {
-        await this.fetchNewAccessToken();
-        accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
-
-        if (!accessTokenWithTimestamp?.token || accessTokenWithTimestamp?.token === 'undefined') {
-          const authErrorMessage = document.getElementById("warn-not-signed-in-word");
-          if (authErrorMessage) {
-            ErrorUtils.displayErrorMessage(authErrorMessage, "notSignedInWarning", this.lang);
-          }
-          return;
+        // Ensure the token has at least 20 seconds of lifetime left before use
+        if (remainingTime > environment.tokenBuffer) {
+          result = false;
         }
       }
-      // Check if token exists and has more than 20 seconds of lifetime remaining
-      if ((currentTime - accessTokenWithTimestamp.timestamp) > environment.tokenLifetime - environment.tokenBuffer) {
-        localStorage.removeItem('word_access_token_with_timestamp');
-        await this.fetchNewAccessToken();
-        accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+    }
+
+    if (!result) {
+      localStorage.removeItem('word_access_token_with_timestamp');
+      return false;
+    }
+
+    return true;
+  }
+
+  async getAccessTokenWithTimestamp(): Promise<{ token: string, timestamp: number } | null> {
+    let accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+    if (!this.isTokenValid(accessTokenWithTimestamp)) {
+      return null;
+    }
+
+    return accessTokenWithTimestamp;
+  }
+
+  async makeAuthRequest(): Promise<any> {
+    let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp()
+
+    try {
+      if (!accessTokenWithTimestamp) {
+        let result = await this.fetchNewAccessToken();
+        if (result) {
+          accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp()
+        }
       }
 
-      const remainingTime = environment.tokenBuffer - (currentTime - accessTokenWithTimestamp.timestamp); // Token lifetime in ms
-
-      // Ensure the token has at least 20 seconds of lifetime left before use
-      if (remainingTime <= environment.tokenBuffer) {
-        await this.fetchNewAccessToken();
-        accessTokenWithTimestamp = JSON.parse(localStorage.getItem('word_access_token_with_timestamp') ?? '{}');
+      if (!accessTokenWithTimestamp?.token) {
+        const authErrorMessage = document.getElementById("warn-not-signed-in-word");
+        if (authErrorMessage) {
+          ErrorUtils.displayErrorMessage(authErrorMessage, "notSignedInWarning", this.lang);
+        }
+        return;
       }
 
       const url = environment.api + 'v2.0/auth';
@@ -94,7 +116,7 @@ export class AuthService {
             this.makeAuthRequest();
           }, 1000);
         } else {
-          const url = `${environment.dashboard}office-register?token=${accessTokenWithTimestamp.token}`;
+          const url = `${environment.dashboard}office-register?token=${accessTokenWithTimestamp?.token}`;
           if (Office && Office.context && Office.context.ui) {
             Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
               if (result.status === Office.AsyncResultStatus.Failed) {
@@ -143,6 +165,7 @@ export class AuthService {
           timestamp: new Date().getTime()
         };
         localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
+        return true;
       } catch (error) {
         const message = document.getElementById("warn-server-error");
         if (message) {
@@ -155,6 +178,8 @@ export class AuthService {
         ErrorUtils.displayErrorMessage(message, "notSignedInWarning", this.lang);
       }
     }
+
+    return false;
   }
 
 
