@@ -3,7 +3,8 @@
         <a (click)="openWittyHomePage()" tabindex="0" aria-label="Open Witty Works homepage">
             <img src="assets/icons/witty-logo.svg" alt="">
         </a>
-        <a *ngIf="isLoggedIn" (click)="openDashboard()" title="{{ lang.settingsIconAlt }}" tabindex="0" [attr.aria-label]="lang.settingsIconAlt">
+        <a *ngIf="isLoggedIn" (click)="openDashboard()" title="{{ lang.settingsIconAlt }}" tabindex="0"
+            [attr.aria-label]="lang.settingsIconAlt">
             <img src="assets/icons/settings.svg" alt="">
         </a>
     </nav>
@@ -37,7 +38,7 @@
 
     <section class='witty-works-ext-section'>
         <div class='witty-works-ext-lato-popup-text'>
-            <div>Subscription plan: {{plan}}</div>
+            <div>Plan: {{plan}}</div>
         </div>
     </section>
 </div>
@@ -46,6 +47,7 @@
     <div class="witty-works-ext-separator"></div>
     <div class="witty-works-ext-wittyworks-container">
         <p>{{lang.wittyVersion}} {{ appVersion }}</p>
-        <a class="witty-works-ext-link" (click)="openHelpCenter()" tabindex="0" [attr.aria-label]="lang.help">{{lang.help}}</a>
+        <a class="witty-works-ext-link" (click)="openHelpCenter()" tabindex="0"
+            [attr.aria-label]="lang.help">{{lang.help}}</a>
     </div>
 </footer>
