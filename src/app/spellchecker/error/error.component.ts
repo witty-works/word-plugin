@@ -75,19 +75,28 @@ export class ErrorComponent {
     private spellcheckerComponent: SpellcheckerComponent,
     private authService: AuthService,
     private ignoreService: IgnoreService
-  ) {}
+  ) { }
 
   getContextErrorComponent(error: ISpellingError) {
-    let ctxt = TextUtils.getContext(error, this.paragraphsWithIds);
-    if (ctxt) {
-      ctxt = ctxt.replace(
-        /()/g,
-        '<img src="assets/icons/soft-return.svg" class="soft-return-icon" alt="Soft return icon"><br>'
-      );
-    } else {
+    // Retrieve and process contexts if they exist
+    const contexts = TextUtils.getContext(error, this.paragraphsWithIds);
+
+    if (!contexts) {
       this.sendErrorToSentry();
+      return null;
     }
-    return ctxt;
+
+    // Process each context string directly, replacing soft return characters as needed
+    this.context = contexts
+      .map(context => {
+        return context.replace(
+          /()/g,
+          '<img src="assets/icons/soft-return.svg" class="soft-return-icon" alt="Soft return icon"><br>'
+        );
+      })
+      .join(' '); // Join all processed contexts with a space
+
+    return this.context;
   }
 
   async toggle(): Promise<void> {
