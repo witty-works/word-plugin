@@ -58,7 +58,7 @@ export class AuthService {
     return accessTokenWithTimestamp;
   }
 
-  async makeAuthRequest(): Promise<any> {
+  async makeAuthRequest(stopTrying: boolean = false): Promise<any> {
     let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp()
 
     try {
@@ -113,9 +113,9 @@ export class AuthService {
           const newCounter = parseInt(authFailCounter) + 1;
           localStorage.setItem('authFailCounter', newCounter.toString());
           setTimeout(() => {
-            this.makeAuthRequest();
+            this.makeAuthRequest(parseInt(authFailCounter) <= 2);
           }, 1000);
-        } else {
+        } else if (stopTrying) {
           const url = `${environment.dashboard}office-register?token=${accessTokenWithTimestamp?.token}`;
           if (Office && Office.context && Office.context.ui) {
             Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
