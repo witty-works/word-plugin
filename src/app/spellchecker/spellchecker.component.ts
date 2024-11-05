@@ -201,6 +201,7 @@ export class SpellcheckerComponent implements OnInit {
       localStorage.setItem('config_hash', response.config_hash);
       localStorage.setItem('user_id', response?.id);
       localStorage.setItem('organization_id', response?.organization_id);
+      localStorage.setItem('plan', response.plan);
     });
   }
 

@@ -18,6 +18,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   teamName = '';
   lang: any;
   isLoggedIn = false;
+  plan = '';
   public appVersion = '-';
 
   private showContextSubscription?: Subscription;
@@ -58,6 +59,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.appVersion = environment.package_version;
     
     this.teamName = localStorage.getItem('organization_name') ?? '';
+    this.plan = localStorage.getItem('plan') ?? '';
 
     this.showContextSubscription = this.settingsService.getShowContextObservable().subscribe(ctx => {
       this.showContext = ctx;
