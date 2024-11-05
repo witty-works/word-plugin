@@ -11,6 +11,7 @@ import * as Sentry from '@sentry/browser';
 import { ErrorUtils } from '../utils/error.utils';
 import { KEYBOARD_SHORTCUTS_CONFIG } from '../keyboard-shortcuts.config';
 import { getLanguageModule } from '../utils/language.utils';
+import TextUtils from '../utils/text.utils';
 
 const analytics = useAnalytics();
 
@@ -78,7 +79,8 @@ export class SpellcheckerComponent implements OnInit {
   constructor(
     private spellcheckerService: CheckingService,
     private authService: AuthService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private textUtils: TextUtils,
   ) {
   }
 
@@ -112,33 +114,22 @@ export class SpellcheckerComponent implements OnInit {
         if (!changedParagraph) return;
         await context.sync();
 
-        let offsetChange = 0;
-        let indexOfFirstChange = 0
         previousParagraphsWithIds.map((paragraph) => {
           if (paragraph.id === event.uniqueLocalIds[0]) {
-            offsetChange = changedParagraph.text.replace(/^\u000b+/, '').length - paragraph.text.replace(/^\u000b+/, '').length;
-            //find the first change where previous paragraph and changed paragraph differ
-            indexOfFirstChange = paragraph.text.replace(/^\u000b+/, '').split('').findIndex((char, index) => char !== changedParagraph.text.replace(/^\u000b+/, '')[index]);
             return { text: changedParagraph.text, id: paragraph.id };
           }
-          return paragraph;
-        });
 
-        this.highlights = this.highlights.filter((highlight) => highlight.offset !== indexOfFirstChange);
-
-        //move highlight according to changes
-        this.highlights = this.highlights.map((highlight) => {
-          if (highlight.paragraphUniqueId === event.uniqueLocalIds[0]) {
-            //make sure the highlight is after the change
-            if (highlight.offset < indexOfFirstChange) {
-              return highlight;
+          result = this.textUtils.highlightWordsInParagraph(paragraph, this.highlights[paragraph.id])
+          this.highlights[paragraph.id] = result["updated_check_result"]
+          this.shownHighlights[paragraph.id] = []
+          for key, highlight in this.highlights[paragraph.id] {
+            if key in result["check_result_keys_to_hide"] {
+              continue
             }
-            return {
-              ...highlight,
-              offset: highlight.offset + offsetChange
-            }
+            this.shownHighlights[paragraph.id].append(highlight)
           }
-          return highlight;
+
+          return paragraph;
         });
       }
       catch (e) {
