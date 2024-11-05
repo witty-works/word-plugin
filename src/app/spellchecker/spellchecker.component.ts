@@ -506,27 +506,28 @@ export class SpellcheckerComponent implements OnInit {
 
         let previousStartOffset = 0;
         let foundMatchingRange = false;
+        let errorRange;
+
         for (const item of searchResults.items) {
           const startOffset = paragraphRange.text.indexOf(item.text, previousStartOffset) + 1; //+1 accounts for the space
           if (startOffset === error.offset) {
-            const errorRange = item;
-            errorRange.select('Select');
-            await context.sync();
-
+            errorRange = item;
             foundMatchingRange = true;
             break;
           }
           previousStartOffset = startOffset + 1;
         }
 
-        if (!foundMatchingRange) {
+        if (!foundMatchingRange || !errorRange) {
           this.handleError(new Error('The range for the error was not found: ' + error.word));
+          return;
         }
-        const highlightedText = context.document.getSelection()
-        highlightedText.load();
+
+        errorRange.load('text');
         await context.sync();
-        highlightedText.insertText(obj.suggestion.text, "Replace");
+        errorRange.insertText(obj.suggestion.text, "Replace"); // Directly replace without using document selection
         await context.sync();
+
       } catch (e) {
         this.handleError(e);
       }
@@ -537,13 +538,44 @@ export class SpellcheckerComponent implements OnInit {
     await Word.run(async (context) => {
       try {
         if (obj.suggestion.remove) {
-          this.highlightAndRemoveWordIncludingPreviousSpace(obj);
-          return
+          await this.highlightAndRemoveWordIncludingPreviousSpace(obj);
+          return;
         }
-        const highlightedText = context.document.getSelection()
-        highlightedText.load();
+
+        // In case we're not removing, load the exact range again to avoid influence from the cursor
+        const paragraphText = this.paragraphsWithIds[obj.paragraphIndex].text;
+        const error = this.highlights[obj.errorIndex];
+        const paragraphRange = await DocumentUtils.fetchParagraph(context, paragraphText);
+
+        paragraphRange.load('text');
         await context.sync();
-        highlightedText.insertText(obj.suggestion.text, "Replace");
+
+        const searchResults = paragraphRange.search(error.word, { matchCase: true });
+        context.load(searchResults, 'text');
+        await context.sync();
+
+        let previousStartOffset = 0;
+        let foundMatchingRange = false;
+        let errorRange;
+
+        for (const item of searchResults.items) {
+          const startOffset = paragraphRange.text.indexOf(item.text, previousStartOffset);
+          if (startOffset === error.offset) {
+            errorRange = item;
+            foundMatchingRange = true;
+            break;
+          }
+          previousStartOffset = startOffset + 1;
+        }
+
+        if (!foundMatchingRange || !errorRange) {
+          this.handleError(new Error('The range for the error was not found: ' + error.word));
+          return;
+        }
+
+        errorRange.load('text');
+        await context.sync();
+        errorRange.insertText(obj.suggestion.text, "Replace"); // Directly replace within the found range
         await context.sync();
       } catch (e) {
         this.handleError(e);
