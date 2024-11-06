@@ -18,6 +18,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   teamName = '';
   lang: any;
   isLoggedIn = false;
+  plan = '';
   public appVersion = '-';
 
   private showContextSubscription?: Subscription;
@@ -28,13 +29,13 @@ export class SettingsComponent implements OnInit, OnDestroy {
   get isDevEnv(): boolean {
     return window.location.hostname === 'localhost';
   }
-  
+
   async openDashboard() {
     try {
       analytics.openLinkLog('dashboard_open');
       const accessToken = await Office.auth.getAccessToken(); //can always fetch new here as you will never manage to reach throttle limit
       const url = `${environment.dashboard}office-login?token=${accessToken}`;
-      Office.context.ui.displayDialogAsync(url, {height: 80, width: 80}, function (result) {
+      Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
         if (result.status === Office.AsyncResultStatus.Failed) {
           console.log('result.error', result.error);
         }
@@ -56,8 +57,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.appVersion = environment.package_version;
-    
+
     this.teamName = localStorage.getItem('organization_name') ?? '';
+    this.plan = localStorage.getItem('plan') ?? '';
+    this.plan = this.plan.replace('_', ' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
 
     this.showContextSubscription = this.settingsService.getShowContextObservable().subscribe(ctx => {
       this.showContext = ctx;
