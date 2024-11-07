@@ -321,14 +321,7 @@ export class SpellcheckerComponent implements OnInit {
         try {
           const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/^\u000b+/, ''), accessTokenWithTimestamp.token);
           if (!newHighlights) return;
-
-          const newHighlightsExcludingOrthography = {
-            ...newHighlights,
-            results: newHighlights.results.filter((result: any) => {
-              return result.category !== 'orthography' && result.category?.length > 0 && result.subcategory?.length > 0;
-            })
-          };
-          this.checkEndpointResponse = newHighlightsExcludingOrthography;
+          this.checkEndpointResponse = newHighlights;
           if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {  //prompt user to register on dashboard   
             const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
             Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
@@ -338,15 +331,15 @@ export class SpellcheckerComponent implements OnInit {
             });
           }
           const checkLogEventId = Math.random().toString(36).substring(2, 15);
-          analytics.checkLog(newHighlightsExcludingOrthography, null, this.selectedText.length, 'check', false, checkLogEventId);
+          analytics.checkLog(newHighlights, null, this.selectedText.length, 'check', false, checkLogEventId);
 
           if (this.authResponse?.plan !== 'witty_free') {
-            newHighlightsExcludingOrthography.results.forEach((result: any) => {
+            newHighlights.results.forEach((result: any) => {
               analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false, checkLogEventId);
             });
           }
           //mostly for analytics purposes
-          const newAlerts = newHighlightsExcludingOrthography.results.map((result) => ({
+          const newAlerts = newHighlights.results.map((result) => ({
             id: `${result.text}-${result.category}-${result.start}${result.end}`,
             startOffset: result.start,
             endOffset: result.end,
@@ -368,7 +361,7 @@ export class SpellcheckerComponent implements OnInit {
           }));
           this.alerts = this.alerts.concat(newAlerts);
 
-          newHighlightsExcludingOrthography.results.forEach(highlight => {
+          newHighlights.results.forEach(highlight => {
             const paragraphIndex = this.paragraphsWithIds.findIndex((paragraph) => {
               //filter out highlights if previous paragraph had identical text -> because we can not differentiate and highlight always the first in this case
               if (this.previouslyCheckedParagraphs.some((checkedParagraph) => checkedParagraph.text === paragraph.text && checkedParagraph.errors.some((error) => error.text === highlight.text))) {
