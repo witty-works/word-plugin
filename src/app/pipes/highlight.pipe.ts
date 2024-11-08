@@ -13,7 +13,7 @@ export class HighlightPipe implements PipeTransform {
     const color = this.getExplanationColor(highlight.details.gravity);
     context = context.replace(re, `<span class="highlighted-text highlighted-text--${color}">$1</span>`);
     return context;
-}
+  }
 
 
   getExplanationColor(gravity: number): string {
