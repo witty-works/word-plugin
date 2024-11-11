@@ -173,11 +173,12 @@ export class ErrorComponent {
 
   get containerStyle() {
     return {
-      backgroundColor: this.getExplanationColor(this.error?.details.gravity),
+      backgroundColor: this.getExplanationColor(this.error?.details.gravity, this.error?.details.subcategory),
     };
   }
 
-  getExplanationColor(gravity: number | undefined): string {
+  getExplanationColor(gravity: number | undefined, subcategory: string | undefined): string {
+    if (subcategory === 'corporate_rules') return '#A1BEED';
     if (!gravity) return "#D3E4AC";
     else if (gravity < 1.5) return "#F7D4D4";
     else if (gravity > 2.5) return "#FFFFD3";
