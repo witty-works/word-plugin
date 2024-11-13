@@ -38,6 +38,7 @@ export const de = {
   howToSelectText:
     "Wähle einen Textabschnitt zum Prüfen aus. Alternativ werden die ersten 2000 Zeichen geprüft.",
   noIssue: "Glückwunsch, keine Sprachprobleme im Bereich Inklusion gefunden.",
+  cantIdentify: "Wir können die Sprache des Textes nicht identifizieren.",
 
   //error
   tryInstead: "Wie wär's mit ...",
@@ -124,6 +125,7 @@ export const en = {
   howToSelectText:
     "Select text to choose a text portion to check. Alternatively the first 2000 characters will be checked.",
   noIssue: "Congratulations, no inclusive language issues found.",
+  cantIdentify: "We can't identify the language of the text.",
 
   //error
   tryInstead: "Try instead ...",
@@ -210,6 +212,7 @@ export const fr = {
   howToSelectText:
     "Sélectionnez du texte pour choisir quelle partie sera analysée. Autrement, les 2000 premiers caractères seront analysés.",
   noIssue: "Félicitations, votre texte est déjà inclusif !",
+  cantIdentify: "Nous ne pouvons pas identifier la langue du texte.",
 
   //error
   tryInstead: "Essayez plutôt...",

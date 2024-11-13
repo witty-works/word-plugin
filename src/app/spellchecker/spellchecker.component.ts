@@ -314,11 +314,24 @@ export class SpellcheckerComponent implements OnInit {
         throw new Error('Valid access token not available');
       }
 
+      let error422Count = 0; // Counter for 422 errors
+
       for (let textChunk of chunks) {
         if (textChunk.trim() === "") continue;  // Skip empty or whitespace-only chunks  
         await delay(delayDuration); // Introduce delay before processing each chunk
 
         try {
+          // Clear any previous error messages
+          const cantIdentifyMessage = document.getElementById("cant-identify-language");
+          if (cantIdentifyMessage) {
+            ErrorUtils.removeErrorMessage(cantIdentifyMessage, "cantIdentify", this.lang);
+          }
+
+          const issueCheckingTextMessage = document.getElementById("issue-checking-text");
+          if (issueCheckingTextMessage) {
+            ErrorUtils.removeErrorMessage(issueCheckingTextMessage, "issueCheckingText", this.lang);
+          }
+          
           const newHighlights = await this.spellcheckerService.checkText(textChunk.replace(/^\u000b+/, ''), accessTokenWithTimestamp.token);
           if (!newHighlights) return;
           this.checkEndpointResponse = newHighlights;
@@ -392,14 +405,11 @@ export class SpellcheckerComponent implements OnInit {
             return a.paragraph - b.paragraph;
           });
           //within the paragraph, order by start offset
-          const message = document.getElementById("issue-checking-text");
-          if (message) {
-            ErrorUtils.removeErrorMessage(message, "issueCheckingText", this.lang);
-          }
         } catch (error: any) {
           let additionalMessage = ""
           if (error.name === 'HttpErrorResponse') {
             if (error.status === 422) {
+              error422Count++; // Increment the counter for 422 errors
               continue; // Ignore and continue processing the next chunk
             } else if (error.status >= 400 && error.status < 500) {
               Sentry.captureException(new Error(`4xx Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`));
@@ -412,9 +422,18 @@ export class SpellcheckerComponent implements OnInit {
             console.error(error);
             additionalMessage = "Unknown error " + `${error}`
           }
-          const message = document.getElementById("issue-checking-text");
-          if (message) {
-            ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang, "Paragraph check failed");
+
+          // Check if all chunks resulted in 422 errors
+          if (error422Count === chunks.length) {
+            const cantIdentifyMessage = document.getElementById("cant-identify-language");
+            if (cantIdentifyMessage) {
+              ErrorUtils.displayErrorMessage(cantIdentifyMessage, "cantIdentify", this.lang);
+            }
+          } else {
+            const issueCheckingTextMessage = document.getElementById("issue-checking-text");
+            if (issueCheckingTextMessage) {
+              ErrorUtils.displayErrorMessage(issueCheckingTextMessage, "issueCheckingText", this.lang);
+            }
           }
         }
       }
