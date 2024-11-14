@@ -1,12 +1,11 @@
 <virtual-scroller #scroll [items]="highlights" [enableUnequalChildrenSizes]="true">
         <ol>
-                <li *ngFor="let errorItem of scroll.viewPortItems; let i = index">
+                <li *ngFor="let errorItem of scroll.viewPortItems;">
                         <app-error 
                                 [error]="errorItem"
-                                [context]="paragraphs[errorItem.paragraph] && paragraphs[errorItem.paragraph].text" 
                                 [showContext]="showContext"
-                                (highlightEvent)="sendHighlight(errorItem.paragraph, scroll.viewPortInfo.startIndexWithBuffer + i)"
-                                (acceptSuggestionEvent)="acceptSuggestion(errorItem.paragraph, scroll.viewPortInfo.startIndexWithBuffer + i, $event)"
+                                (highlightEvent)="sendHighlight(errorItem.paragraphUniqueId, errorItem.errorUniqueId)"
+                                (acceptSuggestionEvent)="acceptSuggestion(errorItem.paragraphUniqueId, errorItem.errorUniqueId, $event)"
                         ></app-error>
                 </li>
         </ol>

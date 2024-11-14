@@ -15,13 +15,13 @@ export class ErrorsListComponent implements OnInit, OnDestroy {
   highlights: ISpellingError[] = [];
 
   @Input()
-  paragraphs: { text: string, id: string }[] = [];
+  paragraphs: Map<string, string> = new Map<string, string>();
 
   @Output()
-  highlightEvent = new EventEmitter<{ paragraphIndex: number, errorIndex: number }>();
+  highlightEvent = new EventEmitter<{ paragraphUniqueId: string, errorUniqueId: string }>();
 
   @Output()
-  acceptSuggestionEvent = new EventEmitter<{ paragraphIndex: number, errorIndex: number, suggestion: IAlternatives }>();
+  acceptSuggestionEvent = new EventEmitter<{ paragraphUniqueId: string, errorUniqueId: string, suggestion: IAlternatives }>();
 
   showContext = true;
 
@@ -42,11 +42,11 @@ export class ErrorsListComponent implements OnInit, OnDestroy {
     }
   }
 
-  sendHighlight(paragraphIndex: number, errorIndex: number) {
-    this.highlightEvent.emit({ paragraphIndex, errorIndex });
+  sendHighlight(paragraphUniqueId: string, errorUniqueId: string) {
+    this.highlightEvent.emit({ paragraphUniqueId, errorUniqueId });
   }
 
-  acceptSuggestion(paragraphIndex: number, errorIndex: number, childObj: { suggestion: IAlternatives }) {
-    this.acceptSuggestionEvent.emit({ paragraphIndex, errorIndex, suggestion: childObj.suggestion });
+  acceptSuggestion(paragraphUniqueId: string, errorUniqueId: string, childObj: { suggestion: IAlternatives }) {
+    this.acceptSuggestionEvent.emit({ paragraphUniqueId, errorUniqueId, suggestion: childObj.suggestion });
   }
 }

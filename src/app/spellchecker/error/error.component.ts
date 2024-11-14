@@ -6,10 +6,10 @@ import { IgnoreService } from "../../services/ignore.service";
 import { AuthService } from '../../services/auth.service';
 import { SpellcheckerComponent } from "../spellchecker.component";
 import { IAlert, IAlternatives } from "../../data/types";
-import { en, de } from "../../translations";
 import { useAnalytics } from "src/app/analytics/analytics";
 import * as Sentry from "@sentry/browser";
 import { KEYBOARD_SHORTCUTS_CONFIG } from "src/app/keyboard-shortcuts.config";
+import { getLanguageModule } from '../../utils/language.utils';
 
 const analytics = useAnalytics();
 
@@ -21,9 +21,6 @@ const analytics = useAnalytics();
 export class ErrorComponent {
   @Input()
   error?: ISpellingError;
-
-  @Input()
-  context?: string;
 
   @Input()
   showContext: boolean = true;
@@ -60,22 +57,20 @@ export class ErrorComponent {
 
   alerts: IAlert[] = this.spellcheckerComponent.alerts;
 
-  paragraphsWithIds: { text: string; id: string }[] =
-    this.spellcheckerComponent.paragraphsWithIds;
+  paragraphsWithIds: Map<string, string> = this.spellcheckerComponent.paragraphsWithIds;
 
-  highlights: ISpellingError[] = this.spellcheckerComponent.highlights;
+  highlights: ISpellingError[] = this.spellcheckerComponent.highlightsList;
 
-  lang =
-    Office.context?.displayLanguage?.split("-")[0].toLowerCase() === "de"
-      ? de
-      : en;
+  lang: any;
 
   constructor(
     private spellcheckerService: CheckingService,
     private spellcheckerComponent: SpellcheckerComponent,
     private authService: AuthService,
     private ignoreService: IgnoreService
-  ) {}
+  ) {
+    this.lang = getLanguageModule(); 
+  }
 
   getContextErrorComponent(error: ISpellingError) {
     let ctxt = TextUtils.getContext(error, this.paragraphsWithIds);
@@ -142,11 +137,10 @@ export class ErrorComponent {
   }
 
   ignoreOnce() {
-    this.spellcheckerComponent.highlights =
-      this.spellcheckerComponent.highlights.filter((error) => {
-        return error.word !== this.error?.word;
-      });
-    this.spellcheckerComponent.updatehighlights();
+    if (this.error !== undefined) {
+      this.spellcheckerComponent.ignoredHighlights.push(this.error.errorUniqueId)
+    }
+
     this.focusElement("toggle");
   }
 
@@ -162,11 +156,9 @@ export class ErrorComponent {
         accessTokenWithTimestamp.token
       );
 
-      this.spellcheckerComponent.highlights =
-        this.spellcheckerComponent.highlights.filter((error) => {
-          return error.word !== this.error?.word;
-        });
-      this.spellcheckerComponent.updatehighlights();
+      if (this.error !== undefined) {
+        this.spellcheckerComponent.ignoredHighlights.push(this.error.errorUniqueId)
+      }
     } catch (error) { }
     this.focusElement("toggle");
   }
