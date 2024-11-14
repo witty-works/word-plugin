@@ -412,6 +412,7 @@ export class SpellcheckerComponent implements OnInit {
     const delayDuration = environment.delayDuration;
 
     this.hasSpellcheckingRun = false;
+    let nonFailingCheckResponse = undefined;
 
     try {
       let accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
@@ -419,6 +420,17 @@ export class SpellcheckerComponent implements OnInit {
         throw new Error('Valid access token not available');
       }
 
+      // Clear any previous error messages
+      const cantIdentifyMessage = document.getElementById("cant-identify-language");
+      if (cantIdentifyMessage) {
+        ErrorUtils.removeErrorMessage(cantIdentifyMessage, "cantIdentify", this.lang);
+      }
+
+      const issueCheckingTextMessage = document.getElementById("issue-checking-text");
+      if (issueCheckingTextMessage) {
+        ErrorUtils.removeErrorMessage(issueCheckingTextMessage, "issueCheckingText", this.lang);
+      }
+      
       let firstParagraph = true;
       for (let paragrapUniqueId of selectedParagraphs.keys()) {
         let selectedParagraph = selectedParagraphs.get(paragrapUniqueId);
@@ -494,30 +506,24 @@ export class SpellcheckerComponent implements OnInit {
             highlights.push(error);
             this.highlights.set(paragrapUniqueId, highlights);
           });
-          //within the paragraph, order by start offset
-          const message = document.getElementById("issue-checking-text");
-          if (message) {
-            ErrorUtils.removeErrorMessage(message, "issueCheckingText", this.lang);
-          }
+          nonFailingCheckResponse = true;
         } catch (error: any) {
-          let additionalMessage = ""
           if (error.name === 'HttpErrorResponse') {
             if (error.status === 422) {
+              nonFailingCheckResponse = nonFailingCheckResponse === true ? true : '422';
               continue; // Ignore and continue processing the next chunk
             } else if (error.status >= 400 && error.status < 500) {
               Sentry.captureException(new Error(`4xx Error ignored in processSelectedText: ${JSON.stringify(error, null, 2)}`));
-              additionalMessage = "Status code " + `${error.status}`
+              console.error("Status code " + `${error.status}`);
+              nonFailingCheckResponse = nonFailingCheckResponse === true ? true : 'xxx';
             } else {
               // in case of f.e. a 500 we hope the next paragraph is ok
+              nonFailingCheckResponse = nonFailingCheckResponse === true ? true : 'xxx';
               continue;
             }
           } else {
+            nonFailingCheckResponse = nonFailingCheckResponse === true ? true : 'xxx';
             console.error(error);
-            additionalMessage = "Unknown error " + `${error}`
-          }
-          const message = document.getElementById("issue-checking-text");
-          if (message) {
-            ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang, "Paragraph check failed");
           }
         }
       }
@@ -531,6 +537,20 @@ export class SpellcheckerComponent implements OnInit {
       console.error(error);
     } finally {
       this.isSpellchecking = false;
+
+      if (nonFailingCheckResponse !== true) {
+        if (nonFailingCheckResponse === '422') {
+          const cantIdentifyMessage = document.getElementById("cant-identify-language");
+          if (cantIdentifyMessage) {
+            ErrorUtils.displayErrorMessage(cantIdentifyMessage, "cantIdentify", this.lang);
+          }
+        } else {
+          const issueCheckingTextMessage = document.getElementById("issue-checking-text");
+          if (issueCheckingTextMessage) {
+            ErrorUtils.displayErrorMessage(issueCheckingTextMessage, "issueCheckingText", this.lang);
+          }
+        }
+      }
     }
   }
 
