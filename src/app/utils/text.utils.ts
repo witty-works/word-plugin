@@ -6,7 +6,12 @@ export default class TextUtils {
         if (!paragraph) {
             return undefined;
         }
-        return paragraph.substring(error.offset - 10, error.offset + error.length + 10);
+        // Get the paragraph from the last space before the error to the next whitespace after the error, so full words are shown
+        const start = Math.max(0, paragraph.lastIndexOf(" ", error.offset - 10) + 1);
+        const end = paragraph.indexOf(" ", error.offset + error.length + 10);
+        const adjustedEnd = end === -1 ? paragraph.length : end;
+
+        return paragraph.substring(start, adjustedEnd);
     }
 
     static escapeRegExp(strg: string) {
