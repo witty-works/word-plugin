@@ -419,7 +419,7 @@ export class SpellcheckerComponent implements OnInit {
         throw new Error('Valid access token not available');
       }
 
-      let firstPharagraph = true;
+      let firstParagraph = true;
       for (let paragrapUniqueId of selectedParagraphs.keys()) {
         let selectedParagraph = selectedParagraphs.get(paragrapUniqueId);
         const paragraphText = this.paragraphsWithIds.get(paragrapUniqueId);
@@ -471,9 +471,9 @@ export class SpellcheckerComponent implements OnInit {
           this.alerts = this.alerts.concat(newAlerts);
 
           let paragraphOffset = 0;
-          if (firstPharagraph && selectedParagraph.length < paragraphText.length) {
+          if (firstParagraph && selectedParagraph.length < paragraphText.length) {
             paragraphOffset = paragraphText.length - selectedParagraph.length;
-            firstPharagraph = false;
+            firstParagraph = false;
           }
 
           newHighlights.results.forEach(highlight => {
