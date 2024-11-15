@@ -25,7 +25,8 @@ button {
   font-style: normal;
   font-weight: 400;
   font-size: 16px;
-  line-height: 20px; /* or 214% */
+  line-height: 20px;
+  /* or 214% */
   box-sizing: border-box;
   border: 1px solid transparent;
   display: inline-block;
@@ -48,9 +49,14 @@ button {
 
 .highlighted-text {
   font-weight: bold;
-  text-decoration-thickness: 2px; 
+  text-decoration-thickness: 2px;
   padding: 0 3px;
   border-radius: 4px;
+}
+
+.highlighted-text--blue {
+  text-decoration: #6f9FED underline solid;
+  background-color: #A1BEED;
 }
 
 .highlighted-text--green {
@@ -77,9 +83,11 @@ button {
 .ngneat-dialog-backdrop {
   padding: 0 !important;
 }
+
 .ngneat-dialog-content {
   padding: 20px !important;
 }
+
 .modal-dialog {
   header {
     margin-bottom: 20px;

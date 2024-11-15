@@ -1,8 +1,8 @@
 import { ICheckResponseResult } from "./types";
 
 export interface ISpellingError {
+    errorUniqueId: string;
     paragraphUniqueId: string;
-    paragraph: number;
     offset: number;
     length: number;
     word: string;

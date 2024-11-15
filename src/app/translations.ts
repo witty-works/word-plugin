@@ -17,8 +17,8 @@ export const de = {
   dontHaveAccount: "Hast du noch kein Konto?",
   signUp: "Registrieren",
   wittyCheck: "Text prüfen",
-  suggstion: "Empfehlung",
-  suggstions: "Empfehlungen",
+  suggestion: "Empfehlung",
+  suggestions: "Empfehlungen",
   clickWittyCheck: "Wähle «Text prüfen», um Empfehlungen zu erhalten.",
   noFurtherSuggestions: "Keine weiteren Empfehlungen.",
   analyzing: "Prüfen...",
@@ -38,6 +38,7 @@ export const de = {
   howToSelectText:
     "Wähle einen Textabschnitt zum Prüfen aus. Alternativ werden die ersten 2000 Zeichen geprüft.",
   noIssue: "Glückwunsch, keine Sprachprobleme im Bereich Inklusion gefunden.",
+  cantIdentify: "Sprache des Textes konnte nicht identifiziert werden.",
 
   //error
   tryInstead: "Wie wär's mit ...",
@@ -77,7 +78,7 @@ export const de = {
     "Es gab ein Problem bei der Überprüfung des Textes. Bitte versuche es in ein paar Minuten noch einmal.",
   notSupportedAccount: "Dein Konto wird von Microsoft nicht unterstützt. Bitte kontaktiere: ",
   trialExpired: "Dein Witty Test ist abgelaufen. Um Witty weiterhin nutzen zu können, musst du auf ein kostenpflichtiges Abonnement umsteigen.",
-      
+
   //accessibility
   openNewWindow: "Öffnet in einem neuen Fenster",
   loading: "Lädt...",
@@ -103,8 +104,8 @@ export const en = {
   dontHaveAccount: "Don’t have an account?",
   signUp: "Sign up",
   wittyCheck: "Check text",
-  suggstion: "suggestion",
-  suggstions: "suggestions",
+  suggestion: "suggestion",
+  suggestions: "suggestions",
   clickWittyCheck: "Choose «Check text», to get suggestions.",
   noFurtherSuggestions: "No further suggestions.",
   analyzing: "Analyzing...",
@@ -124,6 +125,7 @@ export const en = {
   howToSelectText:
     "Select text to choose a text portion to check. Alternatively the first 2000 characters will be checked.",
   noIssue: "Congratulations, no inclusive language issues found.",
+  cantIdentify: "Language of the text could not be identified.",
 
   //error
   tryInstead: "Try instead ...",
@@ -189,7 +191,7 @@ export const fr = {
   dontHaveAccount: "Vous n'avez pas de compte ?",
   signUp: "S'inscrire",
   wittyCheck: "Analyser",
-  suggstion: "suggestion",
+  suggestion: "suggestion",
   suggstions: "suggestions",
   clickWittyCheck: "Cliquez sur « Analyser le texte » pour obtenir des suggestions.",
   noFurtherSuggestions: "Plus de suggestions.",
@@ -210,6 +212,7 @@ export const fr = {
   howToSelectText:
     "Sélectionnez du texte pour choisir quelle partie sera analysée. Autrement, les 2000 premiers caractères seront analysés.",
   noIssue: "Félicitations, votre texte est déjà inclusif !",
+  cantIdentify: "La langue du texte n'a pas pu être identifiée.",
 
   //error
   tryInstead: "Essayez plutôt...",
