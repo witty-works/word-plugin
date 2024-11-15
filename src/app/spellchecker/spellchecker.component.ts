@@ -113,20 +113,55 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   async paragraphDeleted(event: Word.ParagraphChangedEventArgs) {
-    for (const uniqueLocalIds of event.uniqueLocalIds) {
-      let highlights = this.highlights.get(uniqueLocalIds);
-      if (highlights === undefined) {
-        return;
+    await Word.run(async (context) => {
+      let currentParagraphTexts: Map<string, string> = new Map<string, string>();
+      let paragraphs = context.document.body.paragraphs;
+
+      paragraphs.load('items');
+      await context.sync();
+
+      for (const paragraph of paragraphs.items) {
+        paragraph.load("text");
+        paragraph.load("uniqueLocalId");
+      }
+      await context.sync();
+
+      for (const paragraph of paragraphs.items) {
+        currentParagraphTexts.set(paragraph.uniqueLocalId, paragraph.text);
       }
 
-      for (const highlight of highlights) {
-        if (!this.hiddenHighlights.includes(highlight.errorUniqueId)) {
-          this.hiddenHighlights.push(highlight.errorUniqueId);
+      let paragraphArrays = Array.from(this.paragraphsByUniqueId.keys());
+      for (const paragraphUniqueId of event.uniqueLocalIds) {
+        let paragraphIndex = paragraphArrays.indexOf(paragraphUniqueId);
+        if (paragraphIndex < paragraphArrays.length) {
+          let paragraphText = this.paragraphsByUniqueId.get(paragraphUniqueId);
+          let nextParagraphUniqueId = paragraphArrays[paragraphIndex + 1];
+          let nextParagraphText = currentParagraphTexts.get(nextParagraphUniqueId);
+
+          // deleting an empty paragraph can lead to updating the empty paragraph to the content of the previous paragraph (triggers an update before the delete)
+          // and deleting the previous paragraph so we need to update the highlights to point to the correct paragraph
+          if (nextParagraphText !== undefined && nextParagraphText === paragraphText) {
+            let highlights = this.highlights.get(paragraphUniqueId);
+            if (highlights !== undefined) {
+              for (const highlight of highlights) {
+                highlight.paragraphUniqueId = nextParagraphUniqueId;
+              }
+
+              let nextHighlights = this.highlights.get(nextParagraphUniqueId);
+              if (nextHighlights !== undefined) {
+                for (const highlight of nextHighlights) {
+                  highlights.push(highlight);
+                }
+              }
+              this.highlights.set(nextParagraphUniqueId, highlights);
+            }
+          }
         }
-      }
 
-      this.paragraphsByUniqueId.delete(uniqueLocalIds);
-    }
+        this.highlights.delete(paragraphUniqueId);
+        this.paragraphsByUniqueId.delete(paragraphUniqueId);
+      }
+    });
   }
 
   async paragraphChanged(event: Word.ParagraphChangedEventArgs) {
@@ -142,13 +177,12 @@ export class SpellcheckerComponent implements OnInit {
 
         await context.sync();
 
-        Array.from(paragraphs).forEach(([paragrapUniqueId, paragraph]) => {
-          this.paragraphsByUniqueId.set(paragrapUniqueId, paragraph.text);
+        Array.from(paragraphs).forEach(([paragraphUniqueId, paragraph]) => {
+          this.paragraphsByUniqueId.set(paragraphUniqueId, paragraph.text);
 
-          this.updateParagraphHighlights(paragrapUniqueId)
+          this.updateParagraphHighlights(paragraphUniqueId);
         });
-      }
-      catch (e) {
+      } catch (e) {
         this.handleError(e);
       }
     });
@@ -661,7 +695,7 @@ export class SpellcheckerComponent implements OnInit {
         context.load(paragraph, 'text');
         const error = this.getError(obj.paragraphUniqueId, obj.errorUniqueId);
 
-        this.hiddenHighlights.push(error.errorUniqueId);
+        this.ignoredHighlights.push(error.errorUniqueId);
 
         const searchResults = paragraph.search(error.word, { matchCase: true });
         context.load(searchResults, 'text');
