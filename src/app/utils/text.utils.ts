@@ -1,8 +1,8 @@
 import { ISpellingError } from "../data/data-structures";
 
 export default class TextUtils {
-    static getContext(error: ISpellingError, paragraphsWithIds: Map<string, string>): string | undefined {
-        const paragraph = paragraphsWithIds.get(error.paragraphUniqueId);
+    static getContext(error: ISpellingError, paragraphsByUniqueId: Map<string, string>): string | undefined {
+        const paragraph = paragraphsByUniqueId.get(error.paragraphUniqueId);
         if (!paragraph) {
             return undefined;
         }

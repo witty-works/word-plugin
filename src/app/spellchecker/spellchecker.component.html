@@ -50,7 +50,7 @@
         <span id="maxTextLengthDescription">{{lang.hitMaxTextLength2}}</span>
     </div>
     
-    <app-errors-list [highlights]="highlightsList" [paragraphs]="paragraphsWithIds" (highlightEvent)="highlight($event)"
+    <app-errors-list [highlights]="highlightsList" [paragraphs]="paragraphsByUniqueId" (highlightEvent)="highlight($event)"
         (acceptSuggestionEvent)="acceptSuggestion($event)" *ngIf="isLoggedInWord && !isFirstRun && highlightsList.length > 0">
     </app-errors-list>
 

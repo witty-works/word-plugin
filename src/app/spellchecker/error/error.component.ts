@@ -57,7 +57,7 @@ export class ErrorComponent {
 
   alerts: IAlert[] = this.spellcheckerComponent.alerts;
 
-  paragraphsWithIds: Map<string, string> = this.spellcheckerComponent.paragraphsWithIds;
+  paragraphsByUniqueId: Map<string, string> = this.spellcheckerComponent.paragraphsByUniqueId;
 
   highlights: ISpellingError[] = this.spellcheckerComponent.highlightsList;
 
@@ -69,11 +69,11 @@ export class ErrorComponent {
     private authService: AuthService,
     private ignoreService: IgnoreService
   ) {
-    this.lang = getLanguageModule(); 
+    this.lang = getLanguageModule();
   }
 
   getContextErrorComponent(error: ISpellingError) {
-    let ctxt = TextUtils.getContext(error, this.paragraphsWithIds);
+    let ctxt = TextUtils.getContext(error, this.paragraphsByUniqueId);
     if (ctxt) {
       ctxt = ctxt.replace(
         /()/g,

@@ -39,7 +39,7 @@ export class SpellcheckerComponent implements OnInit {
 
   showSpinner = false;
 
-  paragraphsWithIds: Map<string, string> = new Map<string, string>();
+  paragraphsByUniqueId: Map<string, string> = new Map<string, string>();
 
   highlights: Map<string, ISpellingError[]> = new Map<string, ISpellingError[]>();
 
@@ -47,11 +47,7 @@ export class SpellcheckerComponent implements OnInit {
 
   ignoredHighlights: string[] = [];
 
-  lastCorrectedError?: { errorUniqueId: string, paragraphUniqueId: string, paragraphText: string, errorText: string };
-
   hitMaxTextLength = false;
-
-  lastParagraphChecked = 0;
 
   selectedText = '';
 
@@ -129,7 +125,7 @@ export class SpellcheckerComponent implements OnInit {
         }
       }
 
-      this.paragraphsWithIds.delete(uniqueLocalIds);
+      this.paragraphsByUniqueId.delete(uniqueLocalIds);
     }
   }
 
@@ -147,7 +143,7 @@ export class SpellcheckerComponent implements OnInit {
         await context.sync();
 
         Array.from(paragraphs).forEach(([paragrapUniqueId, paragraph]) => {
-          this.paragraphsWithIds.set(paragrapUniqueId, paragraph.text);
+          this.paragraphsByUniqueId.set(paragrapUniqueId, paragraph.text);
 
           this.updateParagraphHighlights(paragrapUniqueId)
         });
@@ -169,63 +165,67 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   updateParagraphHighlights(paragraphUniqueId: string) {
+    let paragraphText = this.paragraphsByUniqueId.get(paragraphUniqueId);
+    if (paragraphText === undefined) {
+      this.highlights.delete(paragraphUniqueId);
+      this.paragraphsByUniqueId.delete(paragraphUniqueId);
+      return;
+    }
+
     let highlights = this.highlights.get(paragraphUniqueId);
     if (highlights === undefined || highlights.length == 0) {
-      return
+      return;
     }
 
     let highlightsFound: string[] = [];
-    let paragraphText = this.paragraphsWithIds.get(paragraphUniqueId);
-    if (paragraphText !== undefined) {
-      let highlightsPositionFound = new Map();
+    let highlightsPositionFound = new Map();
 
-      for (const highlight of highlights) {
-        // Start from last position where this specific word was found
-        let position = highlightsPositionFound.get(highlight.word);
-        let found = false;
+    for (const highlight of highlights) {
+      // Start from last position where this specific word was found
+      let position = highlightsPositionFound.get(highlight.word);
+      let found = false;
 
-        // Try to search for the error across the entire paragraph
-        do {
-          position = paragraphText.indexOf(highlight.word, position);
+      // Try to search for the error across the entire paragraph
+      do {
+        position = paragraphText.indexOf(highlight.word, position);
 
-          if (position == -1) {
-            break;
-          }
-
-          let end = position + highlight.word.length
-
-          // check if there is a word end character before
-          if (highlight.details.subcategory.indexOf('gendered_denominations_ending') === -1 && position > 0 && !this.isWordEnd(paragraphText[position - 1])) {
-            console.log('before')
-            position = end + 1
-            continue;
-          }
-
-          // check if there is a word end character after
-          if (end + 1 < paragraphText.length && !this.isWordEnd(paragraphText[end])) {
-            position = end + 1
-            continue;
-          }
-
-          found = true;
-        } while (found === false && position < paragraphText.length)
-
-        // Word not found
-        if (!found) {
-          continue
+        if (position == -1) {
+          break;
         }
 
-        highlightsFound.push(highlight.errorUniqueId)
-        highlightsPositionFound.set(highlight.word, position + highlight.word.length + 1);
-        highlight.offset = position;
+        let end = position + highlight.word.length
 
-        // Undo hiding if necessary
-        // Unfortunately when selecting text and the word appears in the non selected section, it would incorrectly be listed in the sidebar if we do this
-        //const errorIndex = this.hiddenHighlights.indexOf(highlight.errorUniqueId);
-        //if (errorIndex != -1) {
-        //   this.hiddenHighlights.splice(errorIndex, 1);
-        //}
+        // check if there is a word end character before
+        if (highlight.details.subcategory.indexOf('gendered_denominations_ending') === -1 && position > 0 && !this.isWordEnd(paragraphText[position - 1])) {
+          console.log('before')
+          position = end + 1
+          continue;
+        }
+
+        // check if there is a word end character after
+        if (end + 1 < paragraphText.length && !this.isWordEnd(paragraphText[end])) {
+          position = end + 1
+          continue;
+        }
+
+        found = true;
+      } while (found === false && position < paragraphText.length)
+
+      // Word not found
+      if (!found) {
+        continue
       }
+
+      highlightsFound.push(highlight.errorUniqueId)
+      highlightsPositionFound.set(highlight.word, position + highlight.word.length + 1);
+      highlight.offset = position;
+
+      // Undo hiding if necessary
+      // Unfortunately when selecting text and the word appears in the non selected section, it would incorrectly be listed in the sidebar if we do this
+      //const errorIndex = this.hiddenHighlights.indexOf(highlight.errorUniqueId);
+      //if (errorIndex != -1) {
+      //   this.hiddenHighlights.splice(errorIndex, 1);
+      //}
     }
 
     // Hide all errors that have not been found
@@ -303,11 +303,6 @@ export class SpellcheckerComponent implements OnInit {
     });
   }
 
-  // logout() {
-  //   localStorage.setItem('access_token', '');
-  //   localStorage.setItem('refresh_token', '');
-  // }
-
   openWittyHomePage() {
     analytics.openLinkLog('homepage_open');
     Office.context.ui.openBrowserWindow('https://witty.works');
@@ -337,7 +332,7 @@ export class SpellcheckerComponent implements OnInit {
         const maxTextLength = environment.maxTextLength;
 
         let selectedParagraphs = new Map();
-        let paragraphsWithIds = new Map();
+        let paragraphsByUniqueId = new Map();
         let chunks: string[] = [];
 
         let paragraphs;
@@ -382,14 +377,14 @@ export class SpellcheckerComponent implements OnInit {
           }
 
           selectedParagraphs.set(paragraphs.items[i].uniqueLocalId, text);
-          paragraphsWithIds.set(paragraphs.items[i].uniqueLocalId, paragraphs.items[i].text);
+          paragraphsByUniqueId.set(paragraphs.items[i].uniqueLocalId, paragraphs.items[i].text);
 
           if (this.hitMaxTextLength) {
             break;
           }
         }
 
-        this.paragraphsWithIds = paragraphsWithIds;
+        this.paragraphsByUniqueId = paragraphsByUniqueId;
         this.highlights = new Map();
 
         // Now process the selected text
@@ -407,19 +402,8 @@ export class SpellcheckerComponent implements OnInit {
     }
   }
 
-  async processSelectedText(selectedParagraphs: Map<string, string>): Promise<void> {
-    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-    const delayDuration = environment.delayDuration;
-
-    this.hasSpellcheckingRun = false;
-    let nonFailingCheckResponse = undefined;
-
-    try {
-      let accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
-      if (!accessTokenWithTimestamp) {
-        throw new Error('Valid access token not available');
-      }
-
+  showCheckError(nonFailingCheckResponse: boolean | string | undefined = undefined) {
+    if (nonFailingCheckResponse === undefined) {
       // Clear any previous error messages
       const cantIdentifyMessage = document.getElementById("cant-identify-language");
       if (cantIdentifyMessage) {
@@ -430,11 +414,38 @@ export class SpellcheckerComponent implements OnInit {
       if (issueCheckingTextMessage) {
         ErrorUtils.removeErrorMessage(issueCheckingTextMessage, "issueCheckingText", this.lang);
       }
-      
+    } else if (nonFailingCheckResponse === '422') {
+      const cantIdentifyMessage = document.getElementById("cant-identify-language");
+      if (cantIdentifyMessage) {
+        ErrorUtils.displayErrorMessage(cantIdentifyMessage, "cantIdentify", this.lang);
+      }
+    } else if (nonFailingCheckResponse !== true) {
+      const issueCheckingTextMessage = document.getElementById("issue-checking-text");
+      if (issueCheckingTextMessage) {
+        ErrorUtils.displayErrorMessage(issueCheckingTextMessage, "issueCheckingText", this.lang);
+      }
+    }
+
+    return nonFailingCheckResponse;
+  }
+
+  async processSelectedText(selectedParagraphs: Map<string, string>): Promise<void> {
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    const delayDuration = environment.delayDuration;
+
+    this.hasSpellcheckingRun = false;
+    let nonFailingCheckResponse = this.showCheckError();
+
+    try {
+      let accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
+      if (!accessTokenWithTimestamp) {
+        throw new Error('Valid access token not available');
+      }
+
       let firstParagraph = true;
       for (let paragrapUniqueId of selectedParagraphs.keys()) {
         let selectedParagraph = selectedParagraphs.get(paragrapUniqueId);
-        const paragraphText = this.paragraphsWithIds.get(paragrapUniqueId);
+        const paragraphText = this.paragraphsByUniqueId.get(paragrapUniqueId);
         if (selectedParagraph === undefined || paragraphText == undefined || selectedParagraph.trim() === "") continue;  // Skip empty or whitespace-only chunks  
         await delay(delayDuration); // Introduce delay before processing each chunk
 
@@ -538,19 +549,7 @@ export class SpellcheckerComponent implements OnInit {
     } finally {
       this.isSpellchecking = false;
 
-      if (nonFailingCheckResponse !== true) {
-        if (nonFailingCheckResponse === '422') {
-          const cantIdentifyMessage = document.getElementById("cant-identify-language");
-          if (cantIdentifyMessage) {
-            ErrorUtils.displayErrorMessage(cantIdentifyMessage, "cantIdentify", this.lang);
-          }
-        } else {
-          const issueCheckingTextMessage = document.getElementById("issue-checking-text");
-          if (issueCheckingTextMessage) {
-            ErrorUtils.displayErrorMessage(issueCheckingTextMessage, "issueCheckingText", this.lang);
-          }
-        }
-      }
+      this.showCheckError(nonFailingCheckResponse);
     }
   }
 
@@ -604,8 +603,8 @@ export class SpellcheckerComponent implements OnInit {
         return highlight;
       }
     }
-    throw new Error('Error not found in paragraph');
 
+    throw new Error('Error not found in paragraph');
   }
 
   async highlightAndRemoveWordIncludingPreviousSpace(obj: { paragraphUniqueId: string, errorUniqueId: string, suggestion: IAlternatives }) {
