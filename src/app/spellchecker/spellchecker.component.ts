@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild, HostListener } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
 import { ISpellingError } from "../data/data-structures";
-import { IAlternative, IAlert, IAuthResponse, ICheckResponse } from "../data/types";
+import { IAlternative, IAlert, IAuthResponse, ICheckResponse, IRephrasingResult } from "../data/types";
 import { AuthService } from '../services/auth.service';
 import { environment } from '../../environments/environment';
 import { useAnalytics } from '../analytics/analytics';
@@ -10,6 +10,7 @@ import * as Sentry from '@sentry/browser';
 import { ErrorUtils } from '../utils/error.utils';
 import { KEYBOARD_SHORTCUTS_CONFIG } from '../keyboard-shortcuts.config';
 import { getLanguageModule } from '../utils/language.utils';
+import { SentenceSplitterSyntax, split, TxtSentenceNode } from 'sentence-splitter';
 
 const analytics = useAnalytics();
 
@@ -55,7 +56,6 @@ export class SpellcheckerComponent implements OnInit {
   checkEndpointResponse: ICheckResponse | null = null;
 
   @ViewChild('errorDialog') errorDialog?: TemplateRef<any>;
-
 
   errorIntro = "";
   errorMessage = "";
@@ -311,8 +311,10 @@ export class SpellcheckerComponent implements OnInit {
       this.authResponse = response;
       this.isLoggedInWord = true;
       this.isLoggedin = true;
+
       localStorage.setItem('is_logged_in', 'true');
       localStorage.setItem('organization_name', response.organization_name);
+      localStorage.setItem('llm_alternatives', response.organization_config?.llm_alternatives?.value);
       localStorage.setItem('organization_config_hash', response.organization_config_hash);
       localStorage.setItem('config_hash', response.config_hash);
       localStorage.setItem('user_id', response?.id);
@@ -533,7 +535,7 @@ export class SpellcheckerComponent implements OnInit {
             userId: this.authResponse?.id,
             plan: this.authResponse?.plan,
             data: {
-              language: this.checkEndpointResponse?.language || 'en',
+              language: this.checkEndpointResponse?.language ?? 'en',
               category: result.category,
               subcategory: result.subcategory,
               context: result.context,
@@ -557,6 +559,8 @@ export class SpellcheckerComponent implements OnInit {
             if (highlights === undefined) {
               highlights = [];
             }
+
+            highlight.language = this.checkEndpointResponse?.language ?? 'en'
 
             const error = {
               errorUniqueId: crypto.randomUUID(),
@@ -681,6 +685,89 @@ export class SpellcheckerComponent implements OnInit {
     return null;
   }
 
+  isLLMAlternativesActive(error: ISpellingError) {
+    return true; // @TODO remove
+
+    if (error.details.language !== "fr"
+      || localStorage.getItem('llm_alternatives') !== "true"
+    ) {
+      console.log('llm disabled', error.details.language)
+      return false;
+    }
+
+    return true;
+  }
+
+  getSentence(error: ISpellingError) {
+    const paragraphText = this.paragraphsByUniqueId.get(error.paragraphUniqueId);
+    if (paragraphText !== undefined) {
+      const sentences = split(paragraphText).filter(s => s.type === SentenceSplitterSyntax.Sentence);
+
+      for (let sentence of sentences) {
+        if (error.offset >= sentence.range[0] && error.offset <= sentence.range[1]) {
+          return sentence;
+        }
+      }
+    }
+
+    console.log("Unable to find sentence for:", error);
+    return null;
+  }
+
+  async fetchRephrasings(error: ISpellingError, sentence: TxtSentenceNode) {
+    if (error.rephrasings?.sentence === sentence.raw) {
+      console.log("Sentence unchanged:", sentence);
+
+      return error.rephrasings;
+    }
+
+    if (error.details.alternatives.length == 0) {
+      console.log("No alternatives:", error.details.alternatives);
+
+      return {
+        sentence: sentence.raw,
+        results: new Map(),
+      } as IRephrasingResult;
+    }
+
+    // @TODO remove
+    if (error.details.language != "fr") {
+      let results = new Map();
+      for (const alternative of error.details.alternatives) {
+        if (alternative.remove) {
+          continue;
+        }
+        results.set(
+          alternative.text,
+          sentence.raw.replace(error.word, alternative.text)
+        );
+      }
+
+      if (error.details.alternatives.length) {
+        return {
+          sentence: sentence.raw,
+          results: results,
+        } as IRephrasingResult;
+      }
+    }
+
+    let accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
+    if (!accessTokenWithTimestamp) {
+      throw new Error('Valid access token not available');
+    }
+
+    const apiResponse = await this.spellcheckerService.getLLMSuggestion(
+      error,
+      sentence,
+      accessTokenWithTimestamp.token
+    );
+
+    return {
+      sentence: apiResponse.sentence,
+      results: new Map(Object.entries(apiResponse.results)),
+    } as IRephrasingResult;
+  }
+
   async acceptSuggestion(obj: { paragraphUniqueId: string, errorUniqueId: string, suggestion: IAlternative }) {
     await Word.run(async (context) => {
       try {
@@ -690,16 +777,35 @@ export class SpellcheckerComponent implements OnInit {
         const error = this.getError(obj.paragraphUniqueId, obj.errorUniqueId);
 
         let words: Map<string, number> = new Map<string, number>();
-        if (obj.suggestion.remove) {
-          words.set(' ' + error.word, 1);
-          words.set(error.word + ' ', 0);
-        }
+        let rephrasing: string | undefined;
+        if (obj.suggestion.remove || !this.isLLMAlternativesActive(error)) {
+          if (obj.suggestion.remove) {
+            words.set(' ' + error.word, error.offset - 1);
+            words.set(error.word + ' ', error.offset);
+          }
+          words.set(error.word, error.offset);
 
-        words.set(error.word, 0);
+          rephrasing = "";
+        } else {
+          const sentence = this.getSentence(error);
+          if (sentence === null) {
+            return;
+          }
+
+          const rephrasings = await this.fetchRephrasings(error, sentence);
+          rephrasing = rephrasings?.results.get(obj.suggestion.text);
+          if (rephrasing === undefined) {
+            // TODO re-render error component
+            console.log("rephrasing not found", obj.suggestion.text, [...rephrasings.results.entries()])
+            return;
+          }
+
+          words.set(sentence.raw, sentence.range[0]);
+        }
 
         let errorRange: Word.Range | null = null;
         for (let [word, offset] of words) {
-          errorRange = await this.searchItem(context, paragraph, word, error.offset - offset)
+          errorRange = await this.searchItem(context, paragraph, word, offset)
           if (errorRange) {
             break;
           }
@@ -712,7 +818,7 @@ export class SpellcheckerComponent implements OnInit {
 
         errorRange.load('text');
         await context.sync();
-        errorRange.insertText(obj.suggestion.text, "Replace"); // Directly replace within the found range
+        errorRange.insertText(rephrasing, "Replace"); // Directly replace within the found range
         await context.sync();
 
         this.ignoredHighlights.push(error.errorUniqueId);

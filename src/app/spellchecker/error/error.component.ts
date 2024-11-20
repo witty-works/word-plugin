@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Input, Output, HostListener } from "@angular/core";
-import { ISpellingError } from "../../data/data-structures";
+import { Component, EventEmitter, Input, Output, HostListener, WritableSignal, signal } from "@angular/core";
+import { ISpellingError, } from "../../data/data-structures";
 import TextUtils from "../../utils/text.utils";
 import { CheckingService } from "../../services/checking.service";
 import { IgnoreService } from "../../services/ignore.service";
 import { AuthService } from '../../services/auth.service';
 import { SpellcheckerComponent } from "../spellchecker.component";
-import { IAlert, IAlternative } from "../../data/types";
+import { IAlert, IAlternative, IRephrasingResult } from "../../data/types";
 import { useAnalytics } from "src/app/analytics/analytics";
 import * as Sentry from "@sentry/browser";
 import { KEYBOARD_SHORTCUTS_CONFIG } from "src/app/keyboard-shortcuts.config";
@@ -63,6 +63,10 @@ export class ErrorComponent {
 
   lang: any;
 
+  diff = require('diff');
+
+  rephrasings: WritableSignal<IRephrasingResult | null> = signal(null);
+
   constructor(
     private spellcheckerService: CheckingService,
     private spellcheckerComponent: SpellcheckerComponent,
@@ -70,6 +74,44 @@ export class ErrorComponent {
     private ignoreService: IgnoreService
   ) {
     this.lang = getLanguageModule();
+  }
+
+  getRephrasing(suggestion: IAlternative) {
+    if (!this.error) {
+      return false;
+    }
+
+    if (!this.spellcheckerComponent.isLLMAlternativesActive(this.error)) {
+      return false;
+    }
+
+    const rephrasings: IRephrasingResult | null = this.rephrasings()
+    if (rephrasings === null) {
+      return 'Spinner ..';
+    }
+
+    const rephrasing = rephrasings.results.get(suggestion.text);
+    if (rephrasing === undefined) {
+      return false;
+    }
+
+    let diff: string;
+
+    const diffElements: [{ added: boolean, value: string }] = this.diff.diffWords(
+      rephrasings.sentence,
+      rephrasing
+    );
+
+    diff = ""
+    diffElements.forEach((diffElement) => {
+      if (diffElement.added) {
+        diff += " <b>" + diffElement.value + "</b>"
+      } else if (!diff.endsWith(" ..")) {
+        diff += " .."
+      }
+    });
+
+    return diff;
   }
 
   getContextErrorComponent(error: ISpellingError) {
@@ -112,6 +154,23 @@ export class ErrorComponent {
       alertRelevantToSuggestion &&
         analytics.popoverLogs(alertRelevantToSuggestion, "popover_close");
     }
+
+    if (!this.isOpen
+      || this.error === undefined // TODO handle error
+      || !this.spellcheckerComponent.isLLMAlternativesActive(this.error)
+    ) {
+      return;
+    }
+
+    const sentence = this.spellcheckerComponent.getSentence(this.error)
+    if (sentence === null) {
+      // TODO handle error
+      return;
+    }
+
+    const rephrasings = await this.spellcheckerComponent.fetchRephrasings(this.error, sentence);
+    this.error.rephrasings = rephrasings
+    this.rephrasings.set(rephrasings)
   }
 
   sendHighlight() {

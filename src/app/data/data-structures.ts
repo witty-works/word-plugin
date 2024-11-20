@@ -1,4 +1,4 @@
-import { ICheckResponseResult } from "./types";
+import { ICheckResponseResult, IRephrasingResult } from "./types";
 
 export interface ISpellingError {
     errorUniqueId: string;
@@ -7,4 +7,5 @@ export interface ISpellingError {
     length: number;
     word: string;
     details: ICheckResponseResult;
+    rephrasings?: IRephrasingResult;
 }

@@ -81,6 +81,11 @@ export interface ICheckResponseResult {
   source: ISource;
 }
 
+export interface IRephrasingResult {
+  sentence: string,
+  results: Map<string, string>,
+}
+
 //AUTH ENDPOINT
 export interface IAuthResponse {
   config: ResponseConfig;
@@ -170,6 +175,9 @@ export interface IAlternative {
   text: string;
   remove: boolean;
   inspiration: boolean;
+  collective_noun?: ConstrainBooleanParameters;
+  male_form?: string;
+  female_form?: string;
   context: string;
   hovered?: boolean;
   url: string;

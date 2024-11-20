@@ -76,18 +76,20 @@
         <div class="suggestion-title witty-works-ext-margin-top" *ngIf="suggestions.length > 0">
           {{ lang.tryInstead }}
         </div>
-        <ng-container *ngFor="let suggestion of suggestions.slice(0, 5)">
+        <ng-container *ngFor="let suggestion of suggestions">
+          <!-- Add spinner or show rephrasing if available -->
           <div class="witty-works-ext-button-wrapper" [class.hovered]="suggestion.hovered">
             <button (click)="acceptSuggestion(suggestion)" (mouseenter)="suggestion.hovered = true"
               (mouseleave)="suggestion.hovered = false" [ngStyle]="{
                 'text-decoration': suggestion.text ? 'none' : 'line-through'
               }">
-              {{
-              suggestion.text
-              ? suggestion.hovered || suggestion.text.length <= 25 ? suggestion.text : suggestion.text.substring(0, 25)
-                + ".." : error.word }} </button>
+              {{ suggestion.text ? suggestion.hovered || suggestion.text.length <= 25 ? suggestion.text :
+                suggestion.text.substring(0, 25) + ".." : error.word }} </button>
+                <div *ngIf="suggestion.hovered === true && getRephrasing(suggestion)"
+                  [innerHTML]='getRephrasing(suggestion)'>
+                </div>
                 <div *ngIf="suggestion.context || suggestion.url">
-                  <div *ngIf="suggestion.context">
+                  <div *ngIf="suggestion.context && (suggestion.hovered !== true || !getRephrasing(suggestion))">
                     <a *ngIf="suggestion.url" [href]="suggestion.url" target="_blank" class="suggestion-link"
                       rel="noopener noreferrer">
                       <span *ngIf="suggestion.context.startsWith('💡')">
