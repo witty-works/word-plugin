@@ -11,7 +11,7 @@ export class AuthService {
   isDevEnv = window.location.hostname === 'localhost'
   lang: any;
 
-  constructor(private http: HttpClient, private ErrorUtils: ErrorUtils) {
+  constructor(private http: HttpClient) {
     this.lang = getLanguageModule();
   }
 
@@ -55,6 +55,8 @@ export class AuthService {
       }
     }
 
+    ErrorUtils.updateErrorMessages(this.lang, accessTokenWithTimestamp ? null : "warn-not-signed-in-word");
+
     return accessTokenWithTimestamp;
   }
 
@@ -63,10 +65,6 @@ export class AuthService {
 
     try {
       if (!accessTokenWithTimestamp?.token) {
-        const authErrorMessage = document.getElementById("warn-not-signed-in-word");
-        if (authErrorMessage) {
-          ErrorUtils.displayErrorMessage(authErrorMessage, "notSignedInWarning", this.lang);
-        }
         return;
       }
 
@@ -82,27 +80,8 @@ export class AuthService {
       // Making the HTTP POST request
       const response = await this.http.post<any>(url, {}, httpOptions).toPromise();
 
-      if (response.plan === null || response.plan === "none") {
-        const trialExpiredMessage = document.getElementById("trial-expired-message");
-        if (trialExpiredMessage) {
-          ErrorUtils.displayErrorMessage(trialExpiredMessage, "trialExpired", this.lang);
-        }
-      }
-
-      const authErrorMessage = document.getElementById("warn-not-signed-in-word");
-      if (authErrorMessage) {
-        ErrorUtils.removeErrorMessage(authErrorMessage, "notSignedInWarning", this.lang);
-      }
-
-      const serverErrorMessage = document.getElementById("warn-server-error");
-      if (serverErrorMessage) {
-        ErrorUtils.removeErrorMessage(serverErrorMessage, "serverError", this.lang);
-      }
-
-      const unsupportedAccountErrorMessage = document.getElementById("warn-not-supported-account");
-      if (unsupportedAccountErrorMessage) {
-        ErrorUtils.removeErrorMessage(unsupportedAccountErrorMessage, "notSupportedAccountWarning", this.lang);
-      }
+      const except = response.plan === null || response.plan === "none" ? "trial-expired-message" : null;
+      ErrorUtils.updateErrorMessages(this.lang, except);
 
       return response;
     } catch (error: any) {
@@ -131,21 +110,12 @@ export class AuthService {
         const errorCodes = [13001, 13002, 13000, 5001, 13003];
         if (errorCodes.includes(error?.code)) {
           if (error.code === 13003) {
-            const message = document.getElementById("warn-not-supported-account");
-            if (message) {
-              ErrorUtils.displayErrorMessage(message, "notSupportedAccount", this.lang);
-            }
+            ErrorUtils.updateErrorMessages(this.lang, "warn-not-supported-account");
           } else {
-            const message = document.getElementById("warn-not-signed-in-word");
-            if (message) {
-              ErrorUtils.displayErrorMessage(message, "notSignedInWarning", this.lang);
-            }
+            ErrorUtils.updateErrorMessages(this.lang, "warn-not-signed-in-word");
           }
         } else {
-          const message = document.getElementById("warn-server-error");
-          if (message) {
-            ErrorUtils.displayErrorMessage(message, "serverError", this.lang);
-          }
+          ErrorUtils.updateErrorMessages(this.lang, "warn-server-error");
         }
       }
       return error;
@@ -164,22 +134,14 @@ export class AuthService {
           token: newAccessToken,
           timestamp: new Date().getTime()
         };
+
         localStorage.setItem('word_access_token_with_timestamp', JSON.stringify(accessTokenWithTimestamp));
-        return true;
       } catch (error) {
-        const message = document.getElementById("warn-server-error");
-        if (message) {
-          ErrorUtils.displayErrorMessage(message, "serverError", this.lang);
-        }
-      }
-    } else {
-      const message = document.getElementById("warn-not-signed-in-word");
-      if (message) {
-        ErrorUtils.displayErrorMessage(message, "notSignedInWarning", this.lang);
+        return false;
       }
     }
 
-    return false;
+    return true;
   }
 
 

@@ -31,18 +31,14 @@ export class IgnoreService {
         body: {},
       };
 
-      const message = document.getElementById("warn-failed-ignore-error");
-      if (message) {
-        ErrorUtils.removeErrorMessage(message, "failedRequestText", this.lang);
-      }
+      ErrorUtils.updateErrorMessages(this.lang);
 
       await this.http.put<void>(requestUrlIgnore, {}, httpOptions).toPromise();
     } catch (error: any) {
       Sentry.captureException(error);
-      const message = document.getElementById("warn-failed-ignore-error");
-      if (message) {
-        ErrorUtils.displayErrorMessage(message, "failedRequestText", this.lang);
-      }
+
+      ErrorUtils.updateErrorMessages(this.lang, "warn-failed-ignore-error");
+
       throw error;
     }
   }
