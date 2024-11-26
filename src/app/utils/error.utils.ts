@@ -1,13 +1,34 @@
 import { Injectable } from '@angular/core';
-import { getLanguageModule } from './language.utils';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ErrorUtils {
-  private static defaultLang = getLanguageModule();
+  static updateErrorMessages(lang: any, except: string | null = null) {
+    const errorMessages = new Map();
 
-  static createErrorMessageElement(errorMessageText: string, lang: any = ErrorUtils.defaultLang): HTMLElement {
+    errorMessages.set("throttle-warning", "throttleWarning");
+    errorMessages.set("warn-not-signed-in-word", "notSignedInWarning");
+    errorMessages.set("warn-not-supported-account", "notSupportedAccountWarning");
+    errorMessages.set("trial-expired-message", "trialExpired");
+    errorMessages.set("issue-checking-text", "issueCheckingText");
+    errorMessages.set("warn-failed-ignore-error", "failedRequestText");
+    errorMessages.set("cant-identify-language", "cantIdentify");
+    errorMessages.set("warn-server-error", "serverError");
+
+    for (let [key, value] of errorMessages) {
+      const errorElement = document.getElementById(key);
+      if (errorElement) {
+        if (except === key) {
+          ErrorUtils.displayErrorMessage(errorElement, value, lang);
+        } else {
+          ErrorUtils.removeErrorMessage(errorElement, value, lang);
+        }
+      }
+    }
+  }
+
+  private static createErrorMessageElement(errorMessageText: string, lang: any): HTMLElement {
     const message = document.createElement('div');
     message.classList.add('error-message');
     message.setAttribute('role', 'alert');
@@ -25,7 +46,7 @@ export class ErrorUtils {
     return message;
   }
 
-  static displayErrorMessage(messageContainer: HTMLElement, errorType: string, lang: any = ErrorUtils.defaultLang, additionalMessage = "") {
+  private static displayErrorMessage(messageContainer: HTMLElement, errorType: string, lang: any, additionalMessage = "") {
     const existingErrorMessage = messageContainer.querySelector('.error-message');
     if (additionalMessage) {
       additionalMessage = ` - ["${additionalMessage}"]`;
@@ -47,7 +68,7 @@ export class ErrorUtils {
     });
   }
 
-  static removeErrorMessage(messageContainer: HTMLElement, errorType: string, lang: any = ErrorUtils.defaultLang) {
+  private static removeErrorMessage(messageContainer: HTMLElement, errorType: string, lang: any) {
     const errorMessageElement = messageContainer.querySelector('.error-message');
     if (errorMessageElement && errorMessageElement.textContent === lang[errorType]) {
       messageContainer.removeChild(errorMessageElement);
