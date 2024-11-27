@@ -1,5 +1,5 @@
 export const environment = {
-  package_version: "1.5.0",
+  package_version: "1.5.1",
   production: true,
   environment: "production",
   sentry_dsn: "https://9fe0bcbcd55e6ebae036cd0625603c71@o4507044685938688.ingest.de.sentry.io/4507044705206352",
@@ -10,8 +10,7 @@ export const environment = {
   api: "https://default.api.witty.works/",
   dashboard: "https://dashboard.witty.works/",
   plugin: "https://word.witty.works/",
-  maxChunkSize: 500,
-  maxTextLength: 2000,
+  maxTextLength: 10000,
   delayDuration: 300,
   tokenLifetime: 300000,
   tokenBuffer: 20000,

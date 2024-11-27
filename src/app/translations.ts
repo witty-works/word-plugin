@@ -31,12 +31,9 @@ export const de = {
     "Willkommen bei Witty for Word, der inklusiven Schreibhilfe für Microsoft Word.",
   pleaseRegister:
     "Bitte registriere, um Texte auf inklusive Sprache prüfen zu können.",
-  hitMaxTextLength1: "Du hast die maximale Textlänge erreicht.",
-  hitMaxTextLengthHere: "Hier",
-  hitMaxTextLength2:
-    " siehst du, wie weit dein Text geprüft wurde. Markiere den Text danach, um den Text weiter zu überprüfen.",
+  hitMaxTextLength: "Du habst die maximale Textlänge erreicht. Um den Rest des Textes zu überprüfen, wähle einen anderen Unterabschnitt aus.",
   howToSelectText:
-    "Wähle einen Textabschnitt zum Prüfen aus. Alternativ werden die ersten 2000 Zeichen geprüft.",
+    "Wähle einen Textabschnitt zum Prüfen aus. Alternativ werden die ersten :count Zeichen geprüft.",
   noIssue: "Glückwunsch, keine Sprachprobleme im Bereich Inklusion gefunden.",
   cantIdentify: "Sprache des Textes konnte nicht identifiziert werden.",
 
@@ -118,12 +115,9 @@ export const en = {
     "Welcome to Witty for Word, the inclusive language writing assistance for Microsoft Word.",
   pleaseRegister:
     "Please register to be able check your writing for inclusive language.",
-  hitMaxTextLength1: "You have reached the maximum text length.",
-  hitMaxTextLengthHere: "Here",
-  hitMaxTextLength2:
-    " you can see what portion of the text was checked. Mark the text following to check the rest of the text.",
+  hitMaxTextLength: "You have reached the maximum text length. To check the rest of the text, select the relevant sub-sections.",
   howToSelectText:
-    "Select text to choose a text portion to check. Alternatively the first 2000 characters will be checked.",
+    "Select text to choose a text portion to check. Alternatively the first :count characters will be checked.",
   noIssue: "Congratulations, no inclusive language issues found.",
   cantIdentify: "Language of the text could not be identified.",
 
@@ -205,12 +199,7 @@ export const fr = {
     "Bienvenue sur Witty for Word, l'assistant d'écriture inclusive pour Microsoft Word.",
   pleaseRegister:
     "Inscrivez-vous pour pouvoir analyser votre texte.",
-  hitMaxTextLength1: "Vous avez atteint la longueur maximale de texte.",
-  hitMaxTextLengthHere: "Ici",
-  hitMaxTextLength2:
-    " vous pouvez voir quelle partie du texte a été analysée. Sélectionnez la suite du texte pour analyser le reste du texte.",
-  howToSelectText:
-    "Sélectionnez du texte pour choisir quelle partie sera analysée. Autrement, les 2000 premiers caractères seront analysés.",
+  hitMaxTextLength: "Vous avez atteint la longueur maximale du texte. Pour vérifier le reste du texte, sélectionnez les sous-parties correspondantes.",
   noIssue: "Félicitations, votre texte est déjà inclusif !",
   cantIdentify: "La langue du texte n'a pas pu être identifiée.",
 

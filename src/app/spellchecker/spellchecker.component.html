@@ -3,7 +3,7 @@
         <button *ngIf="isLoggedin && !trialExpired" tabindex="0" class="witty-works-ext-button witty-works-ext-primary-button-red"
             (click)="checkText()" [attr.aria-label]="lang.wittyCheck" (keydown)="handleKeyboardEvent($event)" [attr.aria-keyshortcuts]="shortcuts.wittyCheck.key" title="{{ lang.wittyCheck }} ({{ shortcuts.wittyCheck.key }})">{{lang.wittyCheck}}</button>
             <div *ngIf="isLoggedin && !trialExpired"class="witty-works-ext-selection-info">
-                <p>{{lang.howToSelectText}}</p></div>
+                <p>{{lang.howToSelectText.replace(':count', maxTextLength)}}</p></div>
     </div>
 
     <div *ngIf="!isLoggedin && !isLoggedInWord" tabindex="0" class="number-spelling-errors">
@@ -45,9 +45,7 @@
 
     <div *ngIf="hitMaxTextLength && isLoggedInWord && !isFirstRun && highlightsList.length > 0" class="max-length-reached-banner" role="alert" aria-live="assertive">
         <img src="assets/icons/caution-sign.svg" alt="{{lang.cautionIconAlt}}" style="margin-right: 5px;">
-        <span>{{lang.hitMaxTextLength1}}</span>
-        <a href="#" class="max-length-reached-banner-link" role="link" tabindex="0" (click)="$event.preventDefault(); highlightCheckedText()" (keyup.enter)="highlightCheckedText()" [attr.aria-label]="lang.hitMaxTextLengthHere" aria-describedby="maxTextLengthDescription">{{lang.hitMaxTextLengthHere}}</a>
-        <span id="maxTextLengthDescription">{{lang.hitMaxTextLength2}}</span>
+        <span>{{lang.hitMaxTextLength}}</span>
     </div>
     
     <app-errors-list [highlights]="highlightsList" [paragraphs]="paragraphsByUniqueId" (highlightEvent)="highlight($event)"

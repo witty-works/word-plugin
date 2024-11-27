@@ -49,7 +49,7 @@ export class SpellcheckerComponent implements OnInit {
 
   hitMaxTextLength = false;
 
-  selectedText = '';
+  maxTextLength = environment.maxTextLength;
 
   alerts: IAlert[] = [];
   authResponse: IAuthResponse | null = null;
@@ -231,7 +231,6 @@ export class SpellcheckerComponent implements OnInit {
 
         // check if there is a word end character before
         if (highlight.details.subcategory.indexOf('gendered_denominations_ending') === -1 && position > 0 && !this.isWordEnd(paragraphText[position - 1])) {
-          console.log('before')
           position = end + 1
           continue;
         }
@@ -276,7 +275,6 @@ export class SpellcheckerComponent implements OnInit {
 
   register() {
     this.authService.makeAuthRequest().then((response) => {
-      const throttleWarning = document.getElementById("throttle-warning");
       const errorCodes = [13001, 13002, 13000, 5001];//not logged in word, did not consent to add-in permissions
       if (errorCodes.includes(response?.code)) {
         this.isLoggedInWord = false;
@@ -291,28 +289,21 @@ export class SpellcheckerComponent implements OnInit {
       }
       if (response?.code === 13013) { //edge case: throttled
         this.showSpinner = true;
-        if (throttleWarning) {
-          ErrorUtils.displayErrorMessage(throttleWarning, "throttleWarning", this.lang);
-        }
+        ErrorUtils.updateErrorMessages(this.lang, "throttle-warning");
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
         this.hideSpinner();
         return;
       }
 
-      if (throttleWarning) {
-        throttleWarning.style.display = 'none';
-      }
-
       if (response.trialExpired) {
         this.isLoggedin = false;
         this.trialExpired = true;
-        const trialExpiredMessage = document.getElementById("trial-expired-message");
-        if (trialExpiredMessage) {
-          ErrorUtils.displayErrorMessage(trialExpiredMessage, "trialExpired", this.lang);
-        }
+        ErrorUtils.updateErrorMessages(this.lang, "trial-expired-message");
         return;
       }
+
+      ErrorUtils.updateErrorMessages(this.lang);
 
       this.authResponse = response;
       this.isLoggedInWord = true;
@@ -346,7 +337,7 @@ export class SpellcheckerComponent implements OnInit {
     this.hitMaxTextLength = false;
     this.isFirstRun = false;
     this.isSpellchecking = true;
-    this.selectedText = '';
+    let selectedText = '';
     this.highlights = new Map();
 
     try {
@@ -362,19 +353,26 @@ export class SpellcheckerComponent implements OnInit {
           });
         });
 
-        this.selectedText = asyncResult.value as string;
-        const maxTextLength = environment.maxTextLength;
+        selectedText = asyncResult.value as string;
 
         let selectedParagraphs = new Map();
         let paragraphsByUniqueId = new Map();
         let chunks: string[] = [];
 
         let paragraphs;
-        if (this.selectedText.length === 0) {
+        let selection = context.document.getSelection()
+        let selectionStart: Word.Range;
+
+        if (selectedText.length === 0) {
           paragraphs = context.document.body.paragraphs;
+
+          selectionStart = selection.parentBody.getRange("Start");
+          selection = selectionStart.expandTo(selection.parentBody.getRange("End"))
         } else {
-          paragraphs = context.document.getSelection().paragraphs;
-          chunks = this.selectedText.split(/\r/);
+          paragraphs = selection.paragraphs;
+          selectionStart = selection.getRange('Start');
+
+          chunks = selectedText.split(/\r/);
         }
 
         paragraphs.load('items');
@@ -386,14 +384,14 @@ export class SpellcheckerComponent implements OnInit {
         }
         await context.sync();
 
-        if (this.selectedText.length === 0) {
+        if (selectedText.length === 0) {
           for (const paragraph of paragraphs.items) {
             chunks.push(paragraph.text);
           }
         }
 
         let text: string;
-        let textLength: number = 0;
+        let fullText: string = "";
         for (let i = 0; i < paragraphs.items.length; i++) {
           if (i == 0) {
             text = chunks[0];
@@ -403,19 +401,41 @@ export class SpellcheckerComponent implements OnInit {
             text = paragraphs.items[i].text;
           }
 
-          if (textLength + text.length > maxTextLength) {
+          if (fullText.length + text.length >= this.maxTextLength) {
             this.hitMaxTextLength = true;
-            const selectedTextWithinRange = text.substring(0, maxTextLength - textLength);
+            const selectedTextWithinRange = text.substring(0, this.maxTextLength - fullText.length);
             const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
             text = text.substring(0, lastSpace);
           }
-
+          
           selectedParagraphs.set(paragraphs.items[i].uniqueLocalId, text);
           paragraphsByUniqueId.set(paragraphs.items[i].uniqueLocalId, paragraphs.items[i].text);
+
+          if (fullText.length > 0) {
+            fullText += "\r"
+          }
+
+          fullText += text
 
           if (this.hitMaxTextLength) {
             break;
           }
+        }
+
+        try {
+          if (this.hitMaxTextLength) {
+            const searchResult = await selection.search(fullText.slice(-200), { matchCase: true, matchWholeWord: false });
+            context.load(searchResult, 'items');
+            await context.sync();
+
+            if (searchResult.items.length) {
+              const completeRange = selectionStart.expandTo(searchResult.items[0]);
+              completeRange.select('Select');
+              await context.sync();
+            }
+          }
+        } catch (error) {
+          console.error('Error selecting text:', error);
         }
 
         this.paragraphsByUniqueId = paragraphsByUniqueId;
@@ -436,39 +456,13 @@ export class SpellcheckerComponent implements OnInit {
     }
   }
 
-  showCheckError(nonFailingCheckResponse: boolean | string | undefined = undefined) {
-    if (nonFailingCheckResponse === undefined) {
-      // Clear any previous error messages
-      const cantIdentifyMessage = document.getElementById("cant-identify-language");
-      if (cantIdentifyMessage) {
-        ErrorUtils.removeErrorMessage(cantIdentifyMessage, "cantIdentify", this.lang);
-      }
-
-      const issueCheckingTextMessage = document.getElementById("issue-checking-text");
-      if (issueCheckingTextMessage) {
-        ErrorUtils.removeErrorMessage(issueCheckingTextMessage, "issueCheckingText", this.lang);
-      }
-    } else if (nonFailingCheckResponse === '422') {
-      const cantIdentifyMessage = document.getElementById("cant-identify-language");
-      if (cantIdentifyMessage) {
-        ErrorUtils.displayErrorMessage(cantIdentifyMessage, "cantIdentify", this.lang);
-      }
-    } else if (nonFailingCheckResponse !== true) {
-      const issueCheckingTextMessage = document.getElementById("issue-checking-text");
-      if (issueCheckingTextMessage) {
-        ErrorUtils.displayErrorMessage(issueCheckingTextMessage, "issueCheckingText", this.lang);
-      }
-    }
-
-    return nonFailingCheckResponse;
-  }
-
   async processSelectedText(selectedParagraphs: Map<string, string>): Promise<void> {
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
     const delayDuration = environment.delayDuration;
 
     this.hasSpellcheckingRun = false;
-    let nonFailingCheckResponse = this.showCheckError();
+    let nonFailingCheckResponse = null;
+    ErrorUtils.updateErrorMessages(this.lang);
 
     try {
       let accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
@@ -497,11 +491,11 @@ export class SpellcheckerComponent implements OnInit {
             });
           }
           const checkLogEventId = crypto.randomUUID();
-          analytics.checkLog(newHighlights, null, this.selectedText.length, 'check', false, checkLogEventId);
+          analytics.checkLog(newHighlights, null, selectedParagraph.length, 'check', false, checkLogEventId);
 
           if (this.authResponse?.plan !== 'witty_free') {
             newHighlights.results.forEach((result: any) => {
-              analytics.checkResultLog(result, this.authResponse, this.selectedText.length, 'check_result', false, checkLogEventId);
+              analytics.checkResultLog(result, this.authResponse, selectedParagraph.length, 'check_result', false, checkLogEventId);
             });
           }
           //mostly for analytics purposes
@@ -575,15 +569,18 @@ export class SpellcheckerComponent implements OnInit {
       this.hasSpellcheckingRun = true;
     } catch (error: any) {
       Sentry.captureException(new Error(`Error in processSelectedText: ${JSON.stringify(error, null, 2)}`));
-      const message = document.getElementById("issue-checking-text");
-      if (message) {
-        ErrorUtils.displayErrorMessage(message, "issueCheckingText", this.lang, "Check failed");
-      }
+      ErrorUtils.updateErrorMessages(this.lang, "issue-checking-text");
       console.error(error);
     } finally {
       this.isSpellchecking = false;
 
-      this.showCheckError(nonFailingCheckResponse);
+      if (nonFailingCheckResponse === '422') {
+        ErrorUtils.updateErrorMessages(this.lang, "cant-identify-language");
+      } else if (nonFailingCheckResponse === 'xxx') {
+        ErrorUtils.updateErrorMessages(this.lang, "issue-checking-text");
+      } else {
+        ErrorUtils.updateErrorMessages(this.lang);
+      }
     }
   }
 
@@ -756,58 +753,6 @@ export class SpellcheckerComponent implements OnInit {
     } else {
       console.error(e);
     }
-  }
-
-  async highlightCheckedText() {
-    this.isHighlightingCheckedText = true;
-    await Word.run(async (context) => {
-      try {
-        if (!this.selectedText || this.selectedText.length <= 255) {
-          return;
-        }
-
-        let chunks = this.selectedText.split(/\r/);
-        chunks = chunks.filter((paragraph) => paragraph !== "" && paragraph !== "\u000b");
-
-        // Prepare all search operations first
-        const searchPromises = chunks.map(async (chunk) => {
-          if (chunk.length > 200) {
-            chunk = chunk.substring(0, 200);
-          }
-          const searchResults = context.document.body.search(chunk, { matchCase: true, matchWholeWord: false });
-          context.load(searchResults, 'items');
-          return searchResults; // Return the promise for later resolution
-        });
-
-        await context.sync();
-
-        let firstRangeFound = null;
-        let lastRangeFound = null;
-
-        // Process search results
-        for (const searchPromise of searchPromises) {
-          const searchResults = await searchPromise; // Resolve each promise
-          const items = searchResults.items;
-          if (items.length > 0) {
-            if (!firstRangeFound) {
-              firstRangeFound = items[0];
-            }
-            lastRangeFound = items[items.length - 1];
-          }
-        }
-
-        if (!firstRangeFound || !lastRangeFound) {
-          return;
-        }
-
-        const completeRange = firstRangeFound.expandTo(lastRangeFound);
-        completeRange.select('Select');
-        await context.sync();
-      } catch (e) {
-        this.handleError(e);
-      }
-    });
-    this.isHighlightingCheckedText = false;
   }
 
   focusElement(id: string) {
