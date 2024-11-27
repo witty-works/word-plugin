@@ -365,13 +365,8 @@ export class SpellcheckerComponent implements OnInit {
 
         if (selectedText.length === 0) {
           paragraphs = context.document.body.paragraphs;
-
-          selectionStart = selection.parentBody.getRange("Start");
-          selection = selectionStart.expandTo(selection.parentBody.getRange("End"))
         } else {
           paragraphs = selection.paragraphs;
-          selectionStart = selection.getRange('Start');
-
           chunks = selectedText.split(/\r/);
         }
 
@@ -407,7 +402,7 @@ export class SpellcheckerComponent implements OnInit {
             const lastSpace = selectedTextWithinRange.lastIndexOf(' ');
             text = text.substring(0, lastSpace);
           }
-          
+
           selectedParagraphs.set(paragraphs.items[i].uniqueLocalId, text);
           paragraphsByUniqueId.set(paragraphs.items[i].uniqueLocalId, paragraphs.items[i].text);
 
@@ -424,6 +419,13 @@ export class SpellcheckerComponent implements OnInit {
 
         try {
           if (this.hitMaxTextLength) {
+            if (selectedText.length === 0) {
+              selectionStart = selection.parentBody.getRange("Start");
+              selection = selectionStart.expandTo(selection.parentBody.getRange("End"))
+            } else {
+              selectionStart = selection.getRange('Start');
+            }
+
             const searchResult = await selection.search(fullText.slice(-200), { matchCase: true, matchWholeWord: false });
             context.load(searchResult, 'items');
             await context.sync();
