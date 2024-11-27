@@ -323,7 +323,7 @@ export class SpellcheckerComponent implements OnInit {
 
     Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
       if (result.status === Office.AsyncResultStatus.Failed) {
-        console.log('result.error', result.error);
+        console.error('result.error', result.error);
       }
     });
   }
@@ -476,7 +476,11 @@ export class SpellcheckerComponent implements OnInit {
       for (let paragrapUniqueId of selectedParagraphs.keys()) {
         let selectedParagraph = selectedParagraphs.get(paragrapUniqueId);
         const paragraphText = this.paragraphsByUniqueId.get(paragrapUniqueId);
-        if (selectedParagraph === undefined || paragraphText == undefined || selectedParagraph.trim() === "") continue;  // Skip empty or whitespace-only chunks  
+        // Skip empty or whitespace-only chunks  
+        if (selectedParagraph === undefined || paragraphText == undefined || selectedParagraph.trim() === "") {
+          continue;
+        }
+
         await delay(delayDuration); // Introduce delay before processing each chunk
 
         try {
@@ -488,7 +492,7 @@ export class SpellcheckerComponent implements OnInit {
             const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
             Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
               if (result.status === Office.AsyncResultStatus.Failed) {
-                console.log('result.error', result.error);
+                console.error('result.error', result.error);
               }
             });
           }
