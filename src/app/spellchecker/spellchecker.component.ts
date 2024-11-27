@@ -417,44 +417,52 @@ export class SpellcheckerComponent implements OnInit {
           }
         }
 
-        try {
-          if (this.hitMaxTextLength) {
-            if (selectedText.length === 0) {
-              selectionStart = selection.parentBody.getRange("Start");
-              selection = selectionStart.expandTo(selection.parentBody.getRange("End"))
-            } else {
-              selectionStart = selection.getRange('Start');
-            }
+        if (fullText.trim() === "") {
+          this.isSpellchecking = false;
+          ErrorUtils.updateErrorMessages(this.lang, "no-text-selected");
+        } else {
+          try {
+            if (this.hitMaxTextLength) {
+              if (selectedText.length === 0) {
+                selectionStart = selection.parentBody.getRange("Start");
+                selection = selectionStart.expandTo(selection.parentBody.getRange("End"))
+              } else {
+                selectionStart = selection.getRange('Start');
+              }
 
-            const searchResult = await selection.search(fullText.slice(-200), { matchCase: true, matchWholeWord: false });
-            context.load(searchResult, 'items');
-            await context.sync();
-
-            if (searchResult.items.length) {
-              const completeRange = selectionStart.expandTo(searchResult.items[0]);
-              completeRange.select('Select');
+              const searchResult = await selection.search(fullText.slice(-200), { matchCase: true, matchWholeWord: false });
+              context.load(searchResult, 'items');
               await context.sync();
+
+              if (searchResult.items.length) {
+                const completeRange = selectionStart.expandTo(searchResult.items[0]);
+                completeRange.select('Select');
+                await context.sync();
+              }
             }
+          } catch (error) {
+            console.error('Error selecting text:', error);
           }
-        } catch (error) {
-          console.error('Error selecting text:', error);
-        }
 
-        this.paragraphsByUniqueId = paragraphsByUniqueId;
-        this.highlights = new Map();
+          this.paragraphsByUniqueId = paragraphsByUniqueId;
+          this.highlights = new Map();
 
-        // Now process the selected text
-        setTimeout(async () => {
-          // Continue with further operations inside this callback or call a separate async function
-          await this.processSelectedText(selectedParagraphs);
+          // Now process the selected text
+          setTimeout(async () => {
+            // Continue with further operations inside this callback or call a separate async function
+            await this.processSelectedText(selectedParagraphs);
 
-          setTimeout(() => {
-            this.focusElement("toggle");
+            setTimeout(() => {
+              this.isSpellchecking = false;
+              this.focusElement("toggle");
+            }, 100);
           }, 100);
-        }, 100);
+        }
       });
     } catch (error) {
       console.error('Error in checkText:', error);
+      ErrorUtils.updateErrorMessages(this.lang, "issue-checking-text", `${error}`);
+      this.isSpellchecking = false;
     }
   }
 
@@ -575,11 +583,9 @@ export class SpellcheckerComponent implements OnInit {
       this.hasSpellcheckingRun = true;
     } catch (error: any) {
       Sentry.captureException(new Error(`Error in processSelectedText: ${JSON.stringify(error, null, 2)}`));
-      ErrorUtils.updateErrorMessages(this.lang, "issue-checking-text");
+      ErrorUtils.updateErrorMessages(this.lang, "issue-checking-text", `${error}`);
       console.error(error);
     } finally {
-      this.isSpellchecking = false;
-
       if (nonFailingCheckResponse === '422') {
         ErrorUtils.updateErrorMessages(this.lang, "cant-identify-language");
       } else if (nonFailingCheckResponse === 'xxx') {

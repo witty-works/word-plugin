@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ErrorUtils {
-  static updateErrorMessages(lang: any, except: string | null = null) {
+  static updateErrorMessages(lang: any, except: string | null = null, additionalMessage = "") {
     const errorMessages = new Map();
 
     errorMessages.set("throttle-warning", "throttleWarning");
@@ -14,13 +14,14 @@ export class ErrorUtils {
     errorMessages.set("issue-checking-text", "issueCheckingText");
     errorMessages.set("warn-failed-ignore-error", "failedRequestText");
     errorMessages.set("cant-identify-language", "cantIdentify");
+    errorMessages.set("no-text-selected", "noTextSelected");
     errorMessages.set("warn-server-error", "serverError");
 
     for (let [key, value] of errorMessages) {
       const errorElement = document.getElementById(key);
       if (errorElement) {
         if (except === key) {
-          ErrorUtils.displayErrorMessage(errorElement, value, lang);
+          ErrorUtils.displayErrorMessage(errorElement, value, lang, additionalMessage);
         } else {
           ErrorUtils.removeErrorMessage(errorElement, value, lang);
         }
