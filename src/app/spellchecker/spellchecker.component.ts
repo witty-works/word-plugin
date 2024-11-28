@@ -379,13 +379,11 @@ export class SpellcheckerComponent implements OnInit {
 
         selectedText = asyncResult.value as string;
 
+        let selection = context.document.getSelection()
         let selectedParagraphs = new Map();
         let paragraphsByUniqueId = new Map();
         let chunks: string[] = [];
-
         let paragraphs;
-        let selection = context.document.getSelection()
-        let selectionStart: Word.Range;
 
         if (selectedText.length === 0) {
           paragraphs = context.document.body.paragraphs;
@@ -447,6 +445,7 @@ export class SpellcheckerComponent implements OnInit {
         } else {
           try {
             if (this.hitMaxTextLength) {
+              let selectionStart: Word.Range;
               if (selectedText.length === 0) {
                 selectionStart = selection.parentBody.getRange("Start");
                 selection = selectionStart.expandTo(selection.parentBody.getRange("End"))
