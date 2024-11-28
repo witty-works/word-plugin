@@ -7,10 +7,8 @@ export class ErrorUtils {
   static updateErrorMessages(lang: any, except: string | null = null, additionalMessage = "") {
     const errorMessages = new Map();
 
-    errorMessages.set("throttle-warning", "throttleWarning");
     errorMessages.set("warn-not-signed-in-word", "notSignedInWarning");
     errorMessages.set("warn-not-supported-account", "notSupportedAccountWarning");
-    errorMessages.set("trial-expired-message", "trialExpired");
     errorMessages.set("issue-checking-text", "issueCheckingText");
     errorMessages.set("warn-failed-ignore-error", "failedRequestText");
     errorMessages.set("cant-identify-language", "cantIdentify");
@@ -73,9 +71,7 @@ export class ErrorUtils {
     const errorMessageElement = messageContainer.querySelector('.error-message');
     if (errorMessageElement && errorMessageElement.textContent === lang[errorType]) {
       messageContainer.removeChild(errorMessageElement);
-      if (messageContainer.children.length === 0) {
-        messageContainer.style.display = 'none';
-      }
+      messageContainer.style.display = 'none';
     }
   }
 }

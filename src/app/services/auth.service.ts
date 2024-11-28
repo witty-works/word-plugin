@@ -60,7 +60,7 @@ export class AuthService {
     return accessTokenWithTimestamp;
   }
 
-  async makeAuthRequest(stopTrying: boolean = false): Promise<any> {
+  async makeAuthRequest(stopTrying: boolean = false): Promise<any> { 
     let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp()
 
     try {
@@ -80,10 +80,7 @@ export class AuthService {
       // Making the HTTP POST request
       const response = await this.http.post<any>(url, {}, httpOptions).toPromise();
 
-      const except = response.plan === null || response.plan === "none" ? "trial-expired-message" : null;
-      ErrorUtils.updateErrorMessages(this.lang, except);
-
-      return response;
+      return response.plan === null || response.plan === "none" ? "trial-expired" : response;
     } catch (error: any) {
       if (error.status === 403 || error.status === 401) {
         localStorage.removeItem('word_access_token_with_timestamp'); // Clear cached token
@@ -103,19 +100,6 @@ export class AuthService {
               }
             });
           }
-        }
-      } else {
-        const errorMessage = typeof error.message === 'string' ? error.message : JSON.stringify(error, Object.getOwnPropertyNames(error));
-        Sentry.captureException(new Error(`Error in makeAuthRequest: ${errorMessage}`));
-        const errorCodes = [13001, 13002, 13000, 5001, 13003];
-        if (errorCodes.includes(error?.code)) {
-          if (error.code === 13003) {
-            ErrorUtils.updateErrorMessages(this.lang, "warn-not-supported-account");
-          } else {
-            ErrorUtils.updateErrorMessages(this.lang, "warn-not-signed-in-word");
-          }
-        } else {
-          ErrorUtils.updateErrorMessages(this.lang, "warn-server-error");
         }
       }
       return error;

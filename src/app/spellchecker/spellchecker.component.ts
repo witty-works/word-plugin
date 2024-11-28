@@ -20,7 +20,6 @@ const analytics = useAnalytics();
   styleUrls: ['./spellchecker.component.scss']
 })
 export class SpellcheckerComponent implements OnInit {
-  environment = window.location.hostname === 'localhost'
   lang: any;
 
   isSpellchecking = false;
@@ -275,33 +274,43 @@ export class SpellcheckerComponent implements OnInit {
 
   register() {
     this.authService.makeAuthRequest().then((response) => {
-      const errorCodes = [13001, 13002, 13000, 5001];//not logged in word, did not consent to add-in permissions
-      if (errorCodes.includes(response?.code)) {
-        this.isLoggedInWord = false;
-        this.isLoggedin = false;
-        localStorage.setItem('is_logged_in', 'false');
+      console.log(response);
+      if (response === "trial-expired") {
+        this.trialExpired = true;
         return;
       }
+
+      if (response?.code) {
+        const errorMessage = typeof response.message === 'string' ? response.message : JSON.stringify(response, Object.getOwnPropertyNames(response));
+        Sentry.captureException(new Error(`Error in makeAuthRequest: ${errorMessage}`));
+
+        if (response?.code === 13013) { //edge case: unable to get a token
+          ErrorUtils.updateErrorMessages(this.lang, "warn-not-supported-account");
+          this.isLoggedin = false;
+          localStorage.setItem('is_logged_in', 'false');
+          return;
+        }
+
+        const errorCodes = [13001, 13002, 13000, 5001]; //not logged in word, did not consent to add-in permissions
+        if (errorCodes.includes(response?.code)) {
+          this.isLoggedInWord = false;
+          this.isLoggedin = false;
+          localStorage.setItem('is_logged_in', 'false');
+          ErrorUtils.updateErrorMessages(this.lang, "warn-not-signed-in-word");
+          return;
+        } else {
+          ErrorUtils.updateErrorMessages(this.lang, "warn-server-error");
+          return;
+        }
+      }
+
       if (!response || response === undefined || response?.status === 403) { //could not authenticate dashboard
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
         return;
       }
-      if (response?.code === 13013) { //edge case: throttled
-        this.showSpinner = true;
-        ErrorUtils.updateErrorMessages(this.lang, "throttle-warning");
-        this.isLoggedin = false;
-        localStorage.setItem('is_logged_in', 'false');
-        this.hideSpinner();
-        return;
-      }
 
-      if (response.trialExpired) {
-        this.isLoggedin = false;
-        this.trialExpired = true;
-        ErrorUtils.updateErrorMessages(this.lang, "trial-expired-message");
-        return;
-      }
+      this.trialExpired = false;
 
       ErrorUtils.updateErrorMessages(this.lang);
 
@@ -331,6 +340,21 @@ export class SpellcheckerComponent implements OnInit {
   openWittyHomePage() {
     analytics.openLinkLog('homepage_open');
     Office.context.ui.openBrowserWindow('https://witty.works');
+  }
+
+  async openDashboard() {
+    try {
+      analytics.openLinkLog('dashboard_open');
+      const accessToken = await Office.auth.getAccessToken(); //can always fetch new here as you will never manage to reach throttle limit
+      const url = `${environment.dashboard}office-login?token=${accessToken}`;
+      Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
+        if (result.status === Office.AsyncResultStatus.Failed) {
+          console.log('result.error', result.error);
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   async checkText(): Promise<void> {
@@ -756,12 +780,14 @@ export class SpellcheckerComponent implements OnInit {
 
       console.error(e.message);
 
-      this.dialogRef = this.dialogService.open(this.errorDialog!);
-      this.dialogRef.afterClosed$.subscribe((result) => {
-        if (!!result) {
-          this.checkText();
-        }
-      });
+      if (this.errorDialog !== undefined) {
+        this.dialogRef = this.dialogService.open(this.errorDialog!);
+        this.dialogRef.afterClosed$.subscribe((result) => {
+          if (!!result) {
+            this.checkText();
+          }
+        });
+      }
     } else {
       console.error(e);
     }
