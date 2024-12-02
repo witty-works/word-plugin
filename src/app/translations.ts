@@ -35,6 +35,7 @@ export const de = {
   howToSelectText:
     "Wähle einen Textabschnitt zum Prüfen aus. Alternativ werden die ersten :count Zeichen geprüft.",
   noIssue: "Glückwunsch, keine Sprachprobleme im Bereich Inklusion gefunden.",
+  noTextSelected: "Die aktuelle Auswahl enthält keinen Text. Bitte wähle entweder einen Text aus oder entferne die Auswahl, um automatisch vom Anfang des Dokuments an zu analysieren.",
   cantIdentify: "Sprache des Textes konnte nicht identifiziert werden.",
 
   //error
@@ -119,6 +120,7 @@ export const en = {
   howToSelectText:
     "Select text to choose a text portion to check. Alternatively the first :count characters will be checked.",
   noIssue: "Congratulations, no inclusive language issues found.",
+  noTextSelected: "The current selection does not contain text. Please either select some text or remove the selection to automatically analyze from the start of the document.",
   cantIdentify: "Language of the text could not be identified.",
 
   //error
@@ -201,6 +203,7 @@ export const fr = {
     "Inscrivez-vous pour pouvoir analyser votre texte.",
   hitMaxTextLength: "Vous avez atteint la longueur maximale du texte. Pour vérifier le reste du texte, sélectionnez les sous-parties correspondantes.",
   noIssue: "Félicitations, votre texte est déjà inclusif !",
+  noTextSelected: "La sélection actuelle ne contient pas de texte. Veuillez sélectionner du texte ou supprimer la sélection afin d'effectuer une analyse automatique à partir du début du document.",
   cantIdentify: "La langue du texte n'a pas pu être identifiée.",
 
   //error

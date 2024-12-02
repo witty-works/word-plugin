@@ -29,21 +29,27 @@
   <div id="warn-not-signed-in-word"
     style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
   </div>
-  
+
   <div id="warn-not-supported-account"
-        style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
-        <span>
-            <a href="mailto:support@witty.works" style="color: inherit; font-weight: bold; text-decoration: underline; margin-left: 0.25em; cursor: pointer;" role="link" tabindex="0" (click)=$event.preventDefault()>support@witty.works</a>
-        </span>
+    style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
+    <span>
+      <a href="mailto:support@witty.works"
+        style="color: inherit; font-weight: bold; text-decoration: underline; margin-left: 0.25em; cursor: pointer;"
+        role="link" tabindex="0" (click)=$event.preventDefault()>support@witty.works</a>
+    </span>
   </div>
 
   <div id="issue-checking-text"
     style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
   </div>
 
-    <div id="cant-identify-language"
-      style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
-    </div>
+  <div id="no-text-selected"
+    style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
+  </div>
+
+  <div id="cant-identify-language"
+    style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
+  </div>
 
   <div id="warn-server-error"
     style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
@@ -51,20 +57,8 @@
 
   <div id="warn-failed-ignore-error"
     style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
-   </div>
-
-  <div id="trial-expired-message"
-    style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
-    <span>
-      <a href="{{environment.dashboard + '/team/subscription'}}"
-        style="color: inherit; font-weight: bold; text-decoration: underline; margin-left: 0.25em; cursor: pointer;"
-        role="link" tabindex="0" (click)=$event.preventDefault() target="_blank">Upgrade Witty</a>
-    </span>
   </div>
 
-  <div id="throttle-warning"
-    style="display: none; margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
-  </div>
   <app-root></app-root>
   <script>
     // Show update message for old Office versions that base on IE / Edge legacy
