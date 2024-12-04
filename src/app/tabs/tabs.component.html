@@ -1,21 +1,13 @@
 <div class="tablist" role="tablist">
-  <div class="tab" 
-       role="tab"
-       [class.selected]="selectedTab === 'spellchecker'" 
-       [attr.aria-selected]="selectedTab === 'spellchecker' ? 'true' : null"
-       (click)="tabChanged('spellchecker')"
-       (keydown.enter)="tabChanged('spellchecker')" 
-       tabindex="0">
+  <div class="tab" role="tab" [class.selected]="selectedTab === 'spellchecker'"
+    [attr.aria-selected]="selectedTab === 'spellchecker' ? 'true' : null" (click)="tabChanged('spellchecker')"
+    (keydown.enter)="tabChanged('spellchecker')" tabindex="0">
     {{lang.writing}}
   </div>
 
-  <div class="tab" 
-       role="tab"
-       [class.selected]="selectedTab === 'settings'" 
-       [attr.aria-selected]="selectedTab === 'settings' ? 'true' : null"
-       (click)="tabChanged('settings')"
-       (keydown.enter)="tabChanged('settings')" 
-       tabindex="0">
+  <div class="tab" role="tab" [class.selected]="selectedTab === 'settings'"
+    [attr.aria-selected]="selectedTab === 'settings' ? 'true' : null" (click)="tabChanged('settings')"
+    (keydown.enter)="tabChanged('settings')" tabindex="0">
     {{lang.settings}}
   </div>
 </div>

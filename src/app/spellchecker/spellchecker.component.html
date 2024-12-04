@@ -14,10 +14,11 @@
         <p>{{lang.wittyInfos}}</p>
     </div>
 
-    <div *ngIf="trialExpired" style="margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
-        <img src="assets/icons/caution-sign.svg" style="margin-right: 5px;"/>
+    <div *ngIf="trialExpired"
+        style="margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
+        <img src="assets/icons/caution-sign.svg" style="margin-right: 5px;" />
         <span>
-            <a (click)="openDashboard()" 
+            <a (click)="openDashboard()"
                 style="color: inherit; font-weight: bold; text-decoration: underline; margin-left: 0.25em; cursor: pointer;"
                 role="link" tabindex="0" (click)=$event.preventDefault() target="_blank">Upgrade Witty</a>
         </span>
