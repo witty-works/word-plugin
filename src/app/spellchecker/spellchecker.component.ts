@@ -629,7 +629,8 @@ export class SpellcheckerComponent implements OnInit {
 
         // Search for all instances of the error word within the paragraph range.
         const searchResults = paragraph.search(error.word, { matchCase: true });
-        context.load(searchResults, 'text');
+        context.load(searchResults, 'items');
+
         await context.sync();
 
         // Prepare to find the actual range to highlight by calculating offsets.
