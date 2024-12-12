@@ -116,13 +116,7 @@ export class SpellcheckerComponent implements OnInit {
       let currentParagraphTexts: Map<string, string> = new Map<string, string>();
       let paragraphs = context.document.body.paragraphs;
 
-      paragraphs.load('items');
-      await context.sync();
-
-      for (const paragraph of paragraphs.items) {
-        paragraph.load("text");
-        paragraph.load("uniqueLocalId");
-      }
+      paragraphs.load({ select: 'items', expand: 'text,uniqueLocalId' });
       await context.sync();
 
       for (const paragraph of paragraphs.items) {
@@ -392,13 +386,7 @@ export class SpellcheckerComponent implements OnInit {
           chunks = selectedText.split(/\r/);
         }
 
-        paragraphs.load('items');
-        await context.sync();
-
-        for (const paragraph of paragraphs.items) {
-          paragraph.load("text");
-          paragraph.load("uniqueLocalId");
-        }
+        paragraphs.load({ select: 'items', expand: 'text,uniqueLocalId' });
         await context.sync();
 
         if (selectedText.length === 0) {
