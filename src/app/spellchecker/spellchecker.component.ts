@@ -168,10 +168,10 @@ export class SpellcheckerComponent implements OnInit {
       try {
         let paragraphs: Map<string, Word.Paragraph> = new Map<string, Word.Paragraph>();
 
-        for (const uniqueLocalIds of event.uniqueLocalIds) {
-          let paragraph: Word.Paragraph = context.document.getParagraphByUniqueLocalId(uniqueLocalIds);
+        for (const uniqueLocalId of event.uniqueLocalIds) {
+          let paragraph: Word.Paragraph = context.document.getParagraphByUniqueLocalId(uniqueLocalId);
           paragraph.load("text")
-          paragraphs.set(uniqueLocalIds, paragraph);
+          paragraphs.set(uniqueLocalId, paragraph);
         }
 
         await context.sync();
