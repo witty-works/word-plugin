@@ -413,7 +413,7 @@ export class SpellcheckerComponent implements OnInit {
           if (i == 0) {
             text = chunks[0];
           } else if (i == paragraphs.items.length - 1) {
-            text = chunks[chunks.length - 1];
+            text = chunks[paragraphs.items.length - 1];
           } else {
             text = paragraphs.items[i].text;
           }
