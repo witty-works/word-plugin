@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild, HostListener } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
 import { ISpellingError } from "../data/data-structures";
-import { IAlternatives, IAlert, IAuthResponse, ICheckResponse } from "../data/types";
+import { IAlternative, IAlert, IAuthResponse, ICheckResponse } from "../data/types";
 import { AuthService } from '../services/auth.service';
 import { environment } from '../../environments/environment';
 import { useAnalytics } from '../analytics/analytics';
@@ -692,7 +692,7 @@ export class SpellcheckerComponent implements OnInit {
     return null;
   }
 
-  async acceptSuggestion(obj: { paragraphUniqueId: string, errorUniqueId: string, suggestion: IAlternatives }) {
+  async acceptSuggestion(obj: { paragraphUniqueId: string, errorUniqueId: string, suggestion: IAlternative }) {
     await Word.run(async (context) => {
       try {
         // Get the paragraph text and the error object using their respective indices.

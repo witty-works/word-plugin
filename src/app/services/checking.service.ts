@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { ErrorUtils } from '../utils/error.utils';
 import { HttpClient } from "@angular/common/http";
-import { IAlternatives, ICheckResponse } from "../data/types";
+import { IAlternative, ICheckResponse } from "../data/types";
 import { ISpellingError } from "../data/data-structures";
 import { environment } from '../../environments/environment';
 import * as Sentry from '@sentry/browser';
@@ -63,7 +63,7 @@ export class CheckingService {
     }
   }
 
-  getSuggestions(word: ISpellingError): Promise<IAlternatives[]> {
+  getSuggestions(word: ISpellingError): Promise<IAlternative[]> {
     return Promise.resolve(word.details.alternatives);
   }
 }

@@ -5,7 +5,7 @@ import { CheckingService } from "../../services/checking.service";
 import { IgnoreService } from "../../services/ignore.service";
 import { AuthService } from '../../services/auth.service';
 import { SpellcheckerComponent } from "../spellchecker.component";
-import { IAlert, IAlternatives } from "../../data/types";
+import { IAlert, IAlternative } from "../../data/types";
 import { useAnalytics } from "src/app/analytics/analytics";
 import * as Sentry from "@sentry/browser";
 import { KEYBOARD_SHORTCUTS_CONFIG } from "src/app/keyboard-shortcuts.config";
@@ -29,7 +29,7 @@ export class ErrorComponent {
   highlightEvent = new EventEmitter();
 
   @Output()
-  acceptSuggestionEvent = new EventEmitter<{ suggestion: IAlternatives }>();
+  acceptSuggestionEvent = new EventEmitter<{ suggestion: IAlternative }>();
 
   shortcuts = KEYBOARD_SHORTCUTS_CONFIG;
 
@@ -52,7 +52,7 @@ export class ErrorComponent {
   }
 
   isOpen = false;
-  suggestions: IAlternatives[] = [];
+  suggestions: IAlternative[] = [];
   showLearningBite: boolean = false;
 
   alerts: IAlert[] = this.spellcheckerComponent.alerts;
@@ -118,7 +118,7 @@ export class ErrorComponent {
     this.highlightEvent.emit();
   }
 
-  acceptSuggestion(suggestion: IAlternatives) {
+  acceptSuggestion(suggestion: IAlternative) {
     if (suggestion.remove) {
       suggestion.text = "";
     }
