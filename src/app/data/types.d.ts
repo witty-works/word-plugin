@@ -1,3 +1,9 @@
+export interface DiffChange {
+  added: boolean,
+  removed: boolean,
+  value: string
+}
+
 //API REQUEST/RESPONSE
 export interface IRequest {
   url: string;

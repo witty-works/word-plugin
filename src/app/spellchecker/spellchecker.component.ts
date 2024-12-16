@@ -268,7 +268,6 @@ export class SpellcheckerComponent implements OnInit {
 
   register() {
     this.authService.makeAuthRequest().then((response) => {
-      console.log(response);
       if (response === "trial-expired") {
         this.trialExpired = true;
         return;
@@ -686,8 +685,6 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   isLLMAlternativesActive(error: ISpellingError) {
-    return true; // @TODO remove
-
     if (error.details.language !== "fr"
       || localStorage.getItem('llm_alternatives') !== "true"
     ) {
@@ -714,32 +711,33 @@ export class SpellcheckerComponent implements OnInit {
     return null;
   }
 
+  simpleReplacement(sentence: TxtSentenceNode, error: ISpellingError, replacement: string) {
+    const offset = error.details.start - sentence.range[0];
+    return sentence.raw.substring(0, offset) + replacement + sentence.raw.substring(offset + error.word.length);
+}
+
   async fetchRephrasings(error: ISpellingError, sentence: TxtSentenceNode) {
     if (error.rephrasings?.sentence === sentence.raw) {
-      console.log("Sentence unchanged:", sentence);
-
       return error.rephrasings;
     }
 
     if (error.details.alternatives.length == 0) {
-      console.log("No alternatives:", error.details.alternatives);
-
       return {
         sentence: sentence.raw,
         results: new Map(),
       } as IRephrasingResult;
     }
 
-    // @TODO remove
-    if (error.details.language != "fr") {
+    if (!this.isLLMAlternativesActive(error)) {
       let results = new Map();
       for (const alternative of error.details.alternatives) {
         if (alternative.remove) {
           continue;
         }
+        const offset = error.details.start - sentence.range[0];
         results.set(
           alternative.text,
-          sentence.raw.replace(error.word, alternative.text)
+          sentence.raw.substring(0, offset) + alternative.text + sentence.raw.substring(offset + error.word.length)
         );
       }
 
@@ -778,11 +776,9 @@ export class SpellcheckerComponent implements OnInit {
 
         let words: Map<string, number> = new Map<string, number>();
         let rephrasing: string | undefined;
-        if (obj.suggestion.remove || !this.isLLMAlternativesActive(error)) {
-          if (obj.suggestion.remove) {
-            words.set(' ' + error.word, error.offset - 1);
-            words.set(error.word + ' ', error.offset);
-          }
+        if (obj.suggestion.remove) {
+          words.set(' ' + error.word, error.offset - 1);
+          words.set(error.word + ' ', error.offset);
           words.set(error.word, error.offset);
 
           rephrasing = "";
@@ -795,12 +791,12 @@ export class SpellcheckerComponent implements OnInit {
           const rephrasings = await this.fetchRephrasings(error, sentence);
           rephrasing = rephrasings?.results.get(obj.suggestion.text);
           if (rephrasing === undefined) {
-            // TODO re-render error component
             console.log("rephrasing not found", obj.suggestion.text, [...rephrasings.results.entries()])
-            return;
+            words.set(error.word, error.offset);
+            rephrasing = obj.suggestion.text
+          } else {
+            words.set(sentence.raw, sentence.range[0]);
           }
-
-          words.set(sentence.raw, sentence.range[0]);
         }
 
         let errorRange: Word.Range | null = null;

@@ -69,8 +69,6 @@ export class CheckingService {
   }
 
   async getLLMSuggestion(error: ISpellingError, sentence: TxtSentenceNode, accessToken: string): Promise<any> {
-    console.log("Error", error)
-
     const url = environment.api + "v1.0/rephrase";
     const httpOptions = {
       headers: new HttpHeaders({
@@ -89,15 +87,9 @@ export class CheckingService {
     };
 
     try {
-      // Log the input for debugging
-      console.log("API Input for LLM:", apiInput);
-
       const response = await this.http
         .post<any>(url, apiInput, httpOptions)
         .toPromise();
-
-      // Log the response for debugging
-      console.log("API Response from LLM:", response);
 
       return response;
     } catch (error: any) {

@@ -27,19 +27,22 @@
                 </ng-template>
               </div>
               <div>
-                <b>{{ error.details.label.split(":").pop() }}</b>
-                <br />
-                {{ error.details.explanation.text }}
-                {{
-                error.details.explanation.context
-                ? " (" + error.details.explanation.context + ")"
-                : ""
-                }}
+                <h3>{{ error.details.label.split(":").pop() }}</h3>
+                <div *ngIf="rephrasing === null || suggestion === null">
+                  {{ error.details.explanation.text }}
+                  {{
+                  error.details.explanation.context
+                  ? " (" + error.details.explanation.context + ")"
+                  : ""
+                  }}
+                </div>
+                <div *ngIf="rephrasing !== null && suggestion !== null" [innerHTML]="rephrasing" class="witty-works-ext-rephrasing">
+                </div>
               </div>
             </div>
 
             <div class="witty-works-ext-container-row">
-              <ng-container *ngIf="error.details.explanation?.url">
+              <ng-container *ngIf="rephrasing === null && error.details.explanation?.url">
                 <a href="{{error.details.explanation.url}}" target="_blank" rel="noopener noreferrer"
                   class="witty-works-ext-container-row witty-works-ext-justify-end witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer"
                   style="text-decoration: none;">
@@ -77,19 +80,15 @@
           {{ lang.tryInstead }}
         </div>
         <ng-container *ngFor="let suggestion of suggestions">
-          <!-- Add spinner or show rephrasing if available -->
           <div class="witty-works-ext-button-wrapper" [class.hovered]="suggestion.hovered">
-            <button (click)="acceptSuggestion(suggestion)" (mouseenter)="suggestion.hovered = true"
-              (mouseleave)="suggestion.hovered = false" [ngStyle]="{
+            <button (click)="acceptSuggestion(suggestion)" (mouseenter)="suggestionedHovered(suggestion, true)"
+              (mouseleave)="suggestionedHovered(suggestion, false)" [ngStyle]="{
                 'text-decoration': suggestion.text ? 'none' : 'line-through'
               }">
               {{ suggestion.text ? suggestion.hovered || suggestion.text.length <= 25 ? suggestion.text :
                 suggestion.text.substring(0, 25) + ".." : error.word }} </button>
-                <div *ngIf="suggestion.hovered === true && getRephrasing(suggestion)"
-                  [innerHTML]='getRephrasing(suggestion)'>
-                </div>
                 <div *ngIf="suggestion.context || suggestion.url">
-                  <div *ngIf="suggestion.context && (suggestion.hovered !== true || !getRephrasing(suggestion))">
+                  <div *ngIf="suggestion.context">
                     <a *ngIf="suggestion.url" [href]="suggestion.url" target="_blank" class="suggestion-link"
                       rel="noopener noreferrer">
                       <span *ngIf="suggestion.context.startsWith('💡')">
