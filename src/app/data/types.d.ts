@@ -1,3 +1,9 @@
+export interface DiffChange {
+  added: boolean,
+  removed: boolean,
+  value: string
+}
+
 //API REQUEST/RESPONSE
 export interface IRequest {
   url: string;
@@ -54,7 +60,7 @@ export interface ICheckResultLogItems {
   response__data__subcategory: string;
   response__data__start: number;
   response__data__end: number;
-  response__data__alternatives: IAlternatives[];
+  response__data__alternatives: IAlternative[];
   response__data__label: string;
   response__data__explanation__text: string;
   response__data__explanation__icon: string;
@@ -72,13 +78,18 @@ export interface ICheckResponseResult {
   subcategory: string;
   start: number;
   end: number;
-  alternatives: IAlternatives[];
+  alternatives: IAlternative[];
   explanation: IExplanation;
   label: string;
   gravity: number;
   language: string;
   limit_reached: boolean;
   source: ISource;
+}
+
+export interface IRephrasingResult {
+  sentence: string,
+  results: Map<string, string>,
 }
 
 //AUTH ENDPOINT
@@ -158,7 +169,7 @@ export interface IAlertContentData {
   context: string;
   category: string;
   subcategory: string;
-  alternatives: IAlternatives[];
+  alternatives: IAlternative[];
   label: string;
   explanation: IExplanation;
   language: string;
@@ -166,10 +177,13 @@ export interface IAlertContentData {
 }
 
 //POPOVER
-export interface IAlternatives {
+export interface IAlternative {
   text: string;
   remove: boolean;
   inspiration: boolean;
+  collective_noun?: ConstrainBooleanParameters;
+  male_form?: string;
+  female_form?: string;
   context: string;
   hovered?: boolean;
   url: string;
@@ -210,7 +224,7 @@ export interface ILogItems {
   response__data__explanation__icon_image: string;
   response__data__explanation__url: string;
   response__data__source: ISource;
-  response__data__alternatives: IAlternatives[];
+  response__data__alternatives: IAlternative[];
   response__data__gravity: number;
 }
 export interface IAlternativeLogItems extends ILogItems {

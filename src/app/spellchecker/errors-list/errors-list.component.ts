@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { ISpellingError } from "../../data/data-structures";
 import { SettingsService } from "../../services/settings.service";
 import { Subscription } from "rxjs";
-import { IAlternatives } from "../../data/types";
+import { IAlternative } from "../../data/types";
 
 @Component({
   selector: 'app-errors-list',
@@ -21,7 +21,7 @@ export class ErrorsListComponent implements OnInit, OnDestroy {
   highlightEvent = new EventEmitter<{ paragraphUniqueId: string, errorUniqueId: string }>();
 
   @Output()
-  acceptSuggestionEvent = new EventEmitter<{ paragraphUniqueId: string, errorUniqueId: string, suggestion: IAlternatives }>();
+  acceptSuggestionEvent = new EventEmitter<{ paragraphUniqueId: string, errorUniqueId: string, suggestion: IAlternative }>();
 
   showContext = true;
 
@@ -46,7 +46,7 @@ export class ErrorsListComponent implements OnInit, OnDestroy {
     this.highlightEvent.emit({ paragraphUniqueId, errorUniqueId });
   }
 
-  acceptSuggestion(paragraphUniqueId: string, errorUniqueId: string, childObj: { suggestion: IAlternatives }) {
+  acceptSuggestion(paragraphUniqueId: string, errorUniqueId: string, childObj: { suggestion: IAlternative }) {
     this.acceptSuggestionEvent.emit({ paragraphUniqueId, errorUniqueId, suggestion: childObj.suggestion });
   }
 }

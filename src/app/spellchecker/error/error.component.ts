@@ -1,15 +1,16 @@
-import { Component, EventEmitter, Input, Output, HostListener } from "@angular/core";
-import { ISpellingError } from "../../data/data-structures";
+import { Component, EventEmitter, Input, Output, HostListener, WritableSignal, signal, ViewEncapsulation } from "@angular/core";
+import { ISpellingError, } from "../../data/data-structures";
 import TextUtils from "../../utils/text.utils";
 import { CheckingService } from "../../services/checking.service";
 import { IgnoreService } from "../../services/ignore.service";
 import { AuthService } from '../../services/auth.service';
 import { SpellcheckerComponent } from "../spellchecker.component";
-import { IAlert, IAlternatives } from "../../data/types";
+import { IAlert, IAlternative, IRephrasingResult, DiffChange } from "../../data/types";
 import { useAnalytics } from "src/app/analytics/analytics";
 import * as Sentry from "@sentry/browser";
 import { KEYBOARD_SHORTCUTS_CONFIG } from "src/app/keyboard-shortcuts.config";
 import { getLanguageModule } from '../../utils/language.utils';
+import { TxtSentenceNode } from 'sentence-splitter';
 
 const analytics = useAnalytics();
 
@@ -17,6 +18,7 @@ const analytics = useAnalytics();
   selector: "app-error",
   templateUrl: "./error.component.html",
   styleUrls: ["./error.component.scss"],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ErrorComponent {
   @Input()
@@ -29,7 +31,7 @@ export class ErrorComponent {
   highlightEvent = new EventEmitter();
 
   @Output()
-  acceptSuggestionEvent = new EventEmitter<{ suggestion: IAlternatives }>();
+  acceptSuggestionEvent = new EventEmitter<{ suggestion: IAlternative }>();
 
   shortcuts = KEYBOARD_SHORTCUTS_CONFIG;
 
@@ -52,7 +54,7 @@ export class ErrorComponent {
   }
 
   isOpen = false;
-  suggestions: IAlternatives[] = [];
+  suggestions: IAlternative[] = [];
   showLearningBite: boolean = false;
 
   alerts: IAlert[] = this.spellcheckerComponent.alerts;
@@ -63,6 +65,14 @@ export class ErrorComponent {
 
   lang: any;
 
+  diff = require('diff');
+
+  rephrasing: string | null = null;
+
+  suggestion: IAlternative | null = null;
+
+  rephrasings: WritableSignal<IRephrasingResult | null> = signal(null);
+
   constructor(
     private spellcheckerService: CheckingService,
     private spellcheckerComponent: SpellcheckerComponent,
@@ -70,6 +80,132 @@ export class ErrorComponent {
     private ignoreService: IgnoreService
   ) {
     this.lang = getLanguageModule();
+  }
+
+  private removeHTMLTags(htmlString: string) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+    const textContent = doc.body.textContent ?? '';
+    return textContent.trim();
+  }
+
+  private computeDiff(language: string, originalSentence: string, newSentence: string) {
+    let options = {
+      intlSegmenter: new (Intl as any).Segmenter(language, { granularity: 'word' })
+    }
+
+    let diffElements: DiffChange[] = this.diff.diffWords(
+      originalSentence,
+      newSentence,
+      options
+    );
+
+    const maxDiffLength = 120;
+    const minDiffLength = 50;
+
+    let diffElement: DiffChange;
+
+    let diff: string = '';
+    let tag: string = '';
+
+    let start: number = 0;
+    let end: number = diffElements.length - 1;
+
+    for (let i = 0; i < diffElements.length; i++) {
+      diffElement = diffElements[i]
+      if (diffElement.added || diffElement.removed) {
+        if (diff === '') {
+          start = i;
+        } else if (diff.endsWith('</ins>') || diff.endsWith('</del>')) {
+          diff += ' '
+        }
+        end = i;
+
+        tag = diffElement.added ? 'ins' : 'del';
+        diff += `<${tag}>${diffElement.value}</${tag}>`;
+      } else if (diff !== '' && i < diffElements.length - 1) {
+        diff += diffElement.value;
+      }
+    }
+
+    const strippedString = this.removeHTMLTags(diff);
+    let stringLengthDiff = maxDiffLength - strippedString.length
+    if (stringLengthDiff > 0) {
+      let value = '';
+      if (start > 0) {
+        value = diffElements[0].value.substring(
+          Math.max(0, diffElements[0].value.length - Math.min(minDiffLength, stringLengthDiff)),
+          diffElements[0].value.length
+        );
+
+        if (value != diffElements[0].value) {
+          value = value.slice(value.indexOf(' '));
+          value = '...' + value
+        }
+
+        diff = value + diff;
+      }
+
+      stringLengthDiff -= value.length
+      if (end < diffElements.length - 1 && stringLengthDiff) {
+        let value = diffElements[diffElements.length - 1].value.substring(0, Math.min(minDiffLength, stringLengthDiff));
+        if (value != diffElements[diffElements.length - 1].value) {
+          value = value.substring(0, value.lastIndexOf(' '));
+          value = value + '...'
+        }
+
+        diff = diff + value;
+      }
+    }
+
+    return diff
+  }
+
+  suggestionedHovered(suggestion: IAlternative, hovered: boolean | null = null) {
+    if (hovered !== null) {
+      suggestion.hovered = hovered;
+    }
+
+    if (!suggestion.hovered || !this.error) {
+      this.rephrasing = null;
+      this.suggestion = null;
+      return;
+    }
+
+    this.suggestion = suggestion;
+
+    let rephrasing: string | undefined;
+    let sentence: TxtSentenceNode | null | string = null;
+    if (suggestion.remove) {
+      sentence = this.spellcheckerComponent.getSentence(this.error);
+      if (sentence) {
+        rephrasing = this.spellcheckerComponent.simpleReplacement(sentence, this.error, '');
+        sentence = sentence.raw
+      }
+    } else {
+      const rephrasings: IRephrasingResult | null = this.rephrasings()
+      if (rephrasings === null) {
+        this.rephrasing = `<img aria-live="polite" role="alert" src="assets/icons/spinner.svg" alt="${this.lang.loading}" />`;
+        return;
+      }
+  
+      rephrasing = rephrasings.results.get(suggestion.text);
+      if (rephrasing === undefined) {
+        sentence = this.spellcheckerComponent.getSentence(this.error);
+        if (sentence) {
+          rephrasing = this.spellcheckerComponent.simpleReplacement(sentence, this.error, suggestion.text);
+          sentence = sentence.raw;
+        }
+      } else {
+        sentence = rephrasings.sentence;
+      }
+    }
+
+    if (sentence === null || rephrasing === undefined) {
+      return;
+    }
+
+    this.rephrasing = this.computeDiff(this.error.details.language, sentence, rephrasing);
   }
 
   getContextErrorComponent(error: ISpellingError) {
@@ -112,13 +248,31 @@ export class ErrorComponent {
       alertRelevantToSuggestion &&
         analytics.popoverLogs(alertRelevantToSuggestion, "popover_close");
     }
+
+    // TODO handle error undefined
+    if (!this.isOpen || this.error === undefined) {
+      return;
+    }
+
+    const sentence = this.spellcheckerComponent.getSentence(this.error)
+    if (sentence === null) {
+      // TODO handle error
+      return;
+    }
+
+    const rephrasings = await this.spellcheckerComponent.fetchRephrasings(this.error, sentence);
+    this.error.rephrasings = rephrasings
+    this.rephrasings.set(rephrasings)
+    if (this.suggestion) {
+      this.suggestionedHovered(this.suggestion);
+    }
   }
 
   sendHighlight() {
     this.highlightEvent.emit();
   }
 
-  acceptSuggestion(suggestion: IAlternatives) {
+  acceptSuggestion(suggestion: IAlternative) {
     if (suggestion.remove) {
       suggestion.text = "";
     }
@@ -166,6 +320,8 @@ export class ErrorComponent {
   get containerStyle() {
     return {
       backgroundColor: this.getExplanationColor(this.error?.details.gravity, this.error?.details.subcategory),
+      // TODO how to prevent this not being not enough? minHeight can cause jumping on mouseover
+      height: "140px",
     };
   }
 
@@ -177,7 +333,7 @@ export class ErrorComponent {
     else return "#F8E7CB";
   }
 
-  sendErrorToSentry(error?: any) {
+  sendErrorToSentry() {
     Sentry.captureException(
       new Error(
         `Error word: ${this.error?.word} not found in paragraph: ${this.error?.details?.context}`

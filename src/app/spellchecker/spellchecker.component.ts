@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild, HostListener } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
 import { ISpellingError } from "../data/data-structures";
-import { IAlternatives, IAlert, IAuthResponse, ICheckResponse } from "../data/types";
+import { IAlternative, IAlert, IAuthResponse, ICheckResponse, IRephrasingResult } from "../data/types";
 import { AuthService } from '../services/auth.service';
 import { environment } from '../../environments/environment';
 import { useAnalytics } from '../analytics/analytics';
@@ -10,6 +10,7 @@ import * as Sentry from '@sentry/browser';
 import { ErrorUtils } from '../utils/error.utils';
 import { KEYBOARD_SHORTCUTS_CONFIG } from '../keyboard-shortcuts.config';
 import { getLanguageModule } from '../utils/language.utils';
+import { SentenceSplitterSyntax, split, TxtSentenceNode } from 'sentence-splitter';
 
 const analytics = useAnalytics();
 
@@ -55,7 +56,6 @@ export class SpellcheckerComponent implements OnInit {
   checkEndpointResponse: ICheckResponse | null = null;
 
   @ViewChild('errorDialog') errorDialog?: TemplateRef<any>;
-
 
   errorIntro = "";
   errorMessage = "";
@@ -116,13 +116,7 @@ export class SpellcheckerComponent implements OnInit {
       let currentParagraphTexts: Map<string, string> = new Map<string, string>();
       let paragraphs = context.document.body.paragraphs;
 
-      paragraphs.load('items');
-      await context.sync();
-
-      for (const paragraph of paragraphs.items) {
-        paragraph.load("text");
-        paragraph.load("uniqueLocalId");
-      }
+      paragraphs.load({ select: 'items', expand: 'text,uniqueLocalId' });
       await context.sync();
 
       for (const paragraph of paragraphs.items) {
@@ -168,10 +162,10 @@ export class SpellcheckerComponent implements OnInit {
       try {
         let paragraphs: Map<string, Word.Paragraph> = new Map<string, Word.Paragraph>();
 
-        for (const uniqueLocalIds of event.uniqueLocalIds) {
-          let paragraph: Word.Paragraph = context.document.getParagraphByUniqueLocalId(uniqueLocalIds);
+        for (const uniqueLocalId of event.uniqueLocalIds) {
+          let paragraph: Word.Paragraph = context.document.getParagraphByUniqueLocalId(uniqueLocalId);
           paragraph.load("text")
-          paragraphs.set(uniqueLocalIds, paragraph);
+          paragraphs.set(uniqueLocalId, paragraph);
         }
 
         await context.sync();
@@ -274,7 +268,6 @@ export class SpellcheckerComponent implements OnInit {
 
   register() {
     this.authService.makeAuthRequest().then((response) => {
-      console.log(response);
       if (response === "trial-expired") {
         this.trialExpired = true;
         return;
@@ -317,8 +310,10 @@ export class SpellcheckerComponent implements OnInit {
       this.authResponse = response;
       this.isLoggedInWord = true;
       this.isLoggedin = true;
+
       localStorage.setItem('is_logged_in', 'true');
       localStorage.setItem('organization_name', response.organization_name);
+      localStorage.setItem('llm_alternatives', response.organization_config?.llm_alternatives?.value);
       localStorage.setItem('organization_config_hash', response.organization_config_hash);
       localStorage.setItem('config_hash', response.config_hash);
       localStorage.setItem('user_id', response?.id);
@@ -392,13 +387,7 @@ export class SpellcheckerComponent implements OnInit {
           chunks = selectedText.split(/\r/);
         }
 
-        paragraphs.load('items');
-        await context.sync();
-
-        for (const paragraph of paragraphs.items) {
-          paragraph.load("text");
-          paragraph.load("uniqueLocalId");
-        }
+        paragraphs.load({ select: 'items', expand: 'text,uniqueLocalId' });
         await context.sync();
 
         if (selectedText.length === 0) {
@@ -413,7 +402,7 @@ export class SpellcheckerComponent implements OnInit {
           if (i == 0) {
             text = chunks[0];
           } else if (i == paragraphs.items.length - 1) {
-            text = chunks[chunks.length - 1];
+            text = chunks[paragraphs.items.length - 1];
           } else {
             text = paragraphs.items[i].text;
           }
@@ -545,7 +534,7 @@ export class SpellcheckerComponent implements OnInit {
             userId: this.authResponse?.id,
             plan: this.authResponse?.plan,
             data: {
-              language: this.checkEndpointResponse?.language || 'en',
+              language: this.checkEndpointResponse?.language ?? 'en',
               category: result.category,
               subcategory: result.subcategory,
               context: result.context,
@@ -569,6 +558,8 @@ export class SpellcheckerComponent implements OnInit {
             if (highlights === undefined) {
               highlights = [];
             }
+
+            highlight.language = this.checkEndpointResponse?.language ?? 'en'
 
             const error = {
               errorUniqueId: crypto.randomUUID(),
@@ -629,7 +620,8 @@ export class SpellcheckerComponent implements OnInit {
 
         // Search for all instances of the error word within the paragraph range.
         const searchResults = paragraph.search(error.word, { matchCase: true });
-        context.load(searchResults, 'text');
+        context.load(searchResults, 'items');
+
         await context.sync();
 
         // Prepare to find the actual range to highlight by calculating offsets.
@@ -692,7 +684,89 @@ export class SpellcheckerComponent implements OnInit {
     return null;
   }
 
-  async acceptSuggestion(obj: { paragraphUniqueId: string, errorUniqueId: string, suggestion: IAlternatives }) {
+  isLLMAlternativesActive(error: ISpellingError) {
+    if (error.details.language !== "fr"
+      || localStorage.getItem('llm_alternatives') !== "true"
+    ) {
+      console.log('llm disabled', error.details.language)
+      return false;
+    }
+
+    return true;
+  }
+
+  getSentence(error: ISpellingError) {
+    const paragraphText = this.paragraphsByUniqueId.get(error.paragraphUniqueId);
+    if (paragraphText !== undefined) {
+      const sentences = split(paragraphText).filter(s => s.type === SentenceSplitterSyntax.Sentence);
+
+      for (let sentence of sentences) {
+        if (error.offset >= sentence.range[0] && error.offset <= sentence.range[1]) {
+          return sentence;
+        }
+      }
+    }
+
+    console.log("Unable to find sentence for:", error);
+    return null;
+  }
+
+  simpleReplacement(sentence: TxtSentenceNode, error: ISpellingError, replacement: string) {
+    const offset = error.details.start - sentence.range[0];
+    return sentence.raw.substring(0, offset) + replacement + sentence.raw.substring(offset + error.word.length);
+}
+
+  async fetchRephrasings(error: ISpellingError, sentence: TxtSentenceNode) {
+    if (error.rephrasings?.sentence === sentence.raw) {
+      return error.rephrasings;
+    }
+
+    if (error.details.alternatives.length == 0) {
+      return {
+        sentence: sentence.raw,
+        results: new Map(),
+      } as IRephrasingResult;
+    }
+
+    if (!this.isLLMAlternativesActive(error)) {
+      let results = new Map();
+      for (const alternative of error.details.alternatives) {
+        if (alternative.remove) {
+          continue;
+        }
+        const offset = error.details.start - sentence.range[0];
+        results.set(
+          alternative.text,
+          sentence.raw.substring(0, offset) + alternative.text + sentence.raw.substring(offset + error.word.length)
+        );
+      }
+
+      if (error.details.alternatives.length) {
+        return {
+          sentence: sentence.raw,
+          results: results,
+        } as IRephrasingResult;
+      }
+    }
+
+    let accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
+    if (!accessTokenWithTimestamp) {
+      throw new Error('Valid access token not available');
+    }
+
+    const apiResponse = await this.spellcheckerService.getLLMSuggestion(
+      error,
+      sentence,
+      accessTokenWithTimestamp.token
+    );
+
+    return {
+      sentence: apiResponse.sentence,
+      results: new Map(Object.entries(apiResponse.results)),
+    } as IRephrasingResult;
+  }
+
+  async acceptSuggestion(obj: { paragraphUniqueId: string, errorUniqueId: string, suggestion: IAlternative }) {
     await Word.run(async (context) => {
       try {
         // Get the paragraph text and the error object using their respective indices.
@@ -701,16 +775,33 @@ export class SpellcheckerComponent implements OnInit {
         const error = this.getError(obj.paragraphUniqueId, obj.errorUniqueId);
 
         let words: Map<string, number> = new Map<string, number>();
+        let rephrasing: string | undefined;
         if (obj.suggestion.remove) {
-          words.set(' ' + error.word, 1);
-          words.set(error.word + ' ', 0);
-        }
+          words.set(' ' + error.word, error.offset - 1);
+          words.set(error.word + ' ', error.offset);
+          words.set(error.word, error.offset);
 
-        words.set(error.word, 0);
+          rephrasing = "";
+        } else {
+          const sentence = this.getSentence(error);
+          if (sentence === null) {
+            return;
+          }
+
+          const rephrasings = await this.fetchRephrasings(error, sentence);
+          rephrasing = rephrasings?.results.get(obj.suggestion.text);
+          if (rephrasing === undefined) {
+            console.log("rephrasing not found", obj.suggestion.text, [...rephrasings.results.entries()])
+            words.set(error.word, error.offset);
+            rephrasing = obj.suggestion.text
+          } else {
+            words.set(sentence.raw, sentence.range[0]);
+          }
+        }
 
         let errorRange: Word.Range | null = null;
         for (let [word, offset] of words) {
-          errorRange = await this.searchItem(context, paragraph, word, error.offset - offset)
+          errorRange = await this.searchItem(context, paragraph, word, offset)
           if (errorRange) {
             break;
           }
@@ -723,7 +814,7 @@ export class SpellcheckerComponent implements OnInit {
 
         errorRange.load('text');
         await context.sync();
-        errorRange.insertText(obj.suggestion.text, "Replace"); // Directly replace within the found range
+        errorRange.insertText(rephrasing, "Replace"); // Directly replace within the found range
         await context.sync();
 
         this.ignoredHighlights.push(error.errorUniqueId);

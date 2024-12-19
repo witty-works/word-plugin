@@ -1,11 +1,12 @@
 import { Injectable } from "@angular/core";
 import { ErrorUtils } from '../utils/error.utils';
-import { HttpClient } from "@angular/common/http";
-import { IAlternatives, ICheckResponse } from "../data/types";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { IAlternative, ICheckResponse } from "../data/types";
 import { ISpellingError } from "../data/data-structures";
 import { environment } from '../../environments/environment';
 import * as Sentry from '@sentry/browser';
 import { getLanguageModule } from "../utils/language.utils";
+import { TxtSentenceNode } from "sentence-splitter";
 
 @Injectable({
   providedIn: "root",
@@ -21,7 +22,7 @@ export class CheckingService {
   }
 
   async checkText(
-    sentence: string,
+    chunk: string,
     accessToken: string
   ): Promise<ICheckResponse> {
 
@@ -29,7 +30,7 @@ export class CheckingService {
       const url = environment.api + "v2.4/check";
 
       const body = {
-        text: sentence,
+        text: chunk,
         lang: "auto",
         client: "word-plugin:" + environment.package_version,
         config: {
@@ -63,7 +64,37 @@ export class CheckingService {
     }
   }
 
-  getSuggestions(word: ISpellingError): Promise<IAlternatives[]> {
+  getSuggestions(word: ISpellingError): Promise<IAlternative[]> {
     return Promise.resolve(word.details.alternatives);
+  }
+
+  async getLLMSuggestion(error: ISpellingError, sentence: TxtSentenceNode, accessToken: string): Promise<any> {
+    const url = environment.api + "v1.0/rephrase";
+    const httpOptions = {
+      headers: new HttpHeaders({
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`,
+      }),
+    };
+
+    // Send a background API call with the new API input
+    const apiInput = {
+      sentence: sentence.raw,
+      text: error.word,
+      start: error.details.start - sentence.range[0],
+      alternatives: error.details.alternatives.filter(function (alt) { return !alt.remove; }),
+      lang: error.details.language || "en"
+    };
+
+    try {
+      const response = await this.http
+        .post<any>(url, apiInput, httpOptions)
+        .toPromise();
+
+      return response;
+    } catch (error: any) {
+      Sentry.captureException(new Error(`Error in getLLMSuggestion: ${error}`));
+      throw error;
+    }
   }
 }
