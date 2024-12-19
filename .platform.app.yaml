@@ -11,8 +11,8 @@ hooks:
             export CURRENT_VERSION=`grep -oPm1 "(?<=<Version>)[^<]+" src/manifest-prod.xml`
             echo $CURRENT_VERSION
 
-            ./node_modules/.bin/sentry-cli sourcemaps inject --org witty-works --project word-plugin dist/word-plugin
-            ./node_modules/.bin/sentry-cli sourcemaps upload --org witty-works --project word-plugin dist/word-plugin --release $CURRENT_VERSION
+            ./node_modules/.bin/sentry-cli sourcemaps inject --org witty-works-ag --project word-plugin dist/word-plugin
+            ./node_modules/.bin/sentry-cli sourcemaps upload --org witty-works-ag --project word-plugin dist/word-plugin --release $CURRENT_VERSION
         fi
 
         rm src/manifest.xml
