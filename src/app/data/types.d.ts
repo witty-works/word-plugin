@@ -1,3 +1,9 @@
+export interface DiffChange {
+  added: boolean,
+  removed: boolean,
+  value: string
+}
+
 //API REQUEST/RESPONSE
 export interface IRequest {
   url: string;
@@ -79,6 +85,11 @@ export interface ICheckResponseResult {
   language: string;
   limit_reached: boolean;
   source: ISource;
+}
+
+export interface IRephrasingResult {
+  sentence: string,
+  results: Map<string, string>,
 }
 
 //AUTH ENDPOINT
@@ -170,6 +181,9 @@ export interface IAlternative {
   text: string;
   remove: boolean;
   inspiration: boolean;
+  collective_noun?: ConstrainBooleanParameters;
+  male_form?: string;
+  female_form?: string;
   context: string;
   hovered?: boolean;
   url: string;
