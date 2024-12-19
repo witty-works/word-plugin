@@ -138,8 +138,8 @@ export class ErrorComponent {
           diffElements[0].value.length
         );
 
-        value = value.slice(value.indexOf(' '));
         if (value != diffElements[0].value) {
+          value = value.slice(value.indexOf(' '));
           value = '...' + value
         }
 
@@ -149,8 +149,8 @@ export class ErrorComponent {
       stringLengthDiff -= value.length
       if (end < diffElements.length - 1 && stringLengthDiff) {
         let value = diffElements[diffElements.length - 1].value.substring(0, Math.min(minDiffLength, stringLengthDiff));
-        value = value.substring(0, value.lastIndexOf(' '));
         if (value != diffElements[diffElements.length - 1].value) {
+          value = value.substring(0, value.lastIndexOf(' '));
           value = value + '...'
         }
 
