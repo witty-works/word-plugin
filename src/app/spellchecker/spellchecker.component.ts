@@ -689,7 +689,6 @@ export class SpellcheckerComponent implements OnInit {
     if (error.details.language !== "fr"
       || localStorage.getItem('llm_alternatives') !== "true"
     ) {
-      console.log('llm disabled', error.details.language)
       return false;
     }
 
