@@ -82,6 +82,7 @@ export class CheckingService {
       sentence: sentence.raw,
       text: error.word,
       start: error.details.start - sentence.range[0],
+      gender_separator: error.gender_separator,
       alternatives: error.details.alternatives.filter(function (alt) { return !alt.remove; }),
       lang: error.details.language || "en"
     };
