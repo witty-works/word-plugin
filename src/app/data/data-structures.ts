@@ -6,6 +6,7 @@ export interface ISpellingError {
     offset: number;
     length: number;
     word: string;
+    gender_separator: string;
     details: ICheckResponseResult;
     rephrasings?: IRephrasingResult;
 }

@@ -44,6 +44,7 @@ export interface ICheckResponse {
   limit_reached: boolean;
   config_changed: boolean;
   notifications: number;
+  gender_separator: string;
 }
 
 export interface ICheckResultLogItems {

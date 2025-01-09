@@ -567,6 +567,7 @@ export class SpellcheckerComponent implements OnInit {
               offset: highlight.start + paragraphOffset,
               length: highlight.end - highlight.start,
               word: highlight.text,
+              gender_separator: newHighlights.gender_separator,
               details: highlight
             } as ISpellingError;
 
@@ -688,7 +689,6 @@ export class SpellcheckerComponent implements OnInit {
     if (error.details.language !== "fr"
       || localStorage.getItem('llm_alternatives') !== "true"
     ) {
-      console.log('llm disabled', error.details.language)
       return false;
     }
 
@@ -714,7 +714,7 @@ export class SpellcheckerComponent implements OnInit {
   simpleReplacement(sentence: TxtSentenceNode, error: ISpellingError, replacement: string) {
     const offset = error.details.start - sentence.range[0];
     return sentence.raw.substring(0, offset) + replacement + sentence.raw.substring(offset + error.word.length);
-}
+  }
 
   async fetchRephrasings(error: ISpellingError, sentence: TxtSentenceNode) {
     if (error.rephrasings?.sentence === sentence.raw) {
