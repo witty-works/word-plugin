@@ -685,16 +685,6 @@ export class SpellcheckerComponent implements OnInit {
     return null;
   }
 
-  isLLMAlternativesActive(error: ISpellingError) {
-    if (error.details.language !== "fr"
-      || localStorage.getItem('llm_alternatives') !== "true"
-    ) {
-      return false;
-    }
-
-    return true;
-  }
-
   getSentence(error: ISpellingError) {
     const paragraphText = this.paragraphsByUniqueId.get(error.paragraphUniqueId);
     if (paragraphText !== undefined) {
@@ -728,7 +718,7 @@ export class SpellcheckerComponent implements OnInit {
       } as IRephrasingResult;
     }
 
-    if (!this.isLLMAlternativesActive(error)) {
+    if (localStorage.getItem('llm_alternatives') !== "true") {
       let results = new Map();
       for (const alternative of error.details.alternatives) {
         if (alternative.remove) {
@@ -741,12 +731,10 @@ export class SpellcheckerComponent implements OnInit {
         );
       }
 
-      if (error.details.alternatives.length) {
-        return {
-          sentence: sentence.raw,
-          results: results,
-        } as IRephrasingResult;
-      }
+      return {
+        sentence: sentence.raw,
+        results: results,
+      } as IRephrasingResult;
     }
 
     let accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
