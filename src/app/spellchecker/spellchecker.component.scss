@@ -1,4 +1,4 @@
-@import '../styles/variables';
+@use '../styles/variables' as *;
 
 .number-spelling-errors {
   margin-top: 1em;
@@ -32,8 +32,6 @@
   border-radius: 8px;
   color: $white;
 }
-
-@import '../styles/variables';
 
 :host {
   display: flex;

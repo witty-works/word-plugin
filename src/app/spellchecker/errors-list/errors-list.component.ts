@@ -5,9 +5,10 @@ import { Subscription } from "rxjs";
 import { IAlternative } from "../../data/types";
 
 @Component({
-  selector: 'app-errors-list',
-  templateUrl: './errors-list.component.html',
-  styleUrls: ['./errors-list.component.scss']
+    selector: 'app-errors-list',
+    templateUrl: './errors-list.component.html',
+    styleUrls: ['./errors-list.component.scss'],
+    standalone: false
 })
 export class ErrorsListComponent implements OnInit, OnDestroy {
 
