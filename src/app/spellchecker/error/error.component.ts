@@ -11,14 +11,16 @@ import * as Sentry from "@sentry/browser";
 import { KEYBOARD_SHORTCUTS_CONFIG } from "src/app/keyboard-shortcuts.config";
 import { getLanguageModule } from '../../utils/language.utils';
 import { TxtSentenceNode } from 'sentence-splitter';
+import { diffWords } from 'diff';
 
 const analytics = useAnalytics();
 
 @Component({
-  selector: "app-error",
-  templateUrl: "./error.component.html",
-  styleUrls: ["./error.component.scss"],
-  encapsulation: ViewEncapsulation.None,
+    selector: "app-error",
+    templateUrl: "./error.component.html",
+    styleUrls: ["./error.component.scss"],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class ErrorComponent {
   @Input()
@@ -65,8 +67,6 @@ export class ErrorComponent {
 
   lang: any;
 
-  diff = require('diff');
-
   rephrasing: string | null = null;
 
   suggestion: IAlternative | null = null;
@@ -94,7 +94,7 @@ export class ErrorComponent {
       intlSegmenter: new (Intl as any).Segmenter(language, { granularity: 'word' })
     }
 
-    let diffElements: DiffChange[] = this.diff.diffWords(
+    let diffElements: DiffChange[] = diffWords(
       originalSentence,
       newSentence,
       options

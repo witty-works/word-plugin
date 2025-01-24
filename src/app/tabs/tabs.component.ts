@@ -3,9 +3,10 @@ import { TabType } from "../data/tabs";
 import { getLanguageModule } from '../utils/language.utils';
 
 @Component({
-  selector: 'app-tabs',
-  templateUrl: './tabs.component.html',
-  styleUrls: ['./tabs.component.scss']
+    selector: 'app-tabs',
+    templateUrl: './tabs.component.html',
+    styleUrls: ['./tabs.component.scss'],
+    standalone: false
 })
 export class TabsComponent implements OnInit {
   lang: any;

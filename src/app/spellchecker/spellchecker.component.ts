@@ -16,9 +16,10 @@ const analytics = useAnalytics();
 
 /* global Word */
 @Component({
-  selector: 'app-spellchecker',
-  templateUrl: './spellchecker.component.html',
-  styleUrls: ['./spellchecker.component.scss']
+    selector: 'app-spellchecker',
+    templateUrl: './spellchecker.component.html',
+    styleUrls: ['./spellchecker.component.scss'],
+    standalone: false
 })
 export class SpellcheckerComponent implements OnInit {
   lang: any;
