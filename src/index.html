@@ -12,7 +12,21 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
   <!-- Office JavaScript API -->
+  <script type="text/javascript">
+    // Cache the history method values.
+    window._historyCache = {
+      replaceState: window.history.replaceState,
+      pushState: window.history.pushState
+    };
+  </script>
+
   <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+
+  <script type="text/javascript">
+    // Restore the history method values after loading Office.js
+    window.history.replaceState = window._historyCache.replaceState;
+    window.history.pushState = window._historyCache.pushState;
+  </script>
 
   <!-- For more information on Office UI Fabric, visit https://developer.microsoft.com/fabric. -->
   <link rel="stylesheet"
