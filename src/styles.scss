@@ -1,4 +1,6 @@
-@import '../src/app/styles/variables';
+@use '../src/app/styles/variables' as *;
+@use "scss/dropdown" as *;
+@use "scss/checkbox.scss" as *;
 
 * {
   margin: 0;
@@ -15,9 +17,6 @@ body {
   font-family: "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
   user-select: none;
 }
-
-@import "scss/dropdown";
-@import "scss/checkbox.scss";
 
 button {
   position: relative;

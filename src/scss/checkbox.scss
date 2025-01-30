@@ -1,5 +1,4 @@
-@import '../app/styles/variables';
-
+@use '../app/styles/variables' as *;
 
 .check-box {
   //transform: scale(2);
