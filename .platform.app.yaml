@@ -26,7 +26,7 @@ web:
     locations:
         # This tells Nginx to serve from the base directory
         "/":
-            root: "dist/word-plugin"
+            root: "dist/word-plugin/browser"
             index:
                 - "index.html"
             passthru: "/index.html"
