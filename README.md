@@ -1,7 +1,16 @@
 # Witty Word Plugin
 
-This project was generated with
-[Angular CLI](https://github.com/angular/angular-cli) version 11.2.2.
+This code is for now just released as is without a functional backend to make it work practically similar to the [browser extension](https://github.com/witty-works/browser-extension) we have already made public.
+
+The main intention of releasing it in its current form is to allow developers who are looking to build similar add-in to look at how we dealt with the challenges of:
+
+* triggering checks on text inside Microsoft Word
+* allowing interaction with the results along with receive context information
+* replacing content through proposed alternatives.
+
+Our ideal hope would be the creation of an open source package that will make this type of use case a "solved problem" across all browsers by pooling resources to maintain reliable algorithms for dealing with all websites out there, or at least a sizeable subset.
+
+We hope to in the near future also release other bits including the API backend and rule editor and user dashboard that were created at https://witty.works that formed our solution for "operationalizing" inclusive langiage and consistent language within organisations. Please contact lukas.smith@witty.works if you want to support these effort in anyway, including any offers for hosting.
 
 ## Initial Local Setup
 
