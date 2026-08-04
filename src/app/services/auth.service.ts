@@ -49,7 +49,7 @@ export class AuthService {
         return null;
       }
 
-      let result = await this.fetchNewAccessToken();
+      const result = await this.fetchNewAccessToken();
       if (result) {
         accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp(false)
       }
@@ -61,7 +61,7 @@ export class AuthService {
   }
 
   async makeAuthRequest(stopTrying: boolean = false): Promise<any> { 
-    let accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp()
+    const accessTokenWithTimestamp = await this.getAccessTokenWithTimestamp()
 
     try {
       if (!accessTokenWithTimestamp?.token) {

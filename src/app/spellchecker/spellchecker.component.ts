@@ -81,7 +81,7 @@ export class SpellcheckerComponent implements OnInit {
 
   get highlightsList() {
     let highlightList: ISpellingError[] = [];
-    for (let key of this.highlights.keys()) {
+    for (const key of this.highlights.keys()) {
       let highlights = this.highlights.get(key);
       if (Array.isArray(highlights)) {
         highlights = highlights.filter((highlight) => (
@@ -114,8 +114,8 @@ export class SpellcheckerComponent implements OnInit {
 
   async paragraphDeleted(event: Word.ParagraphChangedEventArgs) {
     await Word.run(async (context) => {
-      let currentParagraphTexts: Map<string, string> = new Map<string, string>();
-      let paragraphs = context.document.body.paragraphs;
+      const currentParagraphTexts: Map<string, string> = new Map<string, string>();
+      const paragraphs = context.document.body.paragraphs;
 
       paragraphs.load({ select: 'items', expand: 'text,uniqueLocalId' });
       await context.sync();
@@ -124,24 +124,24 @@ export class SpellcheckerComponent implements OnInit {
         currentParagraphTexts.set(paragraph.uniqueLocalId, paragraph.text);
       }
 
-      let paragraphArrays = Array.from(this.paragraphsByUniqueId.keys());
+      const paragraphArrays = Array.from(this.paragraphsByUniqueId.keys());
       for (const paragraphUniqueId of event.uniqueLocalIds) {
-        let paragraphIndex = paragraphArrays.indexOf(paragraphUniqueId);
+        const paragraphIndex = paragraphArrays.indexOf(paragraphUniqueId);
         if (paragraphIndex < paragraphArrays.length) {
-          let paragraphText = this.paragraphsByUniqueId.get(paragraphUniqueId);
-          let nextParagraphUniqueId = paragraphArrays[paragraphIndex + 1];
-          let nextParagraphText = currentParagraphTexts.get(nextParagraphUniqueId);
+          const paragraphText = this.paragraphsByUniqueId.get(paragraphUniqueId);
+          const nextParagraphUniqueId = paragraphArrays[paragraphIndex + 1];
+          const nextParagraphText = currentParagraphTexts.get(nextParagraphUniqueId);
 
           // deleting an empty paragraph can lead to updating the empty paragraph to the content of the previous paragraph (triggers an update before the delete)
           // and deleting the previous paragraph so we need to update the highlights to point to the correct paragraph
           if (nextParagraphText !== undefined && nextParagraphText === paragraphText) {
-            let highlights = this.highlights.get(paragraphUniqueId);
+            const highlights = this.highlights.get(paragraphUniqueId);
             if (highlights !== undefined) {
               for (const highlight of highlights) {
                 highlight.paragraphUniqueId = nextParagraphUniqueId;
               }
 
-              let nextHighlights = this.highlights.get(nextParagraphUniqueId);
+              const nextHighlights = this.highlights.get(nextParagraphUniqueId);
               if (nextHighlights !== undefined) {
                 for (const highlight of nextHighlights) {
                   highlights.push(highlight);
@@ -161,10 +161,10 @@ export class SpellcheckerComponent implements OnInit {
   async paragraphChanged(event: Word.ParagraphChangedEventArgs) {
     return Word.run(async (context) => {
       try {
-        let paragraphs: Map<string, Word.Paragraph> = new Map<string, Word.Paragraph>();
+        const paragraphs: Map<string, Word.Paragraph> = new Map<string, Word.Paragraph>();
 
         for (const uniqueLocalId of event.uniqueLocalIds) {
-          let paragraph: Word.Paragraph = context.document.getParagraphByUniqueLocalId(uniqueLocalId);
+          const paragraph: Word.Paragraph = context.document.getParagraphByUniqueLocalId(uniqueLocalId);
           paragraph.load("text")
           paragraphs.set(uniqueLocalId, paragraph);
         }
@@ -193,20 +193,20 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   updateParagraphHighlights(paragraphUniqueId: string) {
-    let paragraphText = this.paragraphsByUniqueId.get(paragraphUniqueId);
+    const paragraphText = this.paragraphsByUniqueId.get(paragraphUniqueId);
     if (paragraphText === undefined) {
       this.highlights.delete(paragraphUniqueId);
       this.paragraphsByUniqueId.delete(paragraphUniqueId);
       return;
     }
 
-    let highlights = this.highlights.get(paragraphUniqueId);
+    const highlights = this.highlights.get(paragraphUniqueId);
     if (highlights === undefined || highlights.length == 0) {
       return;
     }
 
-    let highlightsFound: string[] = [];
-    let highlightsPositionFound = new Map();
+    const highlightsFound: string[] = [];
+    const highlightsPositionFound = new Map();
 
     for (const highlight of highlights) {
       // Start from last position where this specific word was found
@@ -221,7 +221,7 @@ export class SpellcheckerComponent implements OnInit {
           break;
         }
 
-        let end = position + highlight.word.length
+        const end = position + highlight.word.length
 
         // check if there is a word end character before
         if (highlight.details.subcategory.indexOf('gendered_denominations_ending') === -1 && position > 0 && !this.isWordEnd(paragraphText[position - 1])) {
@@ -376,8 +376,8 @@ export class SpellcheckerComponent implements OnInit {
         selectedText = asyncResult.value as string;
 
         let selection = context.document.getSelection()
-        let selectedParagraphs = new Map();
-        let paragraphsByUniqueId = new Map();
+        const selectedParagraphs = new Map();
+        const paragraphsByUniqueId = new Map();
         let chunks: string[] = [];
         let paragraphs;
 
@@ -488,14 +488,14 @@ export class SpellcheckerComponent implements OnInit {
     ErrorUtils.updateErrorMessages(this.lang);
 
     try {
-      let accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
+      const accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
       if (!accessTokenWithTimestamp) {
         throw new Error('Valid access token not available');
       }
 
       let firstParagraph = true;
-      for (let paragrapUniqueId of selectedParagraphs.keys()) {
-        let selectedParagraph = selectedParagraphs.get(paragrapUniqueId);
+      for (const paragrapUniqueId of selectedParagraphs.keys()) {
+        const selectedParagraph = selectedParagraphs.get(paragrapUniqueId);
         const paragraphText = this.paragraphsByUniqueId.get(paragrapUniqueId);
         // Skip empty or whitespace-only chunks  
         if (selectedParagraph === undefined || paragraphText == undefined || selectedParagraph.trim() === "") {
@@ -653,7 +653,7 @@ export class SpellcheckerComponent implements OnInit {
   }
 
   getError(paragraphUniqueId: string, errorUniqueId: string): ISpellingError {
-    let highlights = this.highlights.get(paragraphUniqueId);
+    const highlights = this.highlights.get(paragraphUniqueId);
     if (highlights === undefined) {
       throw new Error('Paragraph not found');
     }
@@ -691,7 +691,7 @@ export class SpellcheckerComponent implements OnInit {
     if (paragraphText !== undefined) {
       const sentences = split(paragraphText).filter(s => s.type === SentenceSplitterSyntax.Sentence);
 
-      for (let sentence of sentences) {
+      for (const sentence of sentences) {
         if (error.offset >= sentence.range[0] && error.offset <= sentence.range[1]) {
           return sentence;
         }
@@ -720,7 +720,7 @@ export class SpellcheckerComponent implements OnInit {
     }
 
     if (localStorage.getItem('llm_alternatives') !== "true") {
-      let results = new Map();
+      const results = new Map();
       for (const alternative of error.details.alternatives) {
         if (alternative.remove) {
           continue;
@@ -738,7 +738,7 @@ export class SpellcheckerComponent implements OnInit {
       } as IRephrasingResult;
     }
 
-    let accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
+    const accessTokenWithTimestamp = await this.authService.getAccessTokenWithTimestamp();
     if (!accessTokenWithTimestamp) {
       throw new Error('Valid access token not available');
     }
@@ -763,7 +763,7 @@ export class SpellcheckerComponent implements OnInit {
         context.load(paragraph, 'text');
         const error = this.getError(obj.paragraphUniqueId, obj.errorUniqueId);
 
-        let words: Map<string, number> = new Map<string, number>();
+        const words: Map<string, number> = new Map<string, number>();
         let rephrasing: string | undefined;
         if (obj.suggestion.remove) {
           words.set(' ' + error.word, error.offset - 1);
@@ -789,7 +789,7 @@ export class SpellcheckerComponent implements OnInit {
         }
 
         let errorRange: Word.Range | null = null;
-        for (let [word, offset] of words) {
+        for (const [word, offset] of words) {
           errorRange = await this.searchItem(context, paragraph, word, offset)
           if (errorRange) {
             break;
@@ -833,7 +833,7 @@ export class SpellcheckerComponent implements OnInit {
       if (this.errorDialog !== undefined) {
         this.dialogRef = this.dialogService.open(this.errorDialog!);
         this.dialogRef.afterClosed$.subscribe((result) => {
-          if (!!result) {
+          if (result) {
             this.checkText();
           }
         });

@@ -15,7 +15,7 @@ export class ErrorUtils {
     errorMessages.set("no-text-selected", "noTextSelected");
     errorMessages.set("warn-server-error", "serverError");
 
-    for (let [key, value] of errorMessages) {
+    for (const [key, value] of errorMessages) {
       const errorElement = document.getElementById(key);
       if (errorElement) {
         if (except === key) {

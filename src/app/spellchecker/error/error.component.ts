@@ -90,11 +90,11 @@ export class ErrorComponent {
   }
 
   private computeDiff(language: string, originalSentence: string, newSentence: string) {
-    let options = {
+    const options = {
       intlSegmenter: new (Intl as any).Segmenter(language, { granularity: 'word' })
     }
 
-    let diffElements: DiffChange[] = diffWords(
+    const diffElements: DiffChange[] = diffWords(
       originalSentence,
       newSentence,
       options
