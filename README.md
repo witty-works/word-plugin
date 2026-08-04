@@ -67,6 +67,10 @@ in your default browser and sideload the add-in. If this doesn't work on the
 first try, you may need to visit https://localhost:4200 first to let your
 browser know to trust the self-signed certificate that is being used.
 
+Run `npm run stop` to remove the sideloaded add-in again (`npm run stop:prod`
+for the production manifest). The `:prod` variants of `start:desktop` and
+`start:web` sideload `src/manifest-prod.xml` instead.
+
 ## Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can
@@ -75,13 +79,23 @@ also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 ## Build
 
 Run `npm run build:dev` to build the project. The build artifacts will be stored
-in the `dist/` directory. Use `npm run build` for a production build.
+in the `dist/` directory. Use `npm run build` for a production build, or
+`npm run build:test` to build against the test environment.
+
+Which `src/environments/environment*.ts` file is compiled in is decided by the
+build configuration, so the API and dashboard URLs follow from the command you
+run.
 
 ## Running unit tests
 
 Run `npm run test` to execute the unit tests via
 [Karma](https://karma-runner.github.io). Use `npm run test:coverage` to generate
-a coverage report in `/coverage`.
+a coverage report in `coverage/office-angular`.
+
+## Validating the manifest
+
+Run `npm run validate` to check `src/manifest.xml`, or `npm run validate:prod`
+for `src/manifest-prod.xml`.
 
 ## Linting
 

@@ -1,9 +1,9 @@
-import { enableProdMode, provideZoneChangeDetection } from "@angular/core";
-import { platformBrowserDynamic } from "@angular/platform-browser-dynamic";
 import * as Sentry from "@sentry/angular";
 import { environment } from './environments/environment';
-import { AppModule } from "./app/app.module";
-  
+
+// Imported for side effects from main.ts before the app is bootstrapped, so that
+// Sentry is capturing by the time Office.initialize fires. This module must not
+// bootstrap the app itself — main.ts owns that, once Office is ready.
 if (environment.sentry_dsn) {
   Sentry.init({
     environment: environment.environment,
@@ -16,10 +16,4 @@ if (environment.sentry_dsn) {
     tracesSampleRate: environment.sentry_traces_sample_rate,
     replaysSessionSampleRate: 0.0,
   });
-
-  enableProdMode();
-  platformBrowserDynamic()
-    .bootstrapModule(AppModule, { applicationProviders: [provideZoneChangeDetection()], })
-    .then((success) => console.log('Bootstrap success'))
-    .catch((err) => console.error(err));
 }
