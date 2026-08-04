@@ -1,4 +1,4 @@
-import { enableProdMode } from "@angular/core";
+import { enableProdMode, provideZoneChangeDetection } from "@angular/core";
 import { platformBrowserDynamic } from "@angular/platform-browser-dynamic";
 import * as Sentry from "@sentry/angular";
 import { environment } from './environments/environment';
@@ -19,7 +19,7 @@ if (environment.sentry_dsn) {
 
   enableProdMode();
   platformBrowserDynamic()
-    .bootstrapModule(AppModule)
+    .bootstrapModule(AppModule, { applicationProviders: [provideZoneChangeDetection()], })
     .then((success) => console.log('Bootstrap success'))
     .catch((err) => console.error(err));
 }

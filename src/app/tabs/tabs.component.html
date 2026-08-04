@@ -12,10 +12,14 @@
   </div>
 </div>
 
-<div role="tabpanel" *ngIf="selectedTab === 'spellchecker'">
-  <!-- Content for spellchecker tab -->
-</div>
+@if (selectedTab === 'spellchecker') {
+  <div role="tabpanel">
+    <!-- Content for spellchecker tab -->
+  </div>
+}
 
-<div role="tabpanel" *ngIf="selectedTab === 'settings'">
-  <!-- Content for settings tab -->
-</div>
+@if (selectedTab === 'settings') {
+  <div role="tabpanel">
+    <!-- Content for settings tab -->
+  </div>
+}

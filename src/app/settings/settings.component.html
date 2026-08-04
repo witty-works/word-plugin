@@ -1,53 +1,55 @@
 <div>
-    <nav [attr.aria-label]="lang.areaLabelHeader" class="witty-works-ext-header">
-        <a (click)="openWittyHomePage()" tabindex="0" aria-label="Open Witty Works homepage">
-            <img src="assets/icons/witty-logo.svg" alt="">
-        </a>
-        <a *ngIf="isLoggedIn" (click)="openDashboard()" title="{{ lang.settingsIconAlt }}" tabindex="0"
-            [attr.aria-label]="lang.settingsIconAlt">
-            <img src="assets/icons/settings.svg" alt="">
-        </a>
-    </nav>
+  <nav [attr.aria-label]="lang.areaLabelHeader" class="witty-works-ext-header">
+    <a (click)="openWittyHomePage()" tabindex="0" aria-label="Open Witty Works homepage">
+      <img src="assets/icons/witty-logo.svg" alt="">
+    </a>
+    @if (isLoggedIn) {
+      <a (click)="openDashboard()" title="{{ lang.settingsIconAlt }}" tabindex="0"
+        [attr.aria-label]="lang.settingsIconAlt">
+        <img src="assets/icons/settings.svg" alt="">
+      </a>
+    }
+  </nav>
 
-    <div class='witty-works-ext-separator'></div>
+  <div class='witty-works-ext-separator'></div>
 
-    <section
-        class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-space-between'>
-        <h1 class='witty-works-ext-lato-popup-title'>
-            {{lang.quickSettings}}
-        </h1>
-    </section>
+  <section
+    class='witty-works-ext-wittyworks-container witty-works-ext-container-row witty-works-ext-justify-space-between'>
+    <h1 class='witty-works-ext-lato-popup-title'>
+      {{lang.quickSettings}}
+    </h1>
+  </section>
 
-    <section class="toggle" aria-labelledby="toggle-description-3">
-        <div class="toggler">
-            <div class="check-box">
-                <input type="checkbox" id="toggle-checkbox-3" [ngModel]="showContext"
-                    (ngModelChange)="showContextChanged($event)">
-            </div>
-        </div>
-        <label for="toggle-checkbox-3" id="toggle-description-3" class="description">
-            {{lang.showContext}}
-        </label>
-    </section>
+  <section class="toggle" aria-labelledby="toggle-description-3">
+    <div class="toggler">
+      <div class="check-box">
+        <input type="checkbox" id="toggle-checkbox-3" [ngModel]="showContext"
+          (ngModelChange)="showContextChanged($event)">
+      </div>
+    </div>
+    <label for="toggle-checkbox-3" id="toggle-description-3" class="description">
+      {{lang.showContext}}
+    </label>
+  </section>
 
-    <section class='witty-works-ext-section'>
-        <p class='witty-works-ext-lato-popup-text'>
-            {{lang.signedInTo}} {{teamName}}
-        </p>
-    </section>
+  <section class='witty-works-ext-section'>
+    <p class='witty-works-ext-lato-popup-text'>
+      {{lang.signedInTo}} {{teamName}}
+    </p>
+  </section>
 
-    <section class='witty-works-ext-section'>
-        <div class='witty-works-ext-lato-popup-text'>
-            <div>Plan: {{plan}}</div>
-        </div>
-    </section>
+  <section class='witty-works-ext-section'>
+    <div class='witty-works-ext-lato-popup-text'>
+      <div>Plan: {{plan}}</div>
+    </div>
+  </section>
 </div>
 
 <footer class="witty-works-ext-lato-popup-text">
-    <div class="witty-works-ext-separator"></div>
-    <div class="witty-works-ext-wittyworks-container">
-        <p>{{lang.wittyVersion}} {{ appVersion }}</p>
-        <a class="witty-works-ext-link" (click)="openHelpCenter()" tabindex="0"
-            [attr.aria-label]="lang.help">{{lang.help}}</a>
-    </div>
+  <div class="witty-works-ext-separator"></div>
+  <div class="witty-works-ext-wittyworks-container">
+    <p>{{lang.wittyVersion}} {{ appVersion }}</p>
+    <a class="witty-works-ext-link" (click)="openHelpCenter()" tabindex="0"
+    [attr.aria-label]="lang.help">{{lang.help}}</a>
+  </div>
 </footer>

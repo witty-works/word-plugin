@@ -1,137 +1,161 @@
 <ng-container>
-  <div *ngIf="error && getContextErrorComponent(error) as contextValue">
-    <div class="error-box">
-      <header class="header" (click)="toggle()">
-        <div class="preview" *ngIf="showContext" [innerHTML]="contextValue | highlight : error"></div>
-        <div class="preview" *ngIf="!showContext">{{ error.word }}</div>
-        <button title="{{ error.word }}" class="toggle" id="toggle" [class.active]="isOpen"
-          [attr.aria-expanded]="isOpen ? 'true' : 'false'" [attr.aria-label]="error.word">
-          <img src="assets/icons/chevron-down.svg" alt="" />
-        </button>
-      </header>
-
-      <section class="suggestions" *ngIf="isOpen">
-        <div
-          class="witty-works-ext-wittyworks-container witty-works-ext-container-rounded witty-works-ext-full-padding witty-works-ext-justify-start"
-          [ngStyle]="containerStyle">
-          <div
-            class="witty-works-ext-lato-popover-text witty-works-ext-justify-space-between witty-works-ext-wittyworks-container">
-            <div class="witty-works-ext-container-row witty-works-ext-justify-start">
-              <div aria-hidden="true">
-                <ng-container *ngIf="error.details.explanation?.icon_image; else icon">
-                  <img class="witty-works-ext-explanation-icon-image" [src]="error.details.explanation.icon_image"
-                    alt="" />
-                </ng-container>
-                <ng-template #icon>
-                  <span class="witty-works-ext-explanation-icon">{{ error.details.explanation.icon }}</span>
-                </ng-template>
-              </div>
-              <div>
-                <h3>{{ error.details.label.split(":").pop() }}</h3>
-                <div *ngIf="rephrasing === null || suggestion === null">
-                  {{ error.details.explanation.text }}
-                  {{
-                  error.details.explanation.context
-                  ? " (" + error.details.explanation.context + ")"
-                  : ""
-                  }}
+  @if (error && getContextErrorComponent(error); as contextValue) {
+    <div>
+      <div class="error-box">
+        <header class="header" (click)="toggle()">
+          @if (showContext) {
+            <div class="preview" [innerHTML]="contextValue | highlight : error"></div>
+          }
+          @if (!showContext) {
+            <div class="preview">{{ error.word }}</div>
+          }
+          <button title="{{ error.word }}" class="toggle" id="toggle" [class.active]="isOpen"
+            [attr.aria-expanded]="isOpen ? 'true' : 'false'" [attr.aria-label]="error.word">
+            <img src="assets/icons/chevron-down.svg" alt="" />
+          </button>
+        </header>
+        @if (isOpen) {
+          <section class="suggestions">
+            <div
+              class="witty-works-ext-wittyworks-container witty-works-ext-container-rounded witty-works-ext-full-padding witty-works-ext-justify-start"
+              [ngStyle]="containerStyle">
+              <div
+                class="witty-works-ext-lato-popover-text witty-works-ext-justify-space-between witty-works-ext-wittyworks-container">
+                <div class="witty-works-ext-container-row witty-works-ext-justify-start">
+                  <div aria-hidden="true">
+                    @if (error.details.explanation?.icon_image) {
+                      <img class="witty-works-ext-explanation-icon-image" [src]="error.details.explanation.icon_image"
+                        alt="" />
+                    } @else {
+                      <span class="witty-works-ext-explanation-icon">{{ error.details.explanation.icon }}</span>
+                    }
+                  </div>
+                  <div>
+                    <h3>{{ error.details.label.split(":").pop() }}</h3>
+                    @if (rephrasing === null || suggestion === null) {
+                      <div>
+                        {{ error.details.explanation.text }}
+                        {{
+                        error.details.explanation.context
+                        ? " (" + error.details.explanation.context + ")"
+                        : ""
+                        }}
+                      </div>
+                    }
+                    @if (rephrasing !== null && suggestion !== null) {
+                      <div [innerHTML]="rephrasing" class="witty-works-ext-rephrasing">
+                      </div>
+                    }
+                  </div>
                 </div>
-                <div *ngIf="rephrasing !== null && suggestion !== null" [innerHTML]="rephrasing" class="witty-works-ext-rephrasing">
+                <div class="witty-works-ext-container-row">
+                  @if (rephrasing === null && error.details.explanation?.url) {
+                    <a href="{{error.details.explanation.url}}" target="_blank" rel="noopener noreferrer"
+                      class="witty-works-ext-container-row witty-works-ext-justify-end witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer"
+                      style="text-decoration: none;">
+                      <div
+                        class="witty-works-ext-secondary-button-red witty-works-ext-container-row witty-works-ext-margin-top">
+                        {{ lang.learnMore }}
+                        @if (error.details.explanation.content === 'video') {
+                          <img class="witty-works-ext-margin-left" src="assets/icons/video.svg"
+                            alt="{{lang.videoIconAlt}}" />
+                        }
+                        <div class="witty-works-ext-margin-left" style="pointer-events: 'none'">
+                          <img src="assets/icons/external-link.svg" alt="{{lang.openNewWindow}}" />
+                        </div>
+                      </div>
+                    </a>
+                  }
+                  @if (error.details.source?.text) {
+                    <a href="{{error.details.source.url}}" target="_blank" rel="noopener noreferrer"
+                      class="witty-works-ext-container-row witty-works-ext-justify-end witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer"
+                      style="text-decoration: none;">
+                      <div
+                        class="witty-works-ext-secondary-button-red witty-works-ext-container-row witty-works-ext-margin-top">
+                        {{ lang.visitSource }}
+                        <div class="witty-works-ext-margin-left" style="pointer-events: 'none'">
+                          <img src="assets/icons/external-link.svg" alt="{{lang.openNewWindow}}" />
+                        </div>
+                      </div>
+                    </a>
+                  }
                 </div>
               </div>
             </div>
-
-            <div class="witty-works-ext-container-row">
-              <ng-container *ngIf="rephrasing === null && error.details.explanation?.url">
-                <a href="{{error.details.explanation.url}}" target="_blank" rel="noopener noreferrer"
-                  class="witty-works-ext-container-row witty-works-ext-justify-end witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer"
-                  style="text-decoration: none;">
-
-                  <div
-                    class="witty-works-ext-secondary-button-red witty-works-ext-container-row witty-works-ext-margin-top">
-                    {{ lang.learnMore }}
-                    <ng-container *ngIf="error.details.explanation.content === 'video'">
-                      <img class="witty-works-ext-margin-left" src="assets/icons/video.svg"
-                        alt="{{lang.videoIconAlt}}" />
-                    </ng-container>
-                    <div class="witty-works-ext-margin-left" style="pointer-events: 'none'">
-                      <img src="assets/icons/external-link.svg" alt="{{lang.openNewWindow}}" />
-                    </div>
-                  </div>
-                </a>
-              </ng-container>
-              <ng-container *ngIf="error.details.source?.text">
-                <a href="{{error.details.source.url}}" target="_blank" rel="noopener noreferrer"
-                  class="witty-works-ext-container-row witty-works-ext-justify-end witty-works-ext-lato-popover-text-gray witty-works-ext-cursor-pointer"
-                  style="text-decoration: none;">
-                  <div
-                    class="witty-works-ext-secondary-button-red witty-works-ext-container-row witty-works-ext-margin-top">
-                    {{ lang.visitSource }}
-                    <div class="witty-works-ext-margin-left" style="pointer-events: 'none'">
-                      <img src="assets/icons/external-link.svg" alt="{{lang.openNewWindow}}" />
-                    </div>
-                  </div>
-                </a>
-              </ng-container>
-            </div>
-          </div>
-        </div>
-        <div class="suggestion-title witty-works-ext-margin-top" *ngIf="suggestions.length > 0">
-          {{ lang.tryInstead }}
-        </div>
-        <ng-container *ngFor="let suggestion of suggestions">
-          <div class="witty-works-ext-button-wrapper" [class.hovered]="suggestion.hovered">
-            <button (click)="acceptSuggestion(suggestion)" (mouseenter)="suggestionedHovered(suggestion, true)"
+            @if (suggestions.length > 0) {
+              <div class="suggestion-title witty-works-ext-margin-top">
+                {{ lang.tryInstead }}
+              </div>
+            }
+            @for (suggestion of suggestions; track suggestion) {
+              <div class="witty-works-ext-button-wrapper" [class.hovered]="suggestion.hovered">
+                <button (click)="acceptSuggestion(suggestion)" (mouseenter)="suggestionedHovered(suggestion, true)"
               (mouseleave)="suggestionedHovered(suggestion, false)" [ngStyle]="{
                 'text-decoration': suggestion.text ? 'none' : 'line-through'
               }">
-              {{ suggestion.text ? suggestion.hovered || suggestion.text.length <= 25 ? suggestion.text :
+                  {{ suggestion.text ? suggestion.hovered || suggestion.text.length <= 25 ? suggestion.text :
                 suggestion.text.substring(0, 25) + ".." : error.word }} </button>
-                <div *ngIf="suggestion.context || suggestion.url">
-                  <div *ngIf="suggestion.context">
-                    <a *ngIf="suggestion.url" [href]="suggestion.url" target="_blank" class="suggestion-link"
-                      rel="noopener noreferrer">
-                      <span *ngIf="suggestion.context.startsWith('💡')">
-                        <span>{{ suggestion.context | slice:0:3 }}</span>
-                        <u>{{ suggestion.context | slice:2 }}</u>
-                      </span>
-                      <span *ngIf="!suggestion.context.startsWith('💡')">
-                        <span>&nbsp;&nbsp;</span>
-                        <u>{{ suggestion.context }}</u>
-                      </span>
-                    </a>
-                    <span *ngIf="!suggestion.url">
-                      {{ suggestion.context }}
-                    </span>
+                @if (suggestion.context || suggestion.url) {
+                  <div>
+                    @if (suggestion.context) {
+                      <div>
+                        @if (suggestion.url) {
+                          <a [href]="suggestion.url" target="_blank" class="suggestion-link"
+                            rel="noopener noreferrer">
+                            @if (suggestion.context.startsWith('💡')) {
+                              <span>
+                                <span>{{ suggestion.context | slice:0:3 }}</span>
+                                <u>{{ suggestion.context | slice:2 }}</u>
+                              </span>
+                            }
+                            @if (!suggestion.context.startsWith('💡')) {
+                              <span>
+                                <span>&nbsp;&nbsp;</span>
+                                <u>{{ suggestion.context }}</u>
+                              </span>
+                            }
+                          </a>
+                        }
+                        @if (!suggestion.url) {
+                          <span>
+                            {{ suggestion.context }}
+                          </span>
+                        }
+                      </div>
+                    }
                   </div>
-                </div>
-          </div>
-        </ng-container>
-        <div class="witty-works-ext-button-group">
-          <button (click)="ignoreOnce()"
-            class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer witty-works-ext-cursor-pointer"
-            tabindex="0" [attr.aria-label]="lang.ignoreOnce" [attr.aria-keyshortcuts]="shortcuts.ignoreOnce.key"
-            title="{{ lang.ignoreOnce }} ({{shortcuts.ignoreOnce.key}})">
-            <img src="assets/icons/ignore.svg" alt="{{ lang.ignoreOnce }}" style="margin-bottom: -2px"
-              aria-hidden="true" />
-            <span class="witty-works-ext-lato-popover-text-gray witty-works-ext-ignore-text">
-              {{ lang.ignoreOnce }}
-            </span>
-          </button>
-          <button (click)="ignorePermanently(error.word)"
-            class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer witty-works-ext-cursor-pointer"
-            tabindex="0" [attr.aria-label]="lang.ignorePermanently"
-            [attr.aria-keyshortcuts]="shortcuts.ignorePermanently.key"
-            title="{{ lang.ignorePermanently }} ({{shortcuts.ignorePermanently.key}})">
-            <img src="assets/icons/ignore.svg" alt="{{lang.ignorePermanently}}" style="margin-bottom: -2px"
-              aria-hidden="true" />
-            <span class="witty-works-ext-lato-popover-text-gray witty-works-ext-ignore-text">
-              {{ lang.ignorePermanently }}
-            </span>
-          </button>
-        </div>
-      </section>
+                }
+              </div>
+            }
+            <div class="witty-works-ext-button-group">
+              <button (click)="ignoreOnce()"
+                class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer witty-works-ext-cursor-pointer"
+                tabindex="0" [attr.aria-label]="lang.ignoreOnce" [attr.aria-keyshortcuts]="shortcuts.ignoreOnce.key"
+                title="{{ lang.ignoreOnce }} ({{shortcuts.ignoreOnce.key}})">
+                <img src="assets/icons/ignore.svg" alt="{{ lang.ignoreOnce }}" style="margin-bottom: -2px"
+                  aria-hidden="true" />
+                <span class="witty-works-ext-lato-popover-text-gray witty-works-ext-ignore-text">
+                  {{ lang.ignoreOnce }}
+                </span>
+              </button>
+              <button (click)="ignorePermanently(error.word)"
+                class="witty-works-ext-margin-top witty-works-ext-ignore-color-transformer witty-works-ext-cursor-pointer"
+                tabindex="0" [attr.aria-label]="lang.ignorePermanently"
+                [attr.aria-keyshortcuts]="shortcuts.ignorePermanently.key"
+                title="{{ lang.ignorePermanently }} ({{shortcuts.ignorePermanently.key}})">
+                <img src="assets/icons/ignore.svg" alt="{{lang.ignorePermanently}}" style="margin-bottom: -2px"
+                  aria-hidden="true" />
+                <span class="witty-works-ext-lato-popover-text-gray witty-works-ext-ignore-text">
+                  {{ lang.ignorePermanently }}
+                </span>
+              </button>
+            </div>
+          </section>
+        }
+      </div>
     </div>
-  </div>
-  <div *ngIf="!error && sendErrorToSentry()"></div>
+  }
+  @if (!error && sendErrorToSentry()) {
+    <div></div>
+  }
 </ng-container>
