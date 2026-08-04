@@ -44,6 +44,8 @@ module.exports = [
       'no-irregular-whitespace': 'warn',
       'no-extra-boolean-cast': 'warn',
       'no-empty': 'warn',
+      // New in ESLint 10; flags pre-existing dead initializers.
+      'no-useless-assignment': 'warn',
     },
   },
   {

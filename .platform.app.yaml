@@ -1,6 +1,6 @@
 name: app
 
-type: nodejs:18
+type: nodejs:24
 
 hooks:
     build: |
