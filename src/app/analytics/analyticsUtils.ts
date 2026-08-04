@@ -1,6 +1,6 @@
 import PostHog from 'posthog-js-lite'
 import { IAlert } from '../data/types';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 
 export const DEV_ENV = window.location.hostname === 'localhost';
 

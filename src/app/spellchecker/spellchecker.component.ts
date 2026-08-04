@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild, HostListener } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { CheckingService } from "../services/checking.service";
 import { ISpellingError } from "../data/data-structures";
 import { IAlternative, IAlert, IAuthResponse, ICheckResponse, IRephrasingResult } from "../data/types";
@@ -19,6 +19,7 @@ const analytics = useAnalytics();
     selector: 'app-spellchecker',
     templateUrl: './spellchecker.component.html',
     styleUrls: ['./spellchecker.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SpellcheckerComponent implements OnInit {

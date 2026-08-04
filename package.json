@@ -27,14 +27,14 @@
     "dev-server-port": 4200
   },
   "dependencies": {
-    "@angular/animations": "^21.2.19",
-    "@angular/common": "^21.2.19",
-    "@angular/compiler": "^21.2.19",
-    "@angular/core": "^21.2.19",
-    "@angular/forms": "^21.2.19",
-    "@angular/platform-browser": "^21.2.19",
-    "@angular/platform-browser-dynamic": "^21.2.19",
-    "@angular/router": "^21.2.19",
+    "@angular/animations": "^22.1.0",
+    "@angular/common": "^22.1.0",
+    "@angular/compiler": "^22.1.0",
+    "@angular/core": "^22.1.0",
+    "@angular/forms": "^22.1.0",
+    "@angular/platform-browser": "^22.1.0",
+    "@angular/platform-browser-dynamic": "^22.1.0",
+    "@angular/router": "^22.1.0",
     "@iharbeck/ngx-virtual-scroller": "^17.0.2",
     "@ngneat/dialog": "^5.2.0",
     "@sentry/angular": "^10.69.0",
@@ -49,14 +49,14 @@
     "zone.js": "^0.15.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^21.2.19",
+    "@angular-devkit/build-angular": "^22.1.2",
     "@angular-eslint/builder": "^20.7.0",
     "@angular-eslint/eslint-plugin": "^20.7.0",
     "@angular-eslint/eslint-plugin-template": "^20.7.0",
     "@angular-eslint/schematics": "^20.7.0",
     "@angular-eslint/template-parser": "^20.7.0",
-    "@angular/cli": "^21.2.19",
-    "@angular/compiler-cli": "^21.2.19",
+    "@angular/cli": "^22.1.2",
+    "@angular/compiler-cli": "^22.1.0",
     "@eslint/js": "^9.39.5",
     "@types/diff": "^7.0.2",
     "@types/jasmine": "^5.1.4",
@@ -64,6 +64,7 @@
     "@types/office-js": "^1.0.560",
     "@types/office-runtime": "^1.0.35",
     "eslint": "^9.39.0",
+    "istanbul-lib-instrument": "^6.0.3",
     "jasmine-core": "^5.4.0",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
@@ -73,7 +74,7 @@
     "office-addin-debugging": "^5.1.6",
     "office-addin-dev-certs": "^1.13.5",
     "office-addin-manifest": "^1.13.6",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.66.0"
   }
 }
