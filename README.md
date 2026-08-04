@@ -1,14 +1,45 @@
 # Witty Word Plugin
 
-This code is for now just released as is without a functional backend to make it work practically similar to the [browser extension](https://github.com/witty-works/browser-extension) we have already made public.
+The Microsoft Word add-in from [Witty Works](https://witty.works), our solution
+for "operationalizing" inclusive and consistent language within organizations.
 
-The main intention of releasing it in its current form is to allow developers who are looking to build similar add-in to look at how we dealt with the challenges of:
+The add-in itself is a client. It sends text to the Witty API for review and
+renders the results, so it needs a backend to do anything useful. When this
+repository was first published that backend was not available — it now is, along
+with the rest of the stack.
+
+## The open source stack
+
+Every component we set out to release is now public:
+
+| Component | Repository | What it does |
+| --- | --- | --- |
+| Word add-in | this repository | Checks text inside Microsoft Word |
+| Browser extension | [browser-extension](https://github.com/witty-works/browser-extension) | The same review flow on the web |
+| API / rule engine | [nlp_api](https://github.com/witty-works/nlp_api) | spaCy based rule engine for inclusive language review |
+| Rule editor | [rule-editor](https://github.com/witty-works/rule-editor) | Manages the review rules via Django Admin |
+| Dashboard | [dashboard](https://github.com/witty-works/dashboard) | Administration UI, accounts and organizations |
+| Rule data prep | [nlp_jupyter_notebook](https://github.com/witty-works/nlp_jupyter_notebook) | Pre-processes CSV rule data for the API |
+| Release tooling | [make-release](https://github.com/witty-works/make-release) | Version bump, Sentry release and push, used by this repo |
+
+The hosted service these point at by default (`api.witty.works`,
+`dashboard.witty.works`) requires a Witty account. To run the stack yourself,
+deploy `nlp_api` and `dashboard` and change the `api` and `dashboard` URLs in
+`src/environments/`.
+
+Beyond running it, this code is also worth reading if you are building a similar
+add-in and want to see how we dealt with:
 
 * triggering checks on text inside Microsoft Word
-* allowing interaction with the results along with receive context information
+* allowing interaction with the results along with receiving context information
 * replacing content through proposed alternatives.
 
-We hope to in the near future also release other bits including the API backend and rule editor and user dashboard that were created at https://witty.works that formed our solution for "operationalizing" inclusive language and consistent language within organizations. Please contact lukas.smith@witty.works if you want to support these effort in anyway, including any offers for hosting.
+We would welcome help keeping this going — contributions, and in particular any
+offers for hosting. Please contact lukas.smith@witty.works.
+
+## Requirements
+
+Node.js 22.22.3+, 24.15.0+ or 26+ (see the `engines` field in `package.json`).
 
 ## Initial Local Setup
 
@@ -52,14 +83,14 @@ Run `npm run test` to execute the unit tests via
 [Karma](https://karma-runner.github.io). Use `npm run test:coverage` to generate
 a coverage report in `/coverage`.
 
-## Running end-to-end tests
+## Linting
 
-Run `npm run e2e` to execute the end-to-end tests via
-[Protractor](http://www.protractortest.org/).
+Run `npm run lint` to check the sources, or `npm run lint:fix` to apply the
+fixes ESLint can make automatically.
 
 ## Debugging
 
-This template supports debugging using any of the following techniques:
+This project supports debugging using any of the following techniques:
 
 - [Use a browser's developer tools](https://docs.microsoft.com/office/dev/add-ins/testing/debug-add-ins-in-office-online)
 - [Attach a debugger from the task pane](https://docs.microsoft.com/office/dev/add-ins/testing/attach-debugger-from-task-pane)
@@ -79,5 +110,6 @@ For more information, see the
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any
 additional questions or comments.
 
-To get more help on the Angular CLI use `ng help` or go check out the
-[Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+This add-in is built with Angular. To get more help on the Angular CLI use
+`ng help` or go check out the
+[Angular CLI Overview and Command Reference](https://angular.dev/cli) page.
