@@ -1,133 +1,150 @@
 <div>
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-        <button *ngIf="isLoggedin && !trialExpired" tabindex="0"
-            class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="checkText()"
-            [attr.aria-label]="lang.wittyCheck" (keydown)="handleKeyboardEvent($event)"
-            [attr.aria-keyshortcuts]="shortcuts.wittyCheck.key"
-            title="{{ lang.wittyCheck }} ({{ shortcuts.wittyCheck.key }})">{{lang.wittyCheck}}</button>
-        <div *ngIf="isLoggedin && !trialExpired" class="witty-works-ext-selection-info">
-            <p>{{lang.howToSelectText.replace(':count', maxTextLength)}}</p>
-        </div>
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+    @if (isLoggedin && !trialExpired) {
+      <button tabindex="0"
+        class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="checkText()"
+        [attr.aria-label]="lang.wittyCheck" (keydown)="handleKeyboardEvent($event)"
+        [attr.aria-keyshortcuts]="shortcuts.wittyCheck.key"
+      title="{{ lang.wittyCheck }} ({{ shortcuts.wittyCheck.key }})">{{lang.wittyCheck}}</button>
+    }
+    @if (isLoggedin && !trialExpired) {
+      <div class="witty-works-ext-selection-info">
+        <p>{{lang.howToSelectText.replace(':count', maxTextLength)}}</p>
+      </div>
+    }
+  </div>
+
+  @if (!isLoggedin && !isLoggedInWord) {
+    <div tabindex="0" class="number-spelling-errors">
+      <p>{{lang.wittyInfos}}</p>
     </div>
+  }
 
-    <div *ngIf="!isLoggedin && !isLoggedInWord" tabindex="0" class="number-spelling-errors">
-        <p>{{lang.wittyInfos}}</p>
+  @if (trialExpired) {
+    <div
+      style="margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
+      <img src="assets/icons/caution-sign.svg" style="margin-right: 5px;" />
+      <span>
+        <a (click)="openDashboard()"
+          style="color: inherit; font-weight: bold; text-decoration: underline; margin-left: 0.25em; cursor: pointer;"
+        role="link" tabindex="0" (click)=$event.preventDefault() target="_blank">Upgrade Witty</a>
+      </span>
+      <div style="margin-top: 10px">
+        {{ lang.trialExpired }}
+      </div>
     </div>
+  }
 
-    <div *ngIf="trialExpired"
-        style="margin: 20px; padding: 20px; background-color: #1ebbee; color: white; font-size: 16px;">
-        <img src="assets/icons/caution-sign.svg" style="margin-right: 5px;" />
-        <span>
-            <a (click)="openDashboard()"
-                style="color: inherit; font-weight: bold; text-decoration: underline; margin-left: 0.25em; cursor: pointer;"
-                role="link" tabindex="0" (click)=$event.preventDefault() target="_blank">Upgrade Witty</a>
-        </span>
-        <div style="margin-top: 10px">
-            {{ lang.trialExpired }}
-        </div>
+  @if (!isLoggedin && isLoggedInWord && !trialExpired) {
+    <div tabindex="0" class="number-spelling-errors">
+      <p>{{lang.wittyInfos}}</p>
+      <br />
+      <p>{{lang.pleaseRegister}}</p>
+      <br />
+      <div class="button-spinner-row">
+        <button class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="register()"
+        [attr.aria-label]="lang.register">{{lang.register}}</button>
+        @if (showSpinner) {
+          <div class="lds-spinner">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        }
+      </div>
     </div>
+  }
 
-    <div *ngIf="!isLoggedin && isLoggedInWord && !trialExpired" tabindex="0" class="number-spelling-errors">
-        <p>{{lang.wittyInfos}}</p>
+  <div [ngClass]="{'lds-spinner-container': isSpellchecking}">
+    <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale"
+      [showSpinner]="isSpellchecking" style="opacity: 70%; z-index: 99999999;" [fullScreen]="false">
+      <p style="color:#f06464; padding-top: 85px;" aria-live="polite" role="alert">{{lang.loading}}</p>
+    </ngx-spinner>
+  </div>
 
-        <br />
+  <div aria-live="polite" aria-atomic="true">
+    @if (isLoggedInWord && highlightsList.length > 0) {
+      <div class="number-spelling-errors">
+        {{ highlightsList.length }} {{highlightsList.length == 1 ? lang.suggestion : lang.suggestions}}:
+      </div>
+    }
 
-        <p>{{lang.pleaseRegister}}</p>
+    @if (!isSpellchecking && isLoggedInWord && highlightsList.length === 0 && hasSpellcheckingRun) {
+      <div
+        class="number-spelling-errors">
+        {{ lang.noIssue }}
+      </div>
+    }
+  </div>
 
-        <br />
-        <div class="button-spinner-row">
-            <button class="witty-works-ext-button witty-works-ext-primary-button-red" (click)="register()"
-                [attr.aria-label]="lang.register">{{lang.register}}</button>
-
-            <div *ngIf="showSpinner" class="lds-spinner">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-            </div>
-        </div>
+  @if (hitMaxTextLength && isLoggedInWord && !isFirstRun && highlightsList.length > 0) {
+    <div
+      class="max-length-reached-banner" role="alert" aria-live="assertive">
+      <img src="assets/icons/caution-sign.svg" alt="{{lang.cautionIconAlt}}" style="margin-right: 5px;">
+      <span>{{lang.hitMaxTextLength}}</span>
     </div>
+  }
 
-    <div [ngClass]="{'lds-spinner-container': isSpellchecking}">
-        <ngx-spinner bdColor="rgb(255, 255, 255)" size="medium" color="#f06464" type="line-scale"
-            [showSpinner]="isSpellchecking" style="opacity: 70%; z-index: 99999999;" [fullScreen]="false">
-            <p style="color:#f06464; padding-top: 85px;" aria-live="polite" role="alert">{{lang.loading}}</p>
-        </ngx-spinner>
-    </div>
-
-    <div aria-live="polite" aria-atomic="true">
-        <div *ngIf="isLoggedInWord && highlightsList.length > 0" class="number-spelling-errors">
-            {{ highlightsList.length }} {{highlightsList.length == 1 ? lang.suggestion : lang.suggestions}}:
-        </div>
-
-        <div *ngIf="!isSpellchecking && isLoggedInWord && highlightsList.length === 0 && hasSpellcheckingRun"
-            class="number-spelling-errors">
-            {{ lang.noIssue }}
-        </div>
-    </div>
-
-    <div *ngIf="hitMaxTextLength && isLoggedInWord && !isFirstRun && highlightsList.length > 0"
-        class="max-length-reached-banner" role="alert" aria-live="assertive">
-        <img src="assets/icons/caution-sign.svg" alt="{{lang.cautionIconAlt}}" style="margin-right: 5px;">
-        <span>{{lang.hitMaxTextLength}}</span>
-    </div>
-
+  @if (isLoggedInWord && !isFirstRun && highlightsList.length > 0) {
     <app-errors-list [highlights]="highlightsList" [paragraphs]="paragraphsByUniqueId"
-        (highlightEvent)="highlight($event)" (acceptSuggestionEvent)="acceptSuggestion($event)"
-        *ngIf="isLoggedInWord && !isFirstRun && highlightsList.length > 0">
+      (highlightEvent)="highlight($event)" (acceptSuggestionEvent)="acceptSuggestion($event)"
+      >
     </app-errors-list>
+  }
 
-    <div class="full-size-notification" *ngIf="isLoggedInWord && isFirstRun && isLoggedin">
-        <h1 class="click-witty-check-text">{{lang.clickWittyCheck}}</h1>
-
-        <div class="keyboard-shortcut-info" tabindex="0">
-            <table>
-                <caption style="text-align: left;">{{ lang.keyboardShortcuts }}</caption>
-                <tr>
-                    <th scope="col">{{ lang.keyboardShortcut }}</th>
-                    <th scope="col">{{ lang.keyboardFunction }}</th>
-                </tr>
-                <tr>
-                    <td>{{shortcuts.wittyCheck.key}}</td>
-                    <td>{{lang.wittyCheck}}</td>
-                </tr>
-                <tr>
-                    <td>{{shortcuts.ignoreOnce.key}}</td>
-                    <td>{{lang.ignoreOnce}}</td>
-                </tr>
-                <tr>
-                    <td>{{shortcuts.ignorePermanently.key}}</td>
-                    <td>{{lang.ignorePermanently}}</td>
-                </tr>
-            </table>
-        </div>
-
+  @if (isLoggedInWord && isFirstRun && isLoggedin) {
+    <div class="full-size-notification">
+      <h1 class="click-witty-check-text">{{lang.clickWittyCheck}}</h1>
+      <div class="keyboard-shortcut-info" tabindex="0">
+        <table>
+          <caption style="text-align: left;">{{ lang.keyboardShortcuts }}</caption>
+          <tr>
+            <th scope="col">{{ lang.keyboardShortcut }}</th>
+            <th scope="col">{{ lang.keyboardFunction }}</th>
+          </tr>
+          <tr>
+            <td>{{shortcuts.wittyCheck.key}}</td>
+            <td>{{lang.wittyCheck}}</td>
+          </tr>
+          <tr>
+            <td>{{shortcuts.ignoreOnce.key}}</td>
+            <td>{{lang.ignoreOnce}}</td>
+          </tr>
+          <tr>
+            <td>{{shortcuts.ignorePermanently.key}}</td>
+            <td>{{lang.ignorePermanently}}</td>
+          </tr>
+        </table>
+      </div>
+      @if (isLoggedInWord && !isFirstRun && highlightsList.length === 0 && !isSpellchecking) {
         <div class="full-size-notification"
-            *ngIf="isLoggedInWord && !isFirstRun && highlightsList.length === 0 && !isSpellchecking">
-            <span>{{lang.noFurtherSuggestions}}</span>
+          >
+          <span>{{lang.noFurtherSuggestions}}</span>
         </div>
-
-        <ng-template #errorDialog>
-            <header>
-                <h4>{{lang.error}}</h4>
-            </header>
-            <div>
-                <p>{{ errorIntro }}: <em>{{ errorMessage }}</em></p>
-                <p style="margin-top: 24px;">{{lang.tryAgain}}</p>
-            </div>
-            <footer>
-                <button class="secondary" (click)="dialogRef?.close(undefined)" style="margin-right: 12px;"
-                    [attr.aria-label]="lang.dontAnalyzeAgain">{{lang.dontAnalyzeAgain}}</button>
-                <button (click)="dialogRef?.close('search')"
-                    [attr.aria-label]="lang.analyzeAgain">{{lang.analyzeAgain}}</button>
-            </footer>
-        </ng-template>
+      }
+      <ng-template #errorDialog>
+        <header>
+          <h4>{{lang.error}}</h4>
+        </header>
+        <div>
+          <p>{{ errorIntro }}: <em>{{ errorMessage }}</em></p>
+          <p style="margin-top: 24px;">{{lang.tryAgain}}</p>
+        </div>
+        <footer>
+          <button class="secondary" (click)="dialogRef?.close(undefined)" style="margin-right: 12px;"
+          [attr.aria-label]="lang.dontAnalyzeAgain">{{lang.dontAnalyzeAgain}}</button>
+          <button (click)="dialogRef?.close('search')"
+          [attr.aria-label]="lang.analyzeAgain">{{lang.analyzeAgain}}</button>
+        </footer>
+      </ng-template>
     </div>
+  }

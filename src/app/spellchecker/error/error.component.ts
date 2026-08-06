@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, HostListener, WritableSignal, signal, ViewEncapsulation } from "@angular/core";
+import { Component, EventEmitter, Input, Output, HostListener, WritableSignal, signal, ViewEncapsulation, ChangeDetectionStrategy } from "@angular/core";
 import { ISpellingError, } from "../../data/data-structures";
 import TextUtils from "../../utils/text.utils";
 import { CheckingService } from "../../services/checking.service";
@@ -6,9 +6,9 @@ import { IgnoreService } from "../../services/ignore.service";
 import { AuthService } from '../../services/auth.service';
 import { SpellcheckerComponent } from "../spellchecker.component";
 import { IAlert, IAlternative, IRephrasingResult, DiffChange } from "../../data/types";
-import { useAnalytics } from "src/app/analytics/analytics";
+import { useAnalytics } from "../../analytics/analytics";
 import * as Sentry from "@sentry/browser";
-import { KEYBOARD_SHORTCUTS_CONFIG } from "src/app/keyboard-shortcuts.config";
+import { KEYBOARD_SHORTCUTS_CONFIG } from "../../keyboard-shortcuts.config";
 import { getLanguageModule } from '../../utils/language.utils';
 import { TxtSentenceNode } from 'sentence-splitter';
 import { diffWords } from 'diff';
@@ -20,6 +20,7 @@ const analytics = useAnalytics();
     templateUrl: "./error.component.html",
     styleUrls: ["./error.component.scss"],
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ErrorComponent {
@@ -90,11 +91,11 @@ export class ErrorComponent {
   }
 
   private computeDiff(language: string, originalSentence: string, newSentence: string) {
-    let options = {
+    const options = {
       intlSegmenter: new (Intl as any).Segmenter(language, { granularity: 'word' })
     }
 
-    let diffElements: DiffChange[] = diffWords(
+    const diffElements: DiffChange[] = diffWords(
       originalSentence,
       newSentence,
       options

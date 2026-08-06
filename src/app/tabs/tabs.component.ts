@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { TabType } from "../data/tabs";
 import { getLanguageModule } from '../utils/language.utils';
 
@@ -6,6 +6,7 @@ import { getLanguageModule } from '../utils/language.utils';
     selector: 'app-tabs',
     templateUrl: './tabs.component.html',
     styleUrls: ['./tabs.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class TabsComponent implements OnInit {

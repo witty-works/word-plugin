@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { ISpellingError } from "../../data/data-structures";
 import { SettingsService } from "../../services/settings.service";
 import { Subscription } from "rxjs";
@@ -8,6 +8,7 @@ import { IAlternative } from "../../data/types";
     selector: 'app-errors-list',
     templateUrl: './errors-list.component.html',
     styleUrls: ['./errors-list.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ErrorsListComponent implements OnInit, OnDestroy {

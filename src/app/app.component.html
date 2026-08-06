@@ -1,10 +1,14 @@
 <div id="main-content">
-    <div role="tabpanel">
-        <app-spellchecker *ngIf="selectedTab === 'spellchecker'"></app-spellchecker>
-        <app-settings *ngIf="selectedTab === 'settings'"></app-settings>
-    </div>
+  <div role="tabpanel">
+    @if (selectedTab === 'spellchecker') {
+      <app-spellchecker></app-spellchecker>
+    }
+    @if (selectedTab === 'settings') {
+      <app-settings></app-settings>
+    }
+  </div>
 </div>
 
 <div id="tabs">
-    <app-tabs [selectedTab]="selectedTab" (tabChangedEvent)="tabChanged($event)"></app-tabs>
+  <app-tabs [selectedTab]="selectedTab" (tabChangedEvent)="tabChanged($event)"></app-tabs>
 </div>

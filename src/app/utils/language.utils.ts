@@ -1,4 +1,4 @@
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 import { en, de, fr } from './../translations';
 
 export function getLanguageModule(): any {
