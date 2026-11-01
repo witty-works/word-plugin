@@ -34,7 +34,7 @@
     "@angular/forms": "^22.1.0",
     "@angular/platform-browser": "^22.1.0",
     "@angular/platform-browser-dynamic": "^22.1.0",
-    "@angular/router": "^22.1.0",
+    "@angular/router": "^22.2.1",
     "@iharbeck/ngx-virtual-scroller": "^20.0.0",
     "@ngneat/dialog": "^5.2.1",
     "@sentry/angular": "^10.69.0",
