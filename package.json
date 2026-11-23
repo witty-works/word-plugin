@@ -62,7 +62,7 @@
     "@types/node": "^24.13.3",
     "@types/office-js": "^1.0.604",
     "@types/office-runtime": "^1.0.40",
-    "eslint": "^10.8.0",
+    "eslint": "^10.15.0",
     "istanbul-lib-instrument": "^6.0.3",
     "jasmine-core": "^6.3.0",
     "karma": "^6.4.4",
@@ -74,7 +74,15 @@
     "office-addin-dev-certs": "^2.0.10",
     "office-addin-manifest": "^3.0.1",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.66.0"
+    "typescript-eslint": "^8.73.0"
+  },
+  "//": [
+    "overrides: @microsoft/teamsfx-core 3.1.5 asks for glob ^13, which needs minimatch 10 (GHSA-g3hv-75wg-m249). glob 14 depends on minimatch 11 and keeps the glob() call with the nodir and dot options that teamsfx-core makes. Remove the override once teamsfx-core moves to glob 14."
+  ],
+  "overrides": {
+    "@microsoft/teamsfx-core": {
+      "glob": "^14.0.6"
+    }
   },
   "engines": {
     "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
