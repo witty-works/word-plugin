@@ -20,7 +20,7 @@
     "validate": "office-addin-manifest validate ./src/manifest.xml",
     "validate:prod": "office-addin-manifest validate ./src/manifest-prod.xml"
   },
-  "license": "proprietary",
+  "license": "MIT",
   "config": {
     "app-to-debug": "word",
     "app-type-to-debug": "desktop",
