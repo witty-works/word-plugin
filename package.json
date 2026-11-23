@@ -71,7 +71,7 @@
     "karma-jasmine": "^5.1.0",
     "karma-jasmine-html-reporter": "^2.3.0",
     "office-addin-debugging": "^7.0.1",
-    "office-addin-dev-certs": "^2.0.10",
+    "office-addin-dev-certs": "^3.0.1",
     "office-addin-manifest": "^3.0.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.73.0"
