@@ -1,0 +1,28 @@
+# Dependabot reads package.json and package-lock.json. Security updates are
+# switched on in the repository settings and open pull requests against the
+# default branch, dev; the options below shape them and the weekly version
+# updates. The repository has no GitHub Actions workflows, so there is no
+# github-actions entry.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    # Version updates wait a week after a release, so a compromised or broken
+    # release has time to be pulled before it is proposed here.
+    cooldown:
+      default-days: 7
+    labels:
+      - dependencies
+    groups:
+      # Minor and patch updates in one weekly pull request; major versions
+      # come one pull request each, because they can need code changes.
+      npm:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
