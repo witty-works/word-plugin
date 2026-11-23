@@ -58,7 +58,7 @@
     "@angular/cli": "^22.2.7",
     "@angular/compiler-cli": "^22.2.6",
     "@eslint/js": "^10.0.1",
-    "@types/jasmine": "^6.0.0",
+    "@types/jasmine": "^7.0.0",
     "@types/node": "^24.13.3",
     "@types/office-js": "^1.0.617",
     "@types/office-runtime": "^1.0.40",
