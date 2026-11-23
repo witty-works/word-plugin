@@ -41,7 +41,7 @@
     "@sentry/cli": "^3.8.2",
     "core-js": "^3.51.0",
     "diff": "^9.0.0",
-    "ngx-spinner": "^21.1.0",
+    "ngx-spinner": "^22.0.1",
     "posthog-js-lite": "^4.14.0",
     "rxjs": "~7.8.0",
     "sentence-splitter": "^5.1.0",
