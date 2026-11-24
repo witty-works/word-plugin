@@ -299,7 +299,7 @@ export class SpellcheckerComponent implements OnInit {
         }
       }
 
-      if (!response || response === undefined || response?.status === 403) { //could not authenticate dashboard
+      if (!response || response === undefined || response?.status === 401 || response?.status === 403) { //could not authenticate dashboard: 401 refused token, 403 not let in
         this.isLoggedin = false;
         localStorage.setItem('is_logged_in', 'false');
         return;
