@@ -92,7 +92,7 @@ export class AuthService {
             this.makeAuthRequest(parseInt(authFailCounter) <= 2);
           }, 1000);
         } else if (stopTrying) {
-          const url = `${environment.dashboard}office-register?token=${accessTokenWithTimestamp?.token}`;
+          const url = `${environment.dashboard}office-register#token=${encodeURIComponent(accessTokenWithTimestamp?.token ?? '')}`;
           if (Office && Office.context && Office.context.ui) {
             Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
               if (result.status === Office.AsyncResultStatus.Failed) {

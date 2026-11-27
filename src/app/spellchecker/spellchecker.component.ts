@@ -343,7 +343,7 @@ export class SpellcheckerComponent implements OnInit {
     try {
       analytics.openLinkLog('dashboard_open');
       const accessToken = await Office.auth.getAccessToken(); //can always fetch new here as you will never manage to reach throttle limit
-      const url = `${environment.dashboard}office-login?token=${accessToken}`;
+      const url = `${environment.dashboard}office-login#token=${encodeURIComponent(accessToken)}`;
       Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
         if (result.status === Office.AsyncResultStatus.Failed) {
           console.log('result.error', result.error);
@@ -511,7 +511,7 @@ export class SpellcheckerComponent implements OnInit {
           if (!newHighlights) return;
           this.checkEndpointResponse = newHighlights;
           if (this.checkEndpointResponse.results.length > 0 && !this.checkEndpointResponse.results[0].alternatives) {  //prompt user to register on dashboard   
-            const url = environment.dashboard + 'office-register?token=' + accessTokenWithTimestamp.token;
+            const url = environment.dashboard + 'office-register#token=' + encodeURIComponent(accessTokenWithTimestamp.token);
             Office.context.ui.displayDialogAsync(url, { height: 80, width: 80 }, function (result) {
               if (result.status === Office.AsyncResultStatus.Failed) {
                 console.error('result.error', result.error);
